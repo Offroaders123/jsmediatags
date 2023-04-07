@@ -7,15 +7,9 @@
  * http://id3.org/id3v2.4.0-structure
  *
  * TODO: Padding and Footer
- * @flow
  */
-'use strict';
 
-const ByteArrayUtils = require('./ByteArrayUtils');
-const bin = ByteArrayUtils.bin;
-const getSynchsafeInteger32 = ByteArrayUtils.getSynchsafeInteger32;
-const getInteger32 = ByteArrayUtils.getInteger32;
-const getInteger24 = ByteArrayUtils.getInteger24;
+import { bin, getSynchsafeInteger32, getInteger32, getInteger24 } from './ByteArrayUtils';
 
 // Offsets
 const FLAGS = 5;
@@ -28,25 +22,23 @@ const START_EXTENDED_DATA_V4 = 16;
 // Sizes
 const HEADER_SIZE = 10;
 
-import type {
-  ByteArray,
-  TagHeaderFlags,
-  TagFrameFlags
-} from './FlowTypes';
+import type { ByteArray, TagHeaderFlags, TagFrameFlags } from './FlowTypes';
 
-class ID3v2TagContents {
-  _size: number;
-  _major: number;
-  _revision: number;
-  _contents: ByteArray;
-  _frames: {[key: string]: Array<ByteArray>};
-  _extendedHeader: {
+export default class ID3v2TagContents {
+  declare _size: number;
+  declare _major: number;
+  declare _revision: number;
+  declare _contents: ByteArray;
+  declare _frames: {
+    [key: string]: ByteArray[];
+  };
+  declare _extendedHeader: {
     UPDATE: number,
     CRC: number,
     RESTRICTIONS: number
   };
-  _hasExtendedHeader: boolean;
-  _nextFrameOffset: number;
+  declare _hasExtendedHeader: boolean;
+  declare _nextFrameOffset: number;
 
   constructor(major: number, revision: number) {
     if (major < 2 || major > 4) {
@@ -56,6 +48,7 @@ class ID3v2TagContents {
     this._major = major;
     this._revision = revision;
     this._contents = [].concat(
+      // @ts-expect-error
       bin("ID3"),
       [major, revision],
       [0], // flags
@@ -79,12 +72,12 @@ class ID3v2TagContents {
     return this._updateFlags(flags, 0);
   }
 
-  _updateFlags(flags: TagHeaderFlags, binaryFlags?: number): ID3v2TagContents {
+  _updateFlags(flags: Partial<TagHeaderFlags>, binaryFlags?: number): ID3v2TagContents {
     if (typeof binaryFlags !== 'number') {
       binaryFlags = this._contents[FLAGS] || 0;
     }
 
-    function setOrUnsetBit(shouldSet, bitmap, bit) {
+    function setOrUnsetBit(shouldSet: boolean, bitmap: number, bit: number) {
       if (shouldSet) {
         return bitmap |= 1<<bit;
       } else {
@@ -228,7 +221,7 @@ class ID3v2TagContents {
     flags?: TagFrameFlags,
     noFlagsDataLength?: number
   ): ID3v2TagContents {
-    var size = 0;
+    var size: number | ByteArray = 0;
     var frameFlags = [0, 0];
     if (flags) {
       flags.message = flags.message || {};
@@ -259,14 +252,14 @@ class ID3v2TagContents {
         frameFlags[0] |= (flags.message.read_only ? 1 : 0) << 5;
         frameFlags[1] |= (flags.format.compression ? 1 : 0) << 7;
         frameFlags[1] |= (flags.format.encryption ? 1 : 0) << 6;
-        frameFlags[1] |= (flags.format.grouping_identify ? 1 : 0) << 5;
+        frameFlags[1] |= (flags.format.grouping_identity ? 1 : 0) << 5;
       }
     } else if (this._major === 4) {
       if (flags) {
         frameFlags[0] |= (flags.message.tag_alter_preservation ? 1 : 0) << 6;
         frameFlags[0] |= (flags.message.file_alter_preservation ? 1 : 0) << 5;
         frameFlags[0] |= (flags.message.read_only ? 1 : 0) << 4;
-        frameFlags[1] |= (flags.format.grouping_identify ? 1 : 0) << 6;
+        frameFlags[1] |= (flags.format.grouping_identity ? 1 : 0) << 6;
         frameFlags[1] |= (flags.format.compression ? 1 : 0) << 3;
         frameFlags[1] |= (flags.format.encryption ? 1 : 0) << 2;
         frameFlags[1] |= (flags.format.unsynchronisation ? 1 : 0) << 1;
@@ -281,6 +274,7 @@ class ID3v2TagContents {
     }
 
     var frame = [].concat(
+      // @ts-expect-error
       bin(id),
       size,
       frameFlags,
@@ -314,12 +308,14 @@ class ID3v2TagContents {
         if (key === tagKey) {
           break;
         } else {
+          // @ts-expect-error
           offset += this._extendedHeader[key];
         }
       }
     }
 
     var data = [tagData.length].concat(tagData);
+    // @ts-expect-error
     this._extendedHeader[tagKey] = data.length;
     this._addData(offset, data);
   }
@@ -336,6 +332,7 @@ class ID3v2TagContents {
       ]);
     } else if (this._major === 4) {
       this._addData(EXTENDED_HEADER, [].concat(
+        // @ts-expect-error
         getSynchsafeInteger32(6), // size
         [1], // number of flag bytes
         [0] // extended flags
@@ -355,6 +352,7 @@ class ID3v2TagContents {
       // Extended header data size
       for (var key in this._extendedHeader) {
         if (this._extendedHeader.hasOwnProperty(key)) {
+          // @ts-expect-error
           size += this._extendedHeader[key];
         }
       }
@@ -385,6 +383,7 @@ class ID3v2TagContents {
   }
 
   _setData(offset: number, data: ByteArray) {
+    // @ts-expect-error
     this._contents.splice.apply(this._contents, [
       offset,
       data.length,
@@ -392,11 +391,10 @@ class ID3v2TagContents {
   }
 
   _addData(offset: number, data: ByteArray) {
+    // @ts-expect-error
     this._contents.splice.apply(this._contents, [
       offset,
       0,
     ].concat(data));
   }
 }
-
-module.exports = ID3v2TagContents;

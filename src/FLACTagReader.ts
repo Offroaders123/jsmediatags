@@ -1,11 +1,14 @@
-var MediaTagReader = require('./MediaTagReader');
+import MediaFileReader from './MediaFileReader';
+import MediaTagReader from './MediaTagReader';
 
-/* The first 4 bytes of a FLAC file describes the header for the file. If these
+/**
+ * The first 4 bytes of a FLAC file describes the header for the file. If these
  * bytes respectively read "fLaC", we can determine it is a FLAC file.
  */
 const FLAC_HEADER_SIZE = 4;
 
-/* FLAC metadata is stored in blocks containing data ranging from STREAMINFO to
+/**
+ * FLAC metadata is stored in blocks containing data ranging from STREAMINFO to
  * VORBIS_COMMENT, which is what we want to work with.
  *
  * Each metadata header is 4 bytes long, with the first byte determining whether
@@ -26,7 +29,9 @@ const FLAC_HEADER_SIZE = 4;
 const COMMENT_HEADERS = [4, 132];
 const PICTURE_HEADERS = [6, 134];
 
-// These are the possible image types as defined by the FLAC specification.
+/**
+ * These are the possible image types as defined by the FLAC specification.
+ */
 const IMAGE_TYPES = [
   "Other",
   "32x32 pixels 'file icon' (PNG only)",
@@ -49,20 +54,16 @@ const IMAGE_TYPES = [
   "Illustration",
   "Band/artist logotype",
   "Publisher/Studio logotype"
-];
+] as const;
 
-import type {
-  LoadCallbackType,
-  ByteRange,
-  TagType
-} from './FlowTypes';
+import type { LoadCallbackType, ByteRange, TagType } from './FlowTypes';
 
 /**
  * Class representing a MediaTagReader that parses FLAC tags.
  */
-class FLACTagReader extends MediaTagReader {
-  _commentOffset: number;
-  _pictureOffset: number;
+export default class FLACTagReader extends MediaTagReader {
+  declare _commentOffset: number;
+  declare _pictureOffset: number;
 
   /**
    * Gets the byte range for the tag identifier.
@@ -71,7 +72,7 @@ class FLACTagReader extends MediaTagReader {
    * location, we can only load the first 4 bytes of the file to confirm it
    * is a FLAC first.
    *
-   * @return {ByteRange} The byte range that identifies the tag for a FLAC.
+   * @return The byte range that identifies the tag for a FLAC.
    */
   static getTagIdentifierByteRange(): ByteRange {
     return {
@@ -87,9 +88,9 @@ class FLACTagReader extends MediaTagReader {
    * according to the FLAC file specification should be the characters that
    * indicate a FLAC file.
    *
-   * @return {boolean} True if the header is fLaC, false otherwise.
+   * @return True if the header is fLaC, false otherwise.
    */
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static canReadTagFormat(tagIdentifier: number[]): boolean {
     var id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 4));
     return id === 'fLaC';
   }
@@ -102,8 +103,8 @@ class FLACTagReader extends MediaTagReader {
    * is passed on to the _loadBlock function, which will handle the rest of the
    * parsing for the metadata blocks.
    *
-   * @param {MediaFileReader} mediaFileReader - The MediaFileReader used to parse the file.
-   * @param {LoadCallbackType} callbacks - The callback to call once _loadData is completed.
+   * @param mediaFileReader - The MediaFileReader used to parse the file.
+   * @param callbacks - The callback to call once _loadData is completed.
    */
   _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
     var self = this;
@@ -130,9 +131,9 @@ class FLACTagReader extends MediaTagReader {
    *
    * More info on the FLAC specification may be found here:
    * https://xiph.org/flac/format.html
-   * @param {MediaFileReader} mediaFileReader - The MediaFileReader used to parse the file.
-   * @param {number} offset - The offset to start checking the header from.
-   * @param {LoadCallbackType} callbacks - The callback to call once the header has been found.
+   * @param mediaFileReader - The MediaFileReader used to parse the file.
+   * @param offset - The offset to start checking the header from.
+   * @param callbacks - The callback to call once the header has been found.
    */
   _loadBlock(
     mediaFileReader: MediaFileReader,
@@ -140,16 +141,19 @@ class FLACTagReader extends MediaTagReader {
     callbacks: LoadCallbackType
   ) {
     var self = this;
-    /* As mentioned above, this first byte is loaded to see what metadata type
+    /**
+     * As mentioned above, this first byte is loaded to see what metadata type
      * this block represents.
      */
     var blockHeader = mediaFileReader.getByteAt(offset);
-    /* The last three bytes (integer 24) contain a value representing the length
+    /**
+     * The last three bytes (integer 24) contain a value representing the length
      * of the following metadata block. The 1 is added in order to shift the offset
      * by one to get the last three bytes in the block header.
      */
     var blockSize = mediaFileReader.getInteger24At(offset + 1, true);
-    /* This conditional checks if blockHeader (the byte retrieved representing the
+    /**
+     * This conditional checks if blockHeader (the byte retrieved representing the
      * type of the header) is one the headers we are looking for.
      *
      * If that is not true, the block is skipped over and the next range is loaded:
@@ -161,7 +165,8 @@ class FLACTagReader extends MediaTagReader {
      * header.
      */
     if (COMMENT_HEADERS.indexOf(blockHeader) !== -1) {
-      /* 4 is added to offset to move it to the head of the actual metadata.
+      /**
+       * 4 is added to offset to move it to the head of the actual metadata.
        * The range starting from offsetMatadata (the beginning of the block)
        * and offsetMetadata + blockSize (the end of the block) is loaded.
        */
@@ -195,11 +200,11 @@ class FLACTagReader extends MediaTagReader {
    *
    * If the block does not exist, the error callback is called. Otherwise, the function
    * will call the success callback, allowing data parsing to begin.
-   * @param {MediaFileReader} mediaFileReader - The MediaFileReader used to parse the file.
-   * @param {number} offset - The offset that the existing header was located at.
-   * @param {number} blockHeader - An integer reflecting the header type of the block.
-   * @param {number} blockSize - The size of the previously processed header.
-   * @param {LoadCallbackType} callbacks - The callback functions to be called.
+   * @param mediaFileReader - The MediaFileReader used to parse the file.
+   * @param offset - The offset that the existing header was located at.
+   * @param blockHeader - An integer reflecting the header type of the block.
+   * @param blockSize - The size of the previously processed header.
+   * @param callbacks - The callback functions to be called.
    */
   _nextBlock(
     mediaFileReader: MediaFileReader,
@@ -211,7 +216,7 @@ class FLACTagReader extends MediaTagReader {
     var self = this;
     if (blockHeader > 127) {
       if (!self._commentOffset) {
-        callbacks.onError({
+        callbacks.onError?.({
           "type": "loadData",
           "info": "Comment block could not be found."
         });
@@ -243,11 +248,11 @@ class FLACTagReader extends MediaTagReader {
    *
    * Note that the longs and integers in this block are encoded in little endian
    * as opposed to big endian for the rest of the FLAC spec.
-   * @param {MediaFileReader} data - The MediaFileReader to parse the file with.
-   * @param {Array<string>} [tags] - Optional tags to also be retrieved from the file.
-   * @return {TagType} - An object containing the tag information for the file.
+   * @param data - The MediaFileReader to parse the file with.
+   * @param tags - Optional tags to also be retrieved from the file.
+   * @return - An object containing the tag information for the file.
    */
-  _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  _parseData(data: MediaFileReader, tags?: string[]): TagType {
     var vendorLength = data.getLongAt(this._commentOffset, false);
     var offsetVendor = this._commentOffset + 4;
     /* This line is able to retrieve the vendor string that the VorbisComment block
@@ -314,7 +319,7 @@ class FLACTagReader extends MediaTagReader {
       var offsetDataLength = offsetDescription + descriptionLength + 16;
       var dataLength = data.getLongAt(offsetDataLength, true);
       var offsetData = offsetDataLength + 4;
-      var imageData = data.getBytesAt(offsetData, dataLength, true);
+      var imageData = data.getBytesAt(offsetData, dataLength);
       picture = {
         format: mime,
         type: IMAGE_TYPES[imageType],
@@ -338,5 +343,3 @@ class FLACTagReader extends MediaTagReader {
     return tag;
   }
 }
-
-module.exports = FLACTagReader;

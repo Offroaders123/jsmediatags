@@ -1,21 +1,13 @@
-/**
- * @flow
- */
-'use strict';
+import * as fs from 'node:fs';
 
-const fs = require('fs');
+import ChunkedFileData from './ChunkedFileData';
+import MediaFileReader from './MediaFileReader';
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import type { LoadCallbackType } from './FlowTypes';
 
-import type {
-  LoadCallbackType
-} from './FlowTypes';
-
-
-class NodeFileReader extends MediaFileReader {
-  _path: string;
-  _fileData: ChunkedFileData;
+export default class NodeFileReader extends MediaFileReader {
+  declare _path: string;
+  declare _fileData: ChunkedFileData;
 
   constructor(path: string) {
     super();
@@ -63,7 +55,7 @@ class NodeFileReader extends MediaFileReader {
       return;
     }
 
-    var readData = function(err, _fd) {
+    function readData(err: NodeJS.ErrnoException | null, _fd: number) {
       if (err) {
         onError({"type": "fs", "info": err});
         return;
@@ -76,7 +68,7 @@ class NodeFileReader extends MediaFileReader {
       fs.read(_fd, buffer, 0, length, range[0], processData);
     };
 
-    var processData = function(err, bytesRead, buffer) {
+    function processData(err: NodeJS.ErrnoException | null, bytesRead: number, buffer: Buffer) {
       fs.close(fd, function(err) {
         if (err) {
           console.error(err);
@@ -92,7 +84,7 @@ class NodeFileReader extends MediaFileReader {
       onSuccess();
     };
 
-    var storeBuffer = function(buffer) {
+    function storeBuffer(buffer: Buffer) {
       var data = Array.prototype.slice.call(buffer, 0, length);
       fileData.addData(range[0], data);
     }
@@ -100,5 +92,3 @@ class NodeFileReader extends MediaFileReader {
     fs.open(this._path, "r", undefined, readData);
   }
 }
-
-module.exports = NodeFileReader;

@@ -1,27 +1,12 @@
-/**
- * @flow
- */
-'use strict';
+import MediaTagReader from './MediaTagReader';
+import MediaFileReader from './MediaFileReader';
+import ID3v2FrameReader from './ID3v2FrameReader';
 
-var MediaTagReader = require('./MediaTagReader');
-var MediaFileReader = require('./MediaFileReader');
-var ID3v2FrameReader = require('./ID3v2FrameReader');
-
-import type {
-  CallbackType,
-  LoadCallbackType,
-  TagFrames,
-  TagHeader,
-  TagFrameHeader,
-  TagFrameFlags,
-  CharsetType,
-  ByteRange,
-  TagType,
-} from './FlowTypes';
+import type { CallbackType, LoadCallbackType, TagFrames, TagHeader, TagFrameHeader, TagFrameFlags, CharsetType, ByteRange, TagType } from './FlowTypes';
 
 const ID3_HEADER_SIZE = 10;
 
-class ID3v2TagReader extends MediaTagReader {
+export default class ID3v2TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // ID3 header
     return {
@@ -30,7 +15,7 @@ class ID3v2TagReader extends MediaTagReader {
     };
   }
 
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static canReadTagFormat(tagIdentifier: number[]): boolean {
     var id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
     return id === 'ID3';
   }
@@ -48,7 +33,7 @@ class ID3v2TagReader extends MediaTagReader {
     });
   }
 
-  _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
     var offset = 0;
     var major = data.getByteAt(offset+3);
     if (major > 4) { return {"type": "ID3", "version": ">2.4", "tags": {}}; }
@@ -105,24 +90,28 @@ class ID3v2TagReader extends MediaTagReader {
     var frames = ID3v2FrameReader.readFrames(offset, offsetEnd, data, id3, expandedTags);
     // create shortcuts for most common data.
     for (var name in SHORTCUTS) if (SHORTCUTS.hasOwnProperty(name)) {
+      // @ts-expect-error
       var frameData = this._getFrameData(frames, SHORTCUTS[name]);
       if (frameData) {
+        // @ts-expect-error
         id3.tags[name] = frameData;
       }
     }
 
     for (var frame in frames) if (frames.hasOwnProperty(frame)) {
+      // @ts-expect-error
       id3.tags[frame] = frames[frame];
     }
 
     return id3;
   }
 
-  _getFrameData(frames: TagFrames, ids: Array<string>): ?Object {
+  _getFrameData(frames: TagFrames, ids: string[]): Object | null | void {
     var frame;
     for (var i = 0, id; id = ids[i]; i++) {
       if (id in frames) {
         if (frames[id] instanceof Array) {
+          // @ts-expect-error
           frame = frames[id][0];
         } else {
           frame = frames[id];
@@ -132,11 +121,13 @@ class ID3v2TagReader extends MediaTagReader {
     }
   }
 
-  getShortcuts(): {[key: string]: string|Array<string>} {
+  getShortcuts(): {
+    [key: string]: string | string[];
+  } {
+    // @ts-expect-error
     return SHORTCUTS;
   }
 }
-
 
 const SHORTCUTS = {
   "title"     : ["TIT2", "TT2"],
@@ -148,6 +139,4 @@ const SHORTCUTS = {
   "genre"     : ["TCON", "TCO"],
   "picture"   : ["APIC", "PIC"],
   "lyrics"    : ["USLT", "ULT"]
-};
-
-module.exports = ID3v2TagReader;
+} as const;

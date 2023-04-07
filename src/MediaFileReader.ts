@@ -1,24 +1,13 @@
-/**
- * @flow
- */
-'use strict';
+import { readUTF8String, readUTF16String, readNullTerminatedString } from './StringUtils';
 
-const StringUtils = require('./StringUtils');
+import type { DecodedString } from './StringUtils';
+import type { LoadCallbackType, CharsetType } from './FlowTypes';
 
-import type {
-  DecodedString
-} from './StringUtils';
+export default class MediaFileReader {
+  declare _isInitialized: boolean;
+  declare _size: number;
 
-import type {
-  LoadCallbackType,
-  CharsetType
-} from './FlowTypes';
-
-class MediaFileReader {
-  _isInitialized: boolean;
-  _size: number;
-
-  constructor(path: any) {
+  constructor(path?: any) {
     this._isInitialized = false;
     this._size = 0;
   }
@@ -77,7 +66,7 @@ class MediaFileReader {
     throw new Error("Must implement getByteAt function");
   }
 
-  getBytesAt(offset: number, length: number): Array<number> {
+  getBytesAt(offset: number, length: number): number[] {
     var bytes = new Array(length);
     for( var i = 0; i < length; i++ ) {
       bytes[i] = this.getByteAt(offset+i);
@@ -172,7 +161,7 @@ class MediaFileReader {
   getStringWithCharsetAt(
     offset: number,
     length: number,
-    charset: ?CharsetType
+    charset?: CharsetType
   ): DecodedString {
     var bytes = this.getBytesAt(offset, length);
     var string;
@@ -181,15 +170,15 @@ class MediaFileReader {
       case "utf-16":
       case "utf-16le":
       case "utf-16be":
-        string = StringUtils.readUTF16String(bytes, charset === "utf-16be");
+        string = readUTF16String(bytes, charset === "utf-16be");
         break;
 
       case "utf-8":
-        string = StringUtils.readUTF8String(bytes);
+        string = readUTF8String(bytes);
         break;
 
       default:
-        string = StringUtils.readNullTerminatedString(bytes);
+        string = readNullTerminatedString(bytes);
         break;
     }
 
@@ -220,5 +209,3 @@ class MediaFileReader {
     return size;
   }
 }
-
-module.exports = MediaFileReader;

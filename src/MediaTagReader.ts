@@ -1,20 +1,10 @@
-/**
- * @flow
- */
-'use strict';
+import MediaFileReader from './MediaFileReader';
 
-const MediaFileReader = require('./MediaFileReader');
+import type { CallbackType, LoadCallbackType, ByteRange, TagType } from './FlowTypes';
 
-import type {
-  CallbackType,
-  LoadCallbackType,
-  ByteRange,
-  TagType
-} from './FlowTypes';
-
-class MediaTagReader {
-  _mediaFileReader: MediaFileReader;
-  _tags: ?Array<string>;
+export default class MediaTagReader {
+  declare _mediaFileReader: MediaFileReader;
+  declare _tags?: string[] | null;
 
   constructor(mediaFileReader: MediaFileReader) {
     this._mediaFileReader = mediaFileReader;
@@ -35,11 +25,11 @@ class MediaTagReader {
    * getTagIdentifierByteRange) this function checks if it can read the tag
    * format or not.
    */
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static canReadTagFormat(tagIdentifier: number[]): boolean {
     throw new Error("Must implement");
   }
 
-  setTagsToRead(tags: Array<string>): MediaTagReader {
+  setTagsToRead(tags: string[]): MediaTagReader {
     this._tags = tags;
     return this;
   }
@@ -51,9 +41,10 @@ class MediaTagReader {
       onSuccess: function() {
         self._loadData(self._mediaFileReader, {
           onSuccess: function() {
+            var tags!: TagType;
             try {
-              var tags = self._parseData(self._mediaFileReader, self._tags);
-            } catch (ex) {
+              tags = self._parseData(self._mediaFileReader, self._tags);
+            } catch (ex: any) {
               if (callbacks.onError) {
                 callbacks.onError({
                   "type": "parseData",
@@ -73,7 +64,9 @@ class MediaTagReader {
     });
   }
 
-  getShortcuts(): {[key: string]: (string|Array<string>)} {
+  getShortcuts(): {
+    [key: string]: string | string[];
+  } {
     return {};
   }
 
@@ -90,16 +83,16 @@ class MediaTagReader {
   /**
    * Parse the loaded data to read the media tags.
    */
-  _parseData(mediaFileReader: MediaFileReader, tags: ?Array<string>): TagType {
+  _parseData(mediaFileReader: MediaFileReader, tags?: string[] | null): TagType {
     throw new Error("Must implement _parseData function");
   }
 
-  _expandShortcutTags(tagsWithShortcuts: ?Array<string>): ?Array<string> {
+  _expandShortcutTags(tagsWithShortcuts?: string[] | null): string[] | null | undefined {
     if (!tagsWithShortcuts) {
       return null;
     }
 
-    var tags = [];
+    var tags: string[] = [];
     var shortcuts = this.getShortcuts();
     for (var i = 0, tagOrShortcut; tagOrShortcut = tagsWithShortcuts[i]; i++ ) {
       tags = tags.concat(shortcuts[tagOrShortcut]||[tagOrShortcut]);
@@ -108,5 +101,3 @@ class MediaTagReader {
     return tags;
   }
 }
-
-module.exports = MediaTagReader;

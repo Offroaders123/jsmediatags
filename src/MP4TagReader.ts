@@ -4,23 +4,14 @@
  *   http://atomicparsley.sourceforge.net/mpeg-4files.html
  *   http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/Metadata/Metadata.html
  * Authored by Joshua Kifer <joshua.kifer gmail.com>
- * @flow
  */
-'use strict';
 
-var MediaTagReader = require('./MediaTagReader');
-var MediaFileReader = require('./MediaFileReader');
+import MediaTagReader from './MediaTagReader';
+import MediaFileReader from './MediaFileReader';
 
-import type {
-  CallbackType,
-  LoadCallbackType,
-  CharsetType,
-  ByteRange,
-  TagType,
-  TagFrame
-} from './FlowTypes';
+import type { CallbackType, LoadCallbackType, CharsetType, ByteRange, TagType, TagFrame } from './FlowTypes';
 
-class MP4TagReader extends MediaTagReader {
+export default class MP4TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // The tag identifier is located in [4, 8] but since we'll need to reader
     // the header of the first block anyway, we load it instead to avoid
@@ -31,7 +22,7 @@ class MP4TagReader extends MediaTagReader {
     };
   }
 
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static canReadTagFormat(tagIdentifier: number[]): boolean {
     var id = String.fromCharCode.apply(String, tagIdentifier.slice(4, 8));
     return id === "ftyp";
   }
@@ -116,7 +107,7 @@ class MP4TagReader extends MediaTagReader {
     return atomName !== "----";
   }
 
-  _parseData(data: MediaFileReader, tagsToRead: ?Array<string>): TagType {
+  _parseData(data: MediaFileReader, tagsToRead?: string[] | null): TagType {
     var tags = {};
 
     tagsToRead = this._expandShortcutTags(tagsToRead);
@@ -124,11 +115,14 @@ class MP4TagReader extends MediaTagReader {
 
     // create shortcuts for most common data.
     for (var name in SHORTCUTS) if (SHORTCUTS.hasOwnProperty(name)) {
+      // @ts-expect-error
       var tag = tags[SHORTCUTS[name]];
       if (tag) {
         if (name === "track") {
+          // @ts-expect-error
           tags[name] = tag.data.track;
         } else {
+          // @ts-expect-error
           tags[name] = tag.data;
         }
       }
@@ -137,7 +131,7 @@ class MP4TagReader extends MediaTagReader {
     return {
       "type": "MP4",
       "ftyp": data.getStringAt(8, 4),
-      "version": data.getLongAt(12, true),
+      "version": data.getLongAt(12, true).toString(),
       "tags": tags
     };
   }
@@ -147,7 +141,7 @@ class MP4TagReader extends MediaTagReader {
     data: MediaFileReader,
     offset: number,
     length: number,
-    tagsToRead: ?Array<string>,
+    tagsToRead?: string[] | null,
     parentAtomFullName?: string,
     indent?: string
   ) {
@@ -177,6 +171,7 @@ class MP4TagReader extends MediaTagReader {
         parentAtomFullName === "moov.udta.meta.ilst" &&
         this._canReadAtom(atomName)
       ) {
+        // @ts-expect-error
         tags[atomName] = this._readMetadataAtom(data, seek);
       }
 
@@ -194,6 +189,7 @@ class MP4TagReader extends MediaTagReader {
     var atomName = data.getStringAt(offset + 4, 4);
 
     var klass = data.getInteger24At(offset + METADATA_HEADER + 1, true);
+    // @ts-expect-error
     var type = TYPES[klass];
     var atomData;
     var bigEndian = true;
@@ -263,12 +259,15 @@ class MP4TagReader extends MediaTagReader {
     return {
       id: atomName,
       size: atomSize,
+      // @ts-expect-error
       description: ATOM_DESCRIPTIONS[atomName] || "Unknown",
       data: atomData
     };
   }
 
-  getShortcuts(): {[key: string]: string|Array<string>} {
+  getShortcuts(): {
+    [key: string]: string | string[];
+  } {
     return SHORTCUTS;
   }
 }
@@ -283,7 +282,7 @@ const TYPES = {
   "14": "png",
   "21": "int",
   "22": "uint"
-};
+} as const;
 
 const ATOM_DESCRIPTIONS = {
   "©alb": "Album",
@@ -334,11 +333,11 @@ const ATOM_DESCRIPTIONS = {
   "geID": "Genre ID",
   "xid ": "Vendor Information",
   "flvr": "Codec Flavor"
-};
+} as const;
 
 const UNSUPPORTED_ATOMS = {
   "----": 1,
-};
+} as const;
 
 const SHORTCUTS = {
   "title"     : "©nam",
@@ -350,6 +349,4 @@ const SHORTCUTS = {
   "genre"     : "©gen",
   "picture"   : "covr",
   "lyrics"    : "©lyr"
-};
-
-module.exports = MP4TagReader;
+} as const;

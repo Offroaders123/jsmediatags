@@ -1,28 +1,19 @@
-/**
- * @flow
- */
-'use strict';
+import MediaFileReader from "./MediaFileReader";
+import XhrFileReader from "./XhrFileReader";
+import BlobFileReader from "./BlobFileReader";
+import ArrayFileReader from "./ArrayFileReader";
+import MediaTagReader from "./MediaTagReader";
+import ID3v1TagReader from "./ID3v1TagReader";
+import ID3v2TagReader from "./ID3v2TagReader";
+import MP4TagReader from "./MP4TagReader";
+import FLACTagReader from "./FLACTagReader";
 
-const MediaFileReader = require("./MediaFileReader");
-const XhrFileReader = require("./XhrFileReader");
-const BlobFileReader = require("./BlobFileReader");
-const ArrayFileReader = require("./ArrayFileReader");
-const MediaTagReader = require("./MediaTagReader");
-const ID3v1TagReader = require("./ID3v1TagReader");
-const ID3v2TagReader = require("./ID3v2TagReader");
-const MP4TagReader = require("./MP4TagReader");
-const FLACTagReader = require("./FLACTagReader");
+import type { CallbackType, LoadCallbackType, ByteRange } from './FlowTypes';
 
-import type {
-  CallbackType,
-  LoadCallbackType,
-  ByteRange
-} from './FlowTypes';
+var mediaFileReaders: typeof MediaFileReader[] = [];
+var mediaTagReaders: typeof MediaTagReader[] = [];
 
-var mediaFileReaders: Array<Class<MediaFileReader>> = [];
-var mediaTagReaders: Array<Class<MediaTagReader>> = [];
-
-function read(location: Object, callbacks: CallbackType) {
+export function read(location: Object, callbacks: CallbackType) {
   new Reader(location).read(callbacks);
 }
 
@@ -36,27 +27,27 @@ function isRangeValid(range: ByteRange, fileSize: number) {
   return !(invalidPositiveRange || invalidNegativeRange)
 }
 
-class Reader {
-  _file: any;
-  _tagsToRead: Array<string>;
-  _fileReader: Class<MediaFileReader>;
-  _tagReader: Class<MediaTagReader>;
+export class Reader {
+  declare _file: any;
+  declare _tagsToRead: string[];
+  declare _fileReader: typeof MediaFileReader;
+  declare _tagReader: typeof MediaTagReader;
 
   constructor(file: any) {
     this._file = file;
   }
 
-  setTagsToRead(tagsToRead: Array<string>): Reader {
+  setTagsToRead(tagsToRead: string[]): Reader {
     this._tagsToRead = tagsToRead;
     return this;
   }
 
-  setFileReader(fileReader: Class<MediaFileReader>): Reader {
+  setFileReader(fileReader: typeof MediaFileReader): Reader {
     this._fileReader = fileReader;
     return this;
   }
 
-  setTagReader(tagReader: Class<MediaTagReader>): Reader {
+  setTagReader(tagReader: typeof MediaTagReader): Reader {
     this._tagReader = tagReader;
     return this;
   }
@@ -69,7 +60,7 @@ class Reader {
     fileReader.init({
       onSuccess: function() {
         self._getTagReader(fileReader, {
-          onSuccess: function(TagReader: Class<MediaTagReader>) {
+          onSuccess: function(TagReader: typeof MediaTagReader) {
             new TagReader(fileReader)
               .setTagsToRead(self._tagsToRead)
               .read(callbacks);
@@ -81,7 +72,7 @@ class Reader {
     });
   }
 
-  _getFileReader(): Class<MediaFileReader> {
+  _getFileReader(): typeof MediaFileReader {
     if (this._fileReader) {
       return this._fileReader;
     } else {
@@ -89,7 +80,7 @@ class Reader {
     }
   }
 
-  _findFileReader(): Class<MediaFileReader> {
+  _findFileReader(): typeof MediaFileReader {
     for (var i = 0; i < mediaFileReaders.length; i++) {
       if (mediaFileReaders[i].canReadFile(this._file)) {
         return mediaFileReaders[i];
@@ -162,7 +153,7 @@ class Reader {
               range.offset >= 0 ? range.offset : range.offset + fileSize,
               range.length
             );
-          } catch (ex) {
+          } catch (ex: any) {
             if (callbacks.onError) {
               callbacks.onError({
                 "type": "fileReader",
@@ -194,7 +185,7 @@ class Reader {
 
   _loadTagIdentifierRanges(
     fileReader: MediaFileReader,
-    tagReaders: Array<Class<MediaTagReader>>,
+    tagReaders: typeof MediaTagReader[],
     callbacks: LoadCallbackType
   ) {
     if (tagReaders.length === 0) {
@@ -203,7 +194,7 @@ class Reader {
       return;
     }
 
-    var tagIdentifierRange = [Number.MAX_VALUE, 0];
+    var tagIdentifierRange: [number,number] = [Number.MAX_VALUE, 0];
     var fileSize = fileReader.getSize();
 
     // Create a super set of all ranges so we can load them all at once.
@@ -222,18 +213,18 @@ class Reader {
   }
 }
 
-class Config {
-  static addFileReader(fileReader: Class<MediaFileReader>): Class<Config> {
+export class Config {
+  static addFileReader(fileReader: typeof MediaFileReader): typeof Config {
     mediaFileReaders.push(fileReader);
     return Config;
   }
 
-  static addTagReader(tagReader: Class<MediaTagReader>): Class<Config> {
+  static addTagReader(tagReader: typeof MediaTagReader): typeof Config {
     mediaTagReaders.push(tagReader);
     return Config;
   }
 
-  static removeTagReader(tagReader: Class<MediaTagReader>): Class<Config> {
+  static removeTagReader(tagReader: typeof MediaTagReader): typeof Config {
     var tagReaderIx = mediaTagReaders.indexOf(tagReader);
 
     if (tagReaderIx >= 0) {
@@ -249,7 +240,7 @@ class Config {
     });
   }
 
-  static setDisallowedXhrHeaders(disallowedXhrHeaders: Array<string>) {
+  static setDisallowedXhrHeaders(disallowedXhrHeaders: string[]) {
     XhrFileReader.setConfig({
       disallowedXhrHeaders: disallowedXhrHeaders
     });
@@ -271,18 +262,13 @@ Config
   .addTagReader(MP4TagReader)
   .addTagReader(FLACTagReader);
 
+// @ts-expect-error
 if (typeof process !== "undefined" && !process.browser) {
   if (typeof navigator !== "undefined" && navigator.product === "ReactNative") {
-    const ReactNativeFileReader = require('./ReactNativeFileReader');
+    const { default: ReactNativeFileReader } = await import('./ReactNativeFileReader.js');
     Config.addFileReader(ReactNativeFileReader);
   } else {
-    const NodeFileReader = require('./NodeFileReader');
+    const { default: NodeFileReader } = await import('./NodeFileReader.js');
     Config.addFileReader(NodeFileReader);
   }
 }
-
-module.exports = {
-  "read": read,
-  "Reader": Reader,
-  "Config": Config
-};

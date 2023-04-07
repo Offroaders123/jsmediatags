@@ -1,19 +1,11 @@
-/**
- * @flow
- */
-'use strict';
+import MediaFileReader from './MediaFileReader';
 
-var MediaFileReader = require('./MediaFileReader');
+import type { Byte, ByteArray, LoadCallbackType } from './FlowTypes';
 
-import type {
-  Byte,
-  ByteArray,
-  LoadCallbackType
-} from './FlowTypes';
-
-class ArrayFileReader extends MediaFileReader {
-  _array: ByteArray;
-  _size: number;
+export default class ArrayFileReader extends MediaFileReader {
+  declare _array: ByteArray;
+  declare _size: number;
+  declare _isInitialized: boolean;
 
   constructor(array: ByteArray) {
     super();
@@ -44,5 +36,3 @@ class ArrayFileReader extends MediaFileReader {
     return this._array[offset];
   }
 }
-
-module.exports = ArrayFileReader;

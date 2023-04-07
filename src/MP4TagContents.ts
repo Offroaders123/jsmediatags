@@ -3,24 +3,16 @@
  * writing.
  *
  * http://atomicparsley.sourceforge.net/mpeg-4files.html
- *
- * @flow
  */
-'use strict';
 
-const ByteArrayUtils = require('./ByteArrayUtils');
-const bin = ByteArrayUtils.bin;
-const pad = ByteArrayUtils.pad;
-const getInteger32 = ByteArrayUtils.getInteger32;
+import { bin, pad, getInteger32 } from './ByteArrayUtils';
 
-import type {
-  ByteArray
-} from './FlowTypes';
+import type { ByteArray } from './FlowTypes';
 
-class MP4TagContents {
-  _atoms: Array<Atom>;
+export default class MP4TagContents {
+  declare _atoms: Atom[];
 
-  constructor(ftyp: string, atoms?: Array<Atom>) {
+  constructor(ftyp: string, atoms?: Atom[]) {
     this._atoms = [
       new Atom("ftyp", pad(bin(ftyp), 24))
     ].concat(atoms || []);
@@ -28,6 +20,7 @@ class MP4TagContents {
 
   toArray(): ByteArray {
     return this._atoms.reduce(function(array, atom) {
+      // @ts-expect-error
       return array.concat(atom.toArray());
     }, []);
   }
@@ -36,7 +29,7 @@ class MP4TagContents {
     return new Atom(atomName);
   }
 
-  static createContainerAtom(atomName: string, atoms: Array<Atom>, data?: ByteArray): Atom {
+  static createContainerAtom(atomName: string, atoms: Atom[], data?: ByteArray): Atom {
     return new Atom(atomName, data, atoms);
   }
 
@@ -50,6 +43,7 @@ class MP4TagContents {
     }[type];
 
     return this.createContainerAtom(atomName, [
+      // @ts-expect-error
       new Atom("data", [].concat(
         [0x00, 0x00, 0x00, klass], // 1 byte atom version + 3 byte atom flags
         [0x00, 0x00, 0x00, 0x00], // NULL space
@@ -60,11 +54,11 @@ class MP4TagContents {
 }
 
 class Atom {
-  _name: string;
-  _data: Array<number>;
-  _atoms: Array<Atom>;
+  declare _name: string;
+  declare _data: number[];
+  declare _atoms: Atom[];
 
-  constructor(name: string, data: ?ByteArray, atoms: ?Array<Atom>) {
+  constructor(name: string, data?: ByteArray | null, atoms?: Atom[] | null) {
     this._name = name;
     this._data = data || [];
     this._atoms = atoms || [];
@@ -72,11 +66,13 @@ class Atom {
 
   toArray(): ByteArray {
     var atomsArray = this._atoms.reduce(function(array, atom) {
+      // @ts-expect-error
       return array.concat(atom.toArray());
     }, []);
     var length = 4 + this._name.length + this._data.length + atomsArray.length;
 
     return [].concat(
+      // @ts-expect-error
       getInteger32(length),
       bin(this._name),
       this._data,
@@ -84,5 +80,3 @@ class Atom {
     );
   }
 }
-
-module.exports = MP4TagContents;

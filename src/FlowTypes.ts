@@ -1,8 +1,4 @@
-/**
- * @flow
- */
-
-var MediaFileReader = require('./MediaFileReader');
+import MediaFileReader from './MediaFileReader';
 
 export type CallbackType = {
   onSuccess: (data: any) => void,
@@ -26,7 +22,18 @@ export type ByteRange = {
   length: number
 };
 
-export type DataType = Array<number> | $TypedArray | string;
+export type TypedArray =
+  | Int8Array
+  | Uint8Array
+  | Uint8ClampedArray
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array;
+
+export type DataType = number[] | TypedArray | string;
 
 export type ChunkType = {
   offset: number,
@@ -35,13 +42,13 @@ export type ChunkType = {
 
 export type Byte = number;
 
-export type ByteArray = Array<Byte>;
+export type ByteArray = Byte[];
 
 export type FrameReaderSignature = (
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ) => any;
 
@@ -58,7 +65,7 @@ export type TagFrameHeader = {
   id: string,
   size: number,
   headerSize: number,
-  flags: ?TagFrameFlags
+  flags?: TagFrameFlags | null
 };
 
 export type TagFrameFlags = {
@@ -93,7 +100,11 @@ export type TagHeaderFlags = {
 
 export type TagType = {
   type: string,
-  tags: {[key: string]: FrameType | ShortcutType}
+  ftyp?: string,
+  version?: string,
+  tags: {
+    [key: string]: FrameType | ShortcutType
+  }
 };
 
 export type FrameType = {

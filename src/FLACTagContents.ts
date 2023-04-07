@@ -1,17 +1,13 @@
-const ByteArrayUtils = require('./ByteArrayUtils');
+import { bin } from './ByteArrayUtils';
+import { getInteger24 } from './ByteArrayUtils';
+import { getInteger32 } from './ByteArrayUtils';
 
-const bin = require('./ByteArrayUtils').bin;
-const getInteger24 = require('./ByteArrayUtils').getInteger24;
-const getInteger32 = require('./ByteArrayUtils').getInteger32;
+import type { ByteArray } from './FlowTypes';
 
-import type {
-  ByteArray
-} from './FlowTypes';
+export default class FLACTagContents {
+  declare _blocks: MetadataBlock[];
 
-class FLACTagContents {
-  _blocks: Array<MetadataBlock>;
-
-  constructor(blocks?: Array<MetadataBlock>) {
+  constructor(blocks?: MetadataBlock[]) {
     this._blocks = [];
     this._blocks.push(FLACTagContents.createStreamBlock());
     this._blocks = this._blocks.concat(blocks || []);
@@ -33,22 +29,24 @@ class FLACTagContents {
     return this.createBlock(0, data);
   }
 
-  static createCommentBlock(...data: Array<Array<string>>): MetadataBlock {
+  static createCommentBlock(...data: string[][]): MetadataBlock {
     let length = 12;
-    let byteArray = [];
+    let byteArray: ByteArray = [];
     for (let i = 0; i < data.length; i++) {
       length += data[i][0].length + data[i][1].length + 5;
       byteArray = byteArray.concat(getInteger32(data[i][0].length + data[i][1].length + 1).reverse());
       let entry = data[i][0] + "=" + data[i][1];
       byteArray = byteArray.concat(bin(entry));
     }
-    let array = [].concat(getInteger24(length), [0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
+    // @ts-expect-error
+    let array: ByteArray = [].concat(getInteger24(length), [0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
       getInteger32(data.length).reverse(), byteArray);
     return this.createBlock(4, array);
   }
 
   static createPictureBlock() {
-    let data = [].concat(getInteger24(45), getInteger32(3), getInteger32(10),
+    // @ts-expect-error
+    let data: ByteArray = [].concat(getInteger24(45), getInteger32(3), getInteger32(10),
       bin("image/jpeg"), getInteger32(9), bin("A Picture"), Array(16).fill(0x00),
       getInteger32(4), bin("data"));
     return this.createBlock(6, data);
@@ -56,9 +54,9 @@ class FLACTagContents {
 }
 
 class MetadataBlock {
-  _data: Array<number>;
-  _final: boolean;
-  _type: number;
+  declare _data: number[];
+  declare _final: boolean;
+  declare _type: number;
 
   constructor(type: number, data: ByteArray) {
     this._type = type;
@@ -74,5 +72,3 @@ class MetadataBlock {
     return [ this._type + (this._final ? 128 : 0) ].concat(this._data);
   }
 }
-
-module.exports = FLACTagContents;

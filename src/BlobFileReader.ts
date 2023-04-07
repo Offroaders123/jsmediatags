@@ -1,18 +1,12 @@
-/**
- * @flow
- */
-'use strict';
+import ChunkedFileData from './ChunkedFileData';
+import MediaFileReader from './MediaFileReader';
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import type { LoadCallbackType } from './FlowTypes';
 
-import type {
-  LoadCallbackType
-} from './FlowTypes';
-
-class BlobFileReader extends MediaFileReader {
-  _blob: Blob;
-  _fileData: ChunkedFileData;
+export default class BlobFileReader extends MediaFileReader {
+  declare _blob: Blob;
+  declare _fileData: ChunkedFileData;
+  declare _size: number;
 
   constructor(blob: Blob) {
     super();
@@ -37,12 +31,13 @@ class BlobFileReader extends MediaFileReader {
   loadRange(range: [number, number], callbacks: LoadCallbackType): void {
     var self = this;
     // $FlowIssue - flow isn't aware of mozSlice or webkitSlice
+    // @ts-expect-error
     var blobSlice = this._blob.slice || this._blob.mozSlice || this._blob.webkitSlice;
     var blob = blobSlice.call(this._blob, range[0], range[1] + 1);
     var browserFileReader = new FileReader();
 
     browserFileReader.onloadend = function(event) {
-      var intArray = new Uint8Array(browserFileReader.result);
+      var intArray = new Uint8Array(browserFileReader.result! as ArrayBuffer);
       self._fileData.addData(range[0], intArray);
       callbacks.onSuccess();
     };
@@ -60,5 +55,3 @@ class BlobFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 }
-
-module.exports = BlobFileReader;

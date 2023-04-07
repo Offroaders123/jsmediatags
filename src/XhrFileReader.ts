@@ -1,32 +1,25 @@
-/**
- * @flow
- */
-'use strict';
-
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import ChunkedFileData from './ChunkedFileData';
+import MediaFileReader from './MediaFileReader';
 
 const CHUNK_SIZE = 1024;
 
-import type {
-  LoadCallbackType,
-  CallbackType
-} from './FlowTypes';
+import type { LoadCallbackType, CallbackType } from './FlowTypes';
 
 type ContentRangeType = {
-  firstBytePosition: ?number,
-  lastBytePosition: ?number,
-  instanceLength: ?number,
+  firstBytePosition?: number | null,
+  lastBytePosition?: number | null,
+  instanceLength?: number | null,
 };
 
-class XhrFileReader extends MediaFileReader {
-  static _config: {
-    avoidHeadRequests: boolean,
-    disallowedXhrHeaders: Array<string>,
-    timeoutInSec: number
+export default class XhrFileReader extends MediaFileReader {
+  static _config = {
+    avoidHeadRequests: false,
+    disallowedXhrHeaders: [] as string[],
+    timeoutInSec: 30
   };
-  _url: string;
-  _fileData: ChunkedFileData;
+
+  declare _url: string;
+  declare _fileData: ChunkedFileData;
 
   constructor(url: string) {
     super();
@@ -41,8 +34,9 @@ class XhrFileReader extends MediaFileReader {
     );
   }
 
-  static setConfig(config: Object) {
+  static setConfig(config: Partial<typeof this._config>) {
     for (var key in config) if (config.hasOwnProperty(key)) {
+      // @ts-expect-error
       this._config[key] = config[key];
     }
 
@@ -122,10 +116,11 @@ class XhrFileReader extends MediaFileReader {
   }
 
   _getXhrResponseContent(xhr: XMLHttpRequest): string {
-    return xhr.responseBody || xhr.responseText || "";
+    // @ts-expect-error
+    return xhr.responseBody || xhr.response || xhr.responseText || "";
   }
 
-  _parseContentLength(xhr: XMLHttpRequest): ?number {
+  _parseContentLength(xhr: XMLHttpRequest): number | null {
     var contentLength = this._getResponseHeader(xhr, "Content-Length");
 
     if (contentLength == null) {
@@ -135,7 +130,7 @@ class XhrFileReader extends MediaFileReader {
     }
   }
 
-  _parseContentRange(xhr: XMLHttpRequest): ?ContentRangeType {
+  _parseContentRange(xhr: XMLHttpRequest): ContentRangeType | null {
     var contentRange = this._getResponseHeader(xhr, "Content-Range");
 
     if (contentRange) {
@@ -191,7 +186,7 @@ class XhrFileReader extends MediaFileReader {
 
   _makeXHRRequest(
     method: string,
-    range: ?[number, number],
+    range: [number, number] | null,
     callbacks: CallbackType
   ) {
     var xhr = this._createXHRObject();
@@ -210,6 +205,7 @@ class XhrFileReader extends MediaFileReader {
           "xhr": xhr
         });
       }
+      // @ts-ignore
       xhr = null;
     };
 
@@ -277,7 +273,7 @@ class XhrFileReader extends MediaFileReader {
     return headerNames.indexOf(headerName.toLowerCase()) >= 0;
   }
 
-  _getResponseHeader(xhr: XMLHttpRequest, headerName: string): ?string {
+  _getResponseHeader(xhr: XMLHttpRequest, headerName: string): string | null {
     if (!this._hasResponseHeader(xhr, headerName)) {
       return null;
     }
@@ -292,8 +288,8 @@ class XhrFileReader extends MediaFileReader {
 
   _isWebWorker(): boolean {
     return (
-      typeof WorkerGlobalScope !== 'undefined' &&
-      self instanceof WorkerGlobalScope
+      // @ts-expect-error
+      typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope
     );
   }
 
@@ -310,11 +306,3 @@ class XhrFileReader extends MediaFileReader {
     throw new Error("XMLHttpRequest is not supported");
   }
 }
-
-XhrFileReader._config = {
-  avoidHeadRequests: false,
-  disallowedXhrHeaders: [],
-  timeoutInSec: 30
-};
-
-module.exports = XhrFileReader;

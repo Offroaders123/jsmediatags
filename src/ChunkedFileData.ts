@@ -1,3 +1,7 @@
+const NOT_FOUND = -1;
+
+import type { ChunkType, DataType, TypedArray } from './FlowTypes';
+
 /**
  * This class represents a file that might not have all its data loaded yet.
  * It is used when loading the entire file is not an option because it's too
@@ -6,22 +10,11 @@
  * exception is when the data is not available yet, an error will be thrown.
  * This class does not load the data, it just manages it. It provides operations
  * to add and read data from the file.
- *
- * @flow
  */
-'use strict';
-
-const NOT_FOUND = -1;
-
-import type {
-  ChunkType,
-  DataType
-} from './FlowTypes';
-
-class ChunkedFileData {
+export default class ChunkedFileData {
   // $FlowIssue - get/set properties not yet supported
   static get NOT_FOUND() { return NOT_FOUND; }
-  _fileData: Array<ChunkType>;
+  declare _fileData: ChunkType[];
 
   constructor() {
     this._fileData = [];
@@ -87,7 +80,8 @@ class ChunkedFileData {
       ArrayBuffer.isView(dataA)
     ) {
       // $FlowIssue - flow thinks dataAandB is a string but it's not
-      var dataAandB = new dataA.constructor(dataA.length + dataB.length);
+      // @ts-expect-error
+      var dataAandB = new (dataA.constructor as TypedArray)(dataA.length + dataB.length);
       // $FlowIssue - flow thinks dataAandB is a string but it's not
       dataAandB.set(dataA, 0);
       // $FlowIssue - flow thinks dataAandB is a string but it's not
@@ -95,6 +89,7 @@ class ChunkedFileData {
       return dataAandB;
     } else {
       // $FlowIssue - flow thinks dataAandB is a TypedArray but it's not
+      // @ts-expect-error
       return dataA.concat(dataB);
     }
   }
@@ -105,7 +100,7 @@ class ChunkedFileData {
       return data.slice(begin, end);
     } else {
       // $FlowIssue - flow thinks data is a string but it's not
-      return data.subarray(begin, end);
+      return (data as TypedArray).subarray(begin, end);
     }
   }
 
@@ -213,5 +208,3 @@ class ChunkedFileData {
     throw new Error("Offset " + offset + " hasn't been loaded yet.");
   }
 }
-
-module.exports = ChunkedFileData;

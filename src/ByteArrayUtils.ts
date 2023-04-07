@@ -1,17 +1,10 @@
-/**
- * @flow
- */
-'use strict';
-
-import type {
-  ByteArray
-} from './FlowTypes';
+import type { ByteArray } from './FlowTypes';
 
 /**
  * Converts a string to a binary array
  */
-const bin = function(string: string): ByteArray {
-  var binaryArray = new Array(string.length);
+export function bin(string: string): ByteArray {
+  var binaryArray: ByteArray = new Array(string.length);
   for (var i = 0; i < string.length; i++) {
     binaryArray[i] = string.charCodeAt(i);
   }
@@ -21,18 +14,20 @@ const bin = function(string: string): ByteArray {
 /**
  * Pads an array with \0 until it is size length.
  */
-const pad = function(array: Array<any>, size: number): Array<any> {
+export function pad(array: any[], size: number): any[] {
   for (var i = array.length; i < size; i++) {
     array.push(0);
   }
   return array;
 }
 
-// The ID3v2 tag/frame size is encoded with four bytes where the most
-// significant bit (bit 7) is set to zero in every byte, making a total of 28
-// bits. The zeroed bits are ignored, so a 257 bytes long tag is represented
-// as $00 00 02 01.
-const getSynchsafeInteger32 = function(number: number): ByteArray {
+/**
+ * The ID3v2 tag/frame size is encoded with four bytes where the most
+ * significant bit (bit 7) is set to zero in every byte, making a total of 28
+ * bits. The zeroed bits are ignored, so a 257 bytes long tag is represented
+ * as $00 00 02 01.
+ */
+export function getSynchsafeInteger32(number: number): ByteArray {
   // 0x7f = 0b01111111
   return [
     (number >> 21) & 0x7f,
@@ -42,7 +37,7 @@ const getSynchsafeInteger32 = function(number: number): ByteArray {
   ];
 };
 
-const getInteger32 = function(number: number): ByteArray {
+export function getInteger32(number: number): ByteArray {
   return [
     (number >> 24) & 0xff,
     (number >> 16) & 0xff,
@@ -51,18 +46,10 @@ const getInteger32 = function(number: number): ByteArray {
   ];
 }
 
-const getInteger24 = function(number: number): ByteArray {
+export function getInteger24(number: number): ByteArray {
   return [
     (number >> 16) & 0xff,
     (number >> 8) & 0xff,
     number & 0xff
   ];
 }
-
-module.exports = {
-  bin: bin,
-  pad: pad,
-  getSynchsafeInteger32: getSynchsafeInteger32,
-  getInteger32: getInteger32,
-  getInteger24: getInteger24
-};

@@ -1,18 +1,9 @@
-/**
- * @flow
- */
-'use strict';
+import MediaTagReader from './MediaTagReader';
+import MediaFileReader from './MediaFileReader';
 
-var MediaTagReader = require('./MediaTagReader');
-var MediaFileReader = require('./MediaFileReader');
+import type { LoadCallbackType, ByteRange, TagType } from './FlowTypes';
 
-import type {
-  LoadCallbackType,
-  ByteRange,
-  TagType
-} from './FlowTypes';
-
-class ID3v1TagReader extends MediaTagReader {
+export default class ID3v1TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // The identifier is TAG and is at offset: -128. However, to avoid a
     // fetch for the tag identifier and another for the data, we load the
@@ -23,7 +14,7 @@ class ID3v1TagReader extends MediaTagReader {
     };
   }
 
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static canReadTagFormat(tagIdentifier: number[]): boolean {
     var id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
     return id === "TAG";
   }
@@ -33,7 +24,7 @@ class ID3v1TagReader extends MediaTagReader {
     mediaFileReader.loadRange([fileSize - 128, fileSize - 1], callbacks);
   }
 
-  _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
     var offset = data.getSize() - 128;
 
     var title = data.getStringWithCharsetAt(offset + 3, 30).toString();
@@ -56,10 +47,11 @@ class ID3v1TagReader extends MediaTagReader {
     if (genreIdx < 255) {
       var genre = GENRES[genreIdx];
     } else {
+      // @ts-expect-error
       var genre = "";
     }
 
-    var tag = {
+    var tag: TagType = {
       "type": "ID3",
       "version" : version,
       "tags": {
@@ -104,6 +96,4 @@ var GENRES = [
   "Porn Groove","Satire","Slow Jam","Club","Tango","Samba",
   "Folklore","Ballad","Power Ballad","Rhythmic Soul","Freestyle",
   "Duet","Punk Rock","Drum Solo","Acapella","Euro-House","Dance Hall"
-];
-
-module.exports = ID3v1TagReader;
+] as const;

@@ -1,18 +1,12 @@
-/**
- * @flow
- */
-'use strict';
+import ChunkedFileData from './ChunkedFileData';
+import MediaFileReader from './MediaFileReader';
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import type { LoadCallbackType } from './FlowTypes';
 
-import type {
-    LoadCallbackType
-} from './FlowTypes';
-
-class ArrayBufferFileReader extends MediaFileReader {
-    _buffer: ArrayBuffer;
-    _fileData: ChunkedFileData;
+export default class ArrayBufferFileReader extends MediaFileReader {
+    declare _buffer: ArrayBuffer;
+    declare _fileData: ChunkedFileData;
+    declare _size: number;
 
     constructor(buffer: ArrayBuffer) {
         super();
@@ -40,5 +34,3 @@ class ArrayBufferFileReader extends MediaFileReader {
         return this._fileData.getByteAt(offset);
     }
 }
-
-module.exports = ArrayBufferFileReader;

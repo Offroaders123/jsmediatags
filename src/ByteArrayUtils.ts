@@ -1,4 +1,4 @@
-import type { ByteArray } from './FlowTypes';
+import type { ByteArray } from './FlowTypes.js';
 
 /**
  * Converts a string to a binary array

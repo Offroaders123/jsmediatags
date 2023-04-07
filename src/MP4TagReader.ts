@@ -6,10 +6,10 @@
  * Authored by Joshua Kifer <joshua.kifer gmail.com>
  */
 
-import MediaTagReader from './MediaTagReader';
-import MediaFileReader from './MediaFileReader';
+import MediaTagReader from './MediaTagReader.js';
+import MediaFileReader from './MediaFileReader.js';
 
-import type { CallbackType, LoadCallbackType, CharsetType, ByteRange, TagType, TagFrame } from './FlowTypes';
+import type { CallbackType, LoadCallbackType, CharsetType, ByteRange, TagType, TagFrame } from './FlowTypes.js';
 
 export default class MP4TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {

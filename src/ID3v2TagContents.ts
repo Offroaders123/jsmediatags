@@ -9,7 +9,9 @@
  * TODO: Padding and Footer
  */
 
-import { bin, getSynchsafeInteger32, getInteger32, getInteger24 } from './ByteArrayUtils';
+import { bin, getSynchsafeInteger32, getInteger32, getInteger24 } from './ByteArrayUtils.js';
+
+import type { ByteArray, TagHeaderFlags, TagFrameFlags } from './FlowTypes.js';
 
 // Offsets
 const FLAGS = 5;
@@ -21,8 +23,6 @@ const START_EXTENDED_DATA_V3 = 20;
 const START_EXTENDED_DATA_V4 = 16;
 // Sizes
 const HEADER_SIZE = 10;
-
-import type { ByteArray, TagHeaderFlags, TagFrameFlags } from './FlowTypes';
 
 export default class ID3v2TagContents {
   declare _size: number;

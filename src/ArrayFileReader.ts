@@ -1,6 +1,6 @@
-import MediaFileReader from './MediaFileReader';
+import MediaFileReader from './MediaFileReader.js';
 
-import type { Byte, ByteArray, LoadCallbackType } from './FlowTypes';
+import type { Byte, ByteArray, LoadCallbackType } from './FlowTypes.js';
 
 export default class ArrayFileReader extends MediaFileReader {
   declare _array: ByteArray;

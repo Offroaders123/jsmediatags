@@ -1,7 +1,7 @@
-import MediaTagReader from './MediaTagReader';
-import MediaFileReader from './MediaFileReader';
+import MediaTagReader from './MediaTagReader.js';
+import MediaFileReader from './MediaFileReader.js';
 
-import type { LoadCallbackType, ByteRange, TagType } from './FlowTypes';
+import type { LoadCallbackType, ByteRange, TagType } from './FlowTypes.js';
 
 export default class ID3v1TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {

@@ -1,6 +1,6 @@
-import MediaFileReader from './MediaFileReader';
+import MediaFileReader from './MediaFileReader.js';
 
-import type { CallbackType, LoadCallbackType, ByteRange, TagType } from './FlowTypes';
+import type { CallbackType, LoadCallbackType, ByteRange, TagType } from './FlowTypes.js';
 
 export default class MediaTagReader {
   declare _mediaFileReader: MediaFileReader;

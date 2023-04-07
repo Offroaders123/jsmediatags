@@ -1,14 +1,14 @@
-import MediaFileReader from "./MediaFileReader";
-import XhrFileReader from "./XhrFileReader";
-import BlobFileReader from "./BlobFileReader";
-import ArrayFileReader from "./ArrayFileReader";
-import MediaTagReader from "./MediaTagReader";
-import ID3v1TagReader from "./ID3v1TagReader";
-import ID3v2TagReader from "./ID3v2TagReader";
-import MP4TagReader from "./MP4TagReader";
-import FLACTagReader from "./FLACTagReader";
+import MediaFileReader from "./MediaFileReader.js";
+import XhrFileReader from "./XhrFileReader.js";
+import BlobFileReader from "./BlobFileReader.js";
+import ArrayFileReader from "./ArrayFileReader.js";
+import MediaTagReader from "./MediaTagReader.js";
+import ID3v1TagReader from "./ID3v1TagReader.js";
+import ID3v2TagReader from "./ID3v2TagReader.js";
+import MP4TagReader from "./MP4TagReader.js";
+import FLACTagReader from "./FLACTagReader.js";
 
-import type { CallbackType, LoadCallbackType, ByteRange } from './FlowTypes';
+import type { CallbackType, LoadCallbackType, ByteRange } from './FlowTypes.js';
 
 var mediaFileReaders: typeof MediaFileReader[] = [];
 var mediaTagReaders: typeof MediaTagReader[] = [];

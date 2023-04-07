@@ -1,9 +1,9 @@
 import * as fs from 'node:fs';
 
-import ChunkedFileData from './ChunkedFileData';
-import MediaFileReader from './MediaFileReader';
+import ChunkedFileData from './ChunkedFileData.js';
+import MediaFileReader from './MediaFileReader.js';
 
-import type { LoadCallbackType } from './FlowTypes';
+import type { LoadCallbackType } from './FlowTypes.js';
 
 export default class NodeFileReader extends MediaFileReader {
   declare _path: string;

@@ -1,7 +1,7 @@
-import ChunkedFileData from './ChunkedFileData';
-import MediaFileReader from './MediaFileReader';
+import ChunkedFileData from './ChunkedFileData.js';
+import MediaFileReader from './MediaFileReader.js';
 
-import type { LoadCallbackType } from './FlowTypes';
+import type { LoadCallbackType } from './FlowTypes.js';
 
 export default class BlobFileReader extends MediaFileReader {
   declare _blob: Blob;

@@ -1,7 +1,7 @@
-import { readUTF8String, readUTF16String, readNullTerminatedString } from './StringUtils';
+import { readUTF8String, readUTF16String, readNullTerminatedString } from './StringUtils.js';
 
-import type { DecodedString } from './StringUtils';
-import type { LoadCallbackType, CharsetType } from './FlowTypes';
+import type { DecodedString } from './StringUtils.js';
+import type { LoadCallbackType, CharsetType } from './FlowTypes.js';
 
 export default class MediaFileReader {
   declare _isInitialized: boolean;

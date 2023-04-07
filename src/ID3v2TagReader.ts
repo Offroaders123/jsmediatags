@@ -1,8 +1,8 @@
-import MediaTagReader from './MediaTagReader';
-import MediaFileReader from './MediaFileReader';
-import ID3v2FrameReader from './ID3v2FrameReader';
+import MediaTagReader from './MediaTagReader.js';
+import MediaFileReader from './MediaFileReader.js';
+import ID3v2FrameReader from './ID3v2FrameReader.js';
 
-import type { CallbackType, LoadCallbackType, TagFrames, TagHeader, TagFrameHeader, TagFrameFlags, CharsetType, ByteRange, TagType } from './FlowTypes';
+import type { CallbackType, LoadCallbackType, TagFrames, TagHeader, TagFrameHeader, TagFrameFlags, CharsetType, ByteRange, TagType } from './FlowTypes.js';
 
 const ID3_HEADER_SIZE = 10;
 

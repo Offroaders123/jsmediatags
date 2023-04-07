@@ -1,5 +1,7 @@
-import MediaFileReader from './MediaFileReader';
-import MediaTagReader from './MediaTagReader';
+import MediaFileReader from './MediaFileReader.js';
+import MediaTagReader from './MediaTagReader.js';
+
+import type { LoadCallbackType, ByteRange, TagType } from './FlowTypes.js';
 
 /**
  * The first 4 bytes of a FLAC file describes the header for the file. If these
@@ -55,8 +57,6 @@ const IMAGE_TYPES = [
   "Band/artist logotype",
   "Publisher/Studio logotype"
 ] as const;
-
-import type { LoadCallbackType, ByteRange, TagType } from './FlowTypes';
 
 /**
  * Class representing a MediaTagReader that parses FLAC tags.

@@ -1,6 +1,6 @@
-const NOT_FOUND = -1;
+import type { ChunkType, DataType, TypedArray } from './FlowTypes.js';
 
-import type { ChunkType, DataType, TypedArray } from './FlowTypes';
+const NOT_FOUND = -1;
 
 /**
  * This class represents a file that might not have all its data loaded yet.

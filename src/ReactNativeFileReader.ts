@@ -1,10 +1,10 @@
 import * as RNFS from 'react-native-fs';
 import { Buffer } from 'buffer';
 
-import ChunkedFileData from './ChunkedFileData';
-import MediaFileReader from './MediaFileReader';
+import ChunkedFileData from './ChunkedFileData.js';
+import MediaFileReader from './MediaFileReader.js';
 
-import type { LoadCallbackType } from './FlowTypes';
+import type { LoadCallbackType } from './FlowTypes.js';
 
 export default class ReactNativeFileReader extends MediaFileReader {
   declare _path: string;

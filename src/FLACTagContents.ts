@@ -1,8 +1,8 @@
-import { bin } from './ByteArrayUtils';
-import { getInteger24 } from './ByteArrayUtils';
-import { getInteger32 } from './ByteArrayUtils';
+import { bin } from './ByteArrayUtils.js';
+import { getInteger24 } from './ByteArrayUtils.js';
+import { getInteger32 } from './ByteArrayUtils.js';
 
-import type { ByteArray } from './FlowTypes';
+import type { ByteArray } from './FlowTypes.js';
 
 export default class FLACTagContents {
   declare _blocks: MetadataBlock[];

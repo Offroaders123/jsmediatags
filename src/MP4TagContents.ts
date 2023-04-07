@@ -5,9 +5,9 @@
  * http://atomicparsley.sourceforge.net/mpeg-4files.html
  */
 
-import { bin, pad, getInteger32 } from './ByteArrayUtils';
+import { bin, pad, getInteger32 } from './ByteArrayUtils.js';
 
-import type { ByteArray } from './FlowTypes';
+import type { ByteArray } from './FlowTypes.js';
 
 export default class MP4TagContents {
   declare _atoms: Atom[];

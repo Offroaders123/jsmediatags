@@ -1,9 +1,9 @@
-import MediaFileReader from './MediaFileReader';
-import * as StringUtils from './StringUtils';
-import ArrayFileReader from './ArrayFileReader';
+import MediaFileReader from './MediaFileReader.js';
+import * as StringUtils from './StringUtils.js';
+import ArrayFileReader from './ArrayFileReader.js';
 
-import type { CharsetType, FrameReaderSignature, TagHeader, TagFrames, TagFrameHeader, TagFrameFlags } from './FlowTypes';
-import type { DecodedString } from './StringUtils';
+import type { CharsetType, FrameReaderSignature, TagHeader, TagFrames, TagFrameHeader, TagFrameFlags } from './FlowTypes.js';
+import type { DecodedString } from './StringUtils.js';
 
 const FRAME_DESCRIPTIONS = {
   // v2.2

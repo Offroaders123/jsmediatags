@@ -1,9 +1,9 @@
-import ChunkedFileData from './ChunkedFileData';
-import MediaFileReader from './MediaFileReader';
+import ChunkedFileData from './ChunkedFileData.js';
+import MediaFileReader from './MediaFileReader.js';
+
+import type { LoadCallbackType, CallbackType } from './FlowTypes.js';
 
 const CHUNK_SIZE = 1024;
-
-import type { LoadCallbackType, CallbackType } from './FlowTypes';
 
 type ContentRangeType = {
   firstBytePosition?: number | null,

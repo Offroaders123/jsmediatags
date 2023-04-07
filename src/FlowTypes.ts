@@ -1,4 +1,4 @@
-import MediaFileReader from './MediaFileReader';
+import MediaFileReader from './MediaFileReader.js';
 
 export type CallbackType = {
   onSuccess: (data: any) => void,

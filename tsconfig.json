@@ -6,5 +6,8 @@
     "moduleResolution": "NodeNext",
     "target": "ESNext",
     "strict": true
-  }
+  },
+  "exclude": [
+    "./test"
+  ]
 }

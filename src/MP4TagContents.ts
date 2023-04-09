@@ -12,7 +12,7 @@ import type { ByteArray } from './FlowTypes.js';
 export default class MP4TagContents {
   declare _atoms: Atom[];
 
-  constructor(ftyp: string, atoms?: Atom[]) {
+  constructor(ftyp: string, atoms?: Atom | Atom[]) {
     this._atoms = [
       new Atom("ftyp", pad(bin(ftyp), 24))
     ].concat(atoms || []);
@@ -80,3 +80,5 @@ class Atom {
     );
   }
 }
+
+export type { Atom };

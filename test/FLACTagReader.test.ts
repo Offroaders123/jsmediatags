@@ -1,10 +1,10 @@
+import ArrayFileReader from '../src/ArrayFileReader.js';
+import FLACTagContents from '../src/FLACTagContents.js';
+import FLACTagReader from '../src/FLACTagReader.js';
+
 jest.autoMockOff();
 
-const ArrayFileReader = require('../ArrayFileReader');
-const FLACTagContents = require('../FLACTagContents');
-const FLACTagReader = require('../FLACTagReader');
-
-describe("FLACTagReader", function() {
+describe("FLACTagReader", () => {
   var flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(
     ["TITLE", "A Title"],
     ["ARTIST", "An Artist"],
@@ -12,102 +12,104 @@ describe("FLACTagReader", function() {
     ["TRACKNUMBER", "1"],
     ["GENRE", "A Genre"]
   ), FLACTagContents.createPictureBlock()]);
-  var mediaFileReader;
-  var tagReader;
+  var mediaFileReader: ArrayFileReader;
+  var tagReader: FLACTagReader;
 
-  beforeEach(function() {
+  beforeEach(() => {
     mediaFileReader = new ArrayFileReader(flacFileContents.toArray());
     tagReader = new FLACTagReader(mediaFileReader);
   });
 
-  it("reads the tag type", function () {
-    return new Promise(function(resolve, reject) {
+  it("reads the tag type", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
+        // @ts-expect-error
         onFailure: reject
       });
       jest.runAllTimers();
-    }).then(function(tag) {
-      expect(tag.type).toBe("FLAC");
-      expect(tag.version).toBe("1");
     });
+    expect(tag.type).toBe("FLAC");
+    expect(tag.version).toBe("1");
   });
 
-  it("reads a string tag", function() {
-    return new Promise(function(resolve, reject) {
+  it("reads a string tag", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
+        // @ts-expect-error
         onFailure: reject
       });
       jest.runAllTimers();
-    }).then(function(tag) {
-      var tags = tag.tags;
-      expect(tags.title).toBe("A Title");
     });
+    var tags = tag.tags;
+    expect(tags.title).toBe("A Title");
   });
 
-  it("reads an image tag", function() {
-    return new Promise(function(resolve, reject) {
+  it("reads an image tag", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
+        // @ts-expect-error
         onFailure: reject
       });
       jest.runAllTimers();
-    }).then(function(tag) {
-      var tags = tag.tags;
-      expect(tags.picture.description).toBe("A Picture");
     });
+    var tags = tag.tags;
+    expect(tags.picture.description).toBe("A Picture");
   });
 
-  it("reads all tags", function() {
-    return new Promise(function(resolve, reject) {
+  it("reads all tags", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
+        // @ts-expect-error
         onFailure: reject
       });
       jest.runAllTimers();
-    }).then(function(tag) {
-      var tags = tag.tags;
-      expect(tags.title).toBeTruthy();
-      expect(tags.artist).toBeTruthy();
-      expect(tags.album).toBeTruthy();
-      expect(tags.track).toBeTruthy();
-      expect(tags.picture).toBeTruthy();
     });
+    var tags = tag.tags;
+    expect(tags.title).toBeTruthy();
+    expect(tags.artist).toBeTruthy();
+    expect(tags.album).toBeTruthy();
+    expect(tags.track).toBeTruthy();
+    expect(tags.picture).toBeTruthy();
   });
 
-  it("reads tags no matter their case", function () {
+  it("reads tags no matter their case", async () => {
     var flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(
       ["Title", "A Title"],
       ["artist", "An Artist"],
     )]);
     mediaFileReader = new ArrayFileReader(flacFileContents.toArray());
     tagReader = new FLACTagReader(mediaFileReader);
-    return new Promise(function (resolve, reject) {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
+        // @ts-expect-error
         onFailure: reject
       });
       jest.runAllTimers();
-    }).then(function (tag) {
-      var tags = tag.tags;
-      expect(tags.title).toBeTruthy();
-      expect(tags.artist).toBeTruthy();
     });
+    var tags = tag.tags;
+    expect(tags.title).toBeTruthy();
+    expect(tags.artist).toBeTruthy();
   });
 
-  it("calls failure callback if file doesn't have comments", function() {
+  it("calls failure callback if file doesn't have comments", async () => {
     var flacFileEmpty = new FLACTagContents();
     var fileReaderEmpty = new ArrayFileReader(flacFileEmpty.toArray());
     var tagReaderEmpty = new FLACTagReader(fileReaderEmpty);
-    return new Promise(function(resolve, reject) {
-      tagReaderEmpty.read({
-        onSuccess: resolve,
-        onError: reject
+    try {
+      return await new Promise<any>((resolve, reject) => {
+        tagReaderEmpty.read({
+          onSuccess: resolve,
+          onError: reject
+        });
+        jest.runAllTimers();
       });
-      jest.runAllTimers();
-    }).catch(function(error) {
+    } catch (error: any) {
       expect(error.type).toBe("loadData");
-    });
+    }
   });
 });

@@ -1,73 +1,76 @@
+import * as jsmediatags from "../src/jsmediatags.js";
+import NodeFileReader from "../src/NodeFileReader.js";
+import XhrFileReader from "../src/XhrFileReader.js";
+import ArrayFileReader from "../src/ArrayFileReader.js";
+import ID3v1TagReader from "../src/ID3v1TagReader.js";
+import ID3v2TagReader from "../src/ID3v2TagReader.js";
+import MP4TagReader from "../src/MP4TagReader.js";
+import FLACTagReader from "../src/FLACTagReader.js";
+
 jest
   .enableAutomock()
-  .dontMock("../jsmediatags.js")
-  .dontMock("../ByteArrayUtils.js");
+  .dontMock("../src/jsmediatags.js")
+  .dontMock("../src/ByteArrayUtils.js");
 
-const jsmediatags = require("../jsmediatags");
-const NodeFileReader = require("../NodeFileReader");
-const XhrFileReader = require("../XhrFileReader");
-const ArrayFileReader = require("../ArrayFileReader");
-const ID3v1TagReader = require("../ID3v1TagReader");
-const ID3v2TagReader = require("../ID3v2TagReader");
-const MP4TagReader = require("../MP4TagReader");
-const FLACTagReader = require("../FLACTagReader");
-
-function throwOnSuccess(onError) {
+function throwOnSuccess(onError: () => void) {
   return {
-    onSuccess: function() {
+    onSuccess: () => {
       throw new Error();
     },
     onError: onError
   }
 }
 
-describe("jsmediatags", function() {
+describe("jsmediatags", () => {
   var mockFileReader;
   var mockTags = {};
 
-  beforeEach(function() {
+  beforeEach(() => {
     jsmediatags.Config.removeTagReader(ID3v1TagReader);
     jsmediatags.Config.removeTagReader(MP4TagReader);
     jsmediatags.Config.removeTagReader(FLACTagReader);
     // Reset auto mock to its original state.
     NodeFileReader.canReadFile = jest.fn();
     NodeFileReader.prototype.init = jest.fn()
-      .mockImplementation(function(callbacks) {
-        setTimeout(function() {
+      .mockImplementation(callbacks => {
+        setTimeout(() => {
           callbacks.onSuccess();
         }, 1);
       });
     NodeFileReader.prototype.loadRange = jest.fn()
-      .mockImplementation(function(range, callbacks) {
-        setTimeout(function() {
+      .mockImplementation((range, callbacks) => {
+        setTimeout(() => {
           callbacks.onSuccess();
         }, 1);
       });
 
+      // @ts-ignore
     ID3v2TagReader.getTagIdentifierByteRange.mockReturnValue(
       {offset: 0, length: 0}
     );
     ID3v2TagReader.prototype.setTagsToRead = jest.fn().mockReturnThis();
   });
 
-  it("should read tags with the shortcut function", function() {
+  it("should read tags with the shortcut function", async () => {
+    // @ts-ignore
     NodeFileReader.canReadFile.mockReturnValue(true);
+    // @ts-ignore
     ID3v2TagReader.canReadTagFormat.mockReturnValue(true);
     ID3v2TagReader.prototype.read = jest.fn()
-      .mockImplementation(function(callbacks) {
+      .mockImplementation(callbacks => {
         callbacks.onSuccess(mockTags);
       });
 
-    return new Promise(function(resolve, reject) {
-      jsmediatags.read("fakefile", {onSuccess: resolve, onError: reject});
+    const tags = await new Promise((resolve, reject) => {
+      jsmediatags.read("fakefile", { onSuccess: resolve, onError: reject });
       jest.runAllTimers();
-    }).then(function(tags) {
-      expect(tags).toBe(mockTags);
     });
+    expect(tags).toBe(mockTags);
   });
 
-  describe("file readers", function() {
-    it("should use the given file reader", function() {
+  describe("file readers", () => {
+    it("should use the given file reader", () => {
+      // @ts-ignore
       var reader = new jsmediatags.Reader();
       var MockFileReader = jest.fn();
 
@@ -77,27 +80,33 @@ describe("jsmediatags", function() {
       expect(fileReader).toBe(MockFileReader);
     });
 
-    it("should use the node file reader", function() {
+    it("should use the node file reader", () => {
+      // @ts-ignore
       NodeFileReader.canReadFile.mockReturnValue(true);
 
+      // @ts-ignore
       var reader = new jsmediatags.Reader();
       var FileReader = reader._getFileReader();
 
       expect(FileReader).toBe(NodeFileReader);
     });
 
-    it("should use the Array file reader for Buffers", function() {
+    it("should use the Array file reader for Buffers", () => {
+      // @ts-ignore
       ArrayFileReader.canReadFile.mockReturnValue(true);
 
+      // @ts-ignore
       var reader = new jsmediatags.Reader();
       var FileReader = reader._getFileReader();
 
       expect(FileReader).toBe(ArrayFileReader);
     });
 
-    it("should use the XHR file reader", function() {
+    it("should use the XHR file reader", () => {
+      // @ts-ignore
       XhrFileReader.canReadFile.mockReturnValue(true);
 
+      // @ts-ignore
       var reader = new jsmediatags.Reader();
       var FileReader = reader._getFileReader();
 
@@ -105,100 +114,113 @@ describe("jsmediatags", function() {
     });
   });
 
-  describe("tag readers", function() {
-    it("should use the given tag reader", function() {
+  describe("tag readers", () => {
+    it("should use the given tag reader", async () => {
       var MockTagReader = jest.fn();
 
-      return new Promise(function(resolve, reject) {
+      const TagReader = await new Promise((resolve, reject) => {
+        // @ts-ignore
         var reader = new jsmediatags.Reader();
         reader.setTagReader(MockTagReader);
-        reader._getTagReader(null, {onSuccess: resolve, onError: reject});
+        reader._getTagReader(null, { onSuccess: resolve, onError: reject });
         jest.runAllTimers();
-      }).then(function(TagReader) {
-        expect(TagReader).toBe(MockTagReader);
       });
+      expect(TagReader).toBe(MockTagReader);
     });
 
-    it("should use the tag reader that is able to read the tags", function() {
+    it("should use the tag reader that is able to read the tags", async () => {
       var MockTagReader = jest.fn();
       jsmediatags.Config.addTagReader(MockTagReader);
 
+      // @ts-ignore
       ID3v2TagReader.canReadTagFormat.mockReturnValue(false);
       MockTagReader.getTagIdentifierByteRange = jest.fn()
+      // @ts-ignore
         .mockReturnValue([]);
       MockTagReader.canReadTagFormat = jest.fn()
+      // @ts-ignore
         .mockReturnValue(true);
 
-      return new Promise(function(resolve, reject) {
+      const TagReader = await new Promise((resolve, reject) => {
+        // @ts-ignore
         var reader = new jsmediatags.Reader();
-        reader._getTagReader(new NodeFileReader(), {onSuccess: resolve, onError: reject});
+        reader._getTagReader(new NodeFileReader(), { onSuccess: resolve, onError: reject });
         jest.runAllTimers();
-      }).then(function(TagReader) {
-        jsmediatags.Config.removeTagReader(MockTagReader);
-
-        expect(TagReader).toBe(MockTagReader);
       });
+      jsmediatags.Config.removeTagReader(MockTagReader);
+      expect(TagReader).toBe(MockTagReader);
     });
 
-    it("should fail if no tag reader is found", function() {
+    it("should fail if no tag reader is found", () => {
+      // @ts-ignore
       ID3v2TagReader.canReadTagFormat.mockReturnValue(false);
-      return new Promise(function(resolve, reject) {
+      return new Promise(resolve => {
+        // @ts-ignore
         var reader = new jsmediatags.Reader();
         reader._getTagReader(new NodeFileReader(), throwOnSuccess(resolve));
         jest.runAllTimers();
       });
     });
 
-    it("should load the super set range of all tag reader ranges", function() {
+    it("should load the super set range of all tag reader ranges", async () => {
       var MockTagReader = jest.fn();
       jsmediatags.Config.addTagReader(MockTagReader);
 
+      // @ts-ignore
       ID3v2TagReader.canReadTagFormat.mockReturnValue(false);
+      // @ts-ignore
       ID3v2TagReader.getTagIdentifierByteRange.mockReturnValue(
         {offset: 2, length: 3}
       );
       MockTagReader.getTagIdentifierByteRange = jest.fn()
+      // @ts-ignore
         .mockReturnValue({offset: 5, length: 2});
       MockTagReader.canReadTagFormat = jest.fn()
+      // @ts-ignore
         .mockReturnValue(true);
 
-      return new Promise(function(resolve, reject) {
+      await new Promise((resolve, reject) => {
+        // @ts-ignore
         var reader = new jsmediatags.Reader();
-        reader._findTagReader(new NodeFileReader(), {onSuccess: resolve, onError: reject});
+        reader._findTagReader(new NodeFileReader(), { onSuccess: resolve, onError: reject });
         jest.runAllTimers();
-      }).then(function() {
-        jsmediatags.Config.removeTagReader(MockTagReader);
-        var rangeSuperset = NodeFileReader.prototype.loadRange.mock.calls[0][0];
-        expect(rangeSuperset).toEqual([2, 6]);
       });
+      jsmediatags.Config.removeTagReader(MockTagReader);
+      var rangeSuperset = NodeFileReader.prototype.loadRange.mock.calls[0][0];
+      expect(rangeSuperset).toEqual([2, 6]);
     });
 
-    it("should not load the entire file if two tag loaders require start and end ranges for tag identifier", function() {
+    it("should not load the entire file if two tag loaders require start and end ranges for tag identifier", async () => {
       var fileReader = new NodeFileReader();
       var MockTagReader = jest.fn();
       jsmediatags.Config.addTagReader(MockTagReader);
 
+      // @ts-ignore
       fileReader.getSize.mockReturnValue(1024);
 
+      // @ts-ignore
       ID3v2TagReader.canReadTagFormat.mockReturnValue(false);
+      // @ts-ignore
       ID3v2TagReader.getTagIdentifierByteRange.mockReturnValue(
         {offset: 0, length: 3}
       );
       MockTagReader.getTagIdentifierByteRange = jest.fn()
+      // @ts-ignore
         .mockReturnValue({offset: -3, length: 3});
       MockTagReader.canReadTagFormat = jest.fn()
+      // @ts-ignore
         .mockReturnValue(true);
 
-      return new Promise(function(resolve, reject) {
+      await new Promise((resolve, reject) => {
+        // @ts-ignore
         var reader = new jsmediatags.Reader();
-        reader._findTagReader(fileReader, {onSuccess: resolve, onError: reject});
+        reader._findTagReader(fileReader, { onSuccess: resolve, onError: reject });
         jest.runAllTimers();
-      }).then(function() {
-        jsmediatags.Config.removeTagReader(MockTagReader);
-        var loadRangeCalls = NodeFileReader.prototype.loadRange.mock.calls;
-        expect(loadRangeCalls[0][0]).toEqual([0, 2]);
-        expect(loadRangeCalls[1][0]).toEqual([1021, 1023]);
       });
+      jsmediatags.Config.removeTagReader(MockTagReader);
+      var loadRangeCalls = NodeFileReader.prototype.loadRange.mock.calls;
+      expect(loadRangeCalls[0][0]).toEqual([0, 2]);
+      expect(loadRangeCalls[1][0]).toEqual([1021, 1023]);
     });
   });
 });

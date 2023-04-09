@@ -2,16 +2,20 @@
  * Extended from https://facebook.github.io/jest/docs/manual-mocks.html
  */
 // Get the real (not mocked) version of the 'path' module
-var path = require('path');
+import * as path from "node:path";
 
 // Get the automatic mock for `fs`
 var fsMock = jest.genMockFromModule('fs');
 
+interface MockFiles {
+  [file: string]: string | MockFiles;
+}
+
 // This is a custom function that our tests can use during setup to specify
 // what the files on the "mock" filesystem should look like when any of the
 // `fs` APIs are used.
-var _mockFiles = {};
-function __setMockFiles(newMockFiles) {
+var _mockFiles: MockFiles = {};
+function __setMockFiles(newMockFiles: MockFiles) {
   _mockFiles = {};
 
   for (var file in newMockFiles) {
@@ -27,12 +31,12 @@ function __setMockFiles(newMockFiles) {
 
 // A custom version of `readdirSync` that reads from the special mocked out
 // file list set via __setMockFiles
-function readdirSync(directoryPath) {
+function readdirSync(directoryPath: string) {
   return _mockFiles[directoryPath] || [];
 };
 
 var _fds = [];
-function open(path, flags, mode, callback) {
+function open(path: string, flags, mode, callback) {
   var fd = _fds.push({
     path: path
   }) - 1;
@@ -62,7 +66,7 @@ function read(fd, buffer, offset, length, position, callback) {
   }
 }
 
-function stat(_path, callback) {
+function stat(_path: string, callback) {
   var dir = path.dirname(_path);
   var name = path.basename(_path);
 

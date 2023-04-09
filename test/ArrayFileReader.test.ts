@@ -1,48 +1,46 @@
+import ArrayFileReader from '../src/ArrayFileReader.js';
+
 jest
-  .dontMock('../ArrayFileReader.js')
-  .dontMock('../MediaFileReader.js');
+  .dontMock('../src/ArrayFileReader.js')
+  .dontMock('../src/MediaFileReader.js');
 
-var ArrayFileReader = require('../ArrayFileReader');
-
-function throwOnError(onSuccess) {
+function throwOnError(onSuccess: () => void) {
   return {
     onSuccess: onSuccess,
-    onError: function() {
+    onError: () => {
       throw new Error();
     }
   }
 }
 
-describe("ArrayFileReader", function() {
-  var fileReader;
+describe("ArrayFileReader", () => {
+  var fileReader: ArrayFileReader;
 
-  beforeEach(function() {
-    fileReader = new ArrayFileReader(new Buffer("This is a simple file"));
+  beforeEach(() => {
+    fileReader = new ArrayFileReader([...Buffer.from("This is a simple file")]);
   });
 
-  it("should be able to read the right type of files", function() {
-    expect(ArrayFileReader.canReadFile(new Buffer('Test'))).toBe(true);
+  it("should be able to read the right type of files", () => {
+    expect(ArrayFileReader.canReadFile(Buffer.from('Test'))).toBe(true);
     expect(ArrayFileReader.canReadFile([10, 24])).toBe(true);
     expect(ArrayFileReader.canReadFile("fakefile")).toBe(false);
     expect(ArrayFileReader.canReadFile("http://localhost")).toBe(false);
     expect(ArrayFileReader.canReadFile(new Blob())).toBe(false);
   });
 
-  it("should have the right size information", function() {
-    return new Promise(function(resolve, reject) {
+  it("should have the right size information", async () => {
+    await new Promise<void>(resolve => {
       fileReader.init(throwOnError(resolve));
       jest.runAllTimers();
-    }).then(function() {
-      expect(fileReader.getSize()).toBe(21);
     });
+    expect(fileReader.getSize()).toBe(21);
   });
 
-  it("should read a byte", function() {
-    return new Promise(function(resolve, reject) {
+  it("should read a byte", async () => {
+    await new Promise<void>(resolve => {
       fileReader.loadRange([0, 4], throwOnError(resolve));
       jest.runAllTimers();
-    }).then(function(tags) {
-      expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
     });
+    expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 });

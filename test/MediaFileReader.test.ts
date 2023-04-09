@@ -1,12 +1,12 @@
-jest
-  .dontMock('../MediaFileReader.js')
-  .dontMock('../StringUtils.js');
+import MediaFileReader from '../src/MediaFileReader.js';
 
-var MediaFileReader = require('../MediaFileReader');
+jest
+  .dontMock('../src/MediaFileReader.js')
+  .dontMock('../src/StringUtils.js');
 
 describe("MediaFileReader", function() {
-  var mediaFileReader;
-  var mediaFileBytes = [];
+  var mediaFileReader: MediaFileReader;
+  var mediaFileBytes: number[] = [];
 
   beforeEach(function() {
     mediaFileReader = new MediaFileReader();

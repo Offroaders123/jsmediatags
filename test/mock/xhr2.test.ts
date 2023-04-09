@@ -1,7 +1,11 @@
 var xhr2Mock = jest.genMockFromModule('xhr2');
 
-var _mockUrls = {};
-function __setMockUrls(newMockUrls) {
+interface MockURLs {
+  [url: string]: string | MockURLs;
+}
+
+var _mockUrls: MockURLs = {};
+function __setMockUrls(newMockUrls: MockURLs) {
   _mockUrls = {};
 
   for (var url in newMockUrls) {
@@ -9,7 +13,7 @@ function __setMockUrls(newMockUrls) {
   }
 };
 
-function isRangeDisabled(url) {
+function isRangeDisabled(url: string) {
   return !!(_mockUrls[url] || {}).disableRange;
 }
 
@@ -34,7 +38,7 @@ function getUrlContents(url, range) {
   return range ? contents.slice(range[0], range[1] + 1) : contents;
 }
 
-function getUrlFileLength(url) {
+function getUrlFileLength(url: string) {
   var urlData = _mockUrls[url];
 
   if (urlData == null || urlData.unknownLength) {
@@ -44,7 +48,7 @@ function getUrlFileLength(url) {
   return getUrlContents(url).length;
 }
 
-function isHeaderDisallowed(url, header) {
+function isHeaderDisallowed(url: string, header) {
   var urlData = _mockUrls[url];
   return (
     urlData != null &&
@@ -52,7 +56,7 @@ function isHeaderDisallowed(url, header) {
   );
 }
 
-function getUrlContentLength(url, range) {
+function getUrlContentLength(url: string, range) {
   if (isHeaderDisallowed(url, 'content-length')) {
     return null;
   }
@@ -60,7 +64,7 @@ function getUrlContentLength(url, range) {
   return getUrlContents(url, range).length;
 }
 
-function getUrlStatusCode(url) {
+function getUrlStatusCode(url: string) {
   var urlData = _mockUrls[url];
 
   if (urlData == null) {

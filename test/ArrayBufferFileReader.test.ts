@@ -1,56 +1,54 @@
+import ArrayBufferFileReader from '../src/ArrayBufferFileReader.js';
+
 jest
-    .dontMock('../ArrayBufferFileReader.js')
-    .dontMock('../MediaFileReader.js')
-    .dontMock('../ChunkedFileData.js');
+    .dontMock('../src/ArrayBufferFileReader.js')
+    .dontMock('../src/MediaFileReader.js')
+    .dontMock('../src/ChunkedFileData.js');
 
-var ArrayBufferFileReader = require('../ArrayBufferFileReader');
-
-function throwOnError(onSuccess) {
+function throwOnError(onSuccess: () => void) {
     return {
         onSuccess: onSuccess,
-        onError: function() {
+        onError: () => {
             throw new Error();
         }
     }
 }
 
-function str2ab(str) {
-    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-    var bufView = new Uint16Array(buf);
-    for (var i=0, strLen=str.length; i<strLen; i++) {
+function str2ab(str: string) {
+    const buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+    const bufView = new Uint16Array(buf);
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
         bufView[i] = str.charCodeAt(i);
     }
     return buf;
 }
 
-describe("ArrayBufferFileReader", function() {
-    var fileReader;
+describe("ArrayBufferFileReader", () => {
+    let fileReader: ArrayBufferFileReader;
     const arrBuffer = str2ab('TEST');
 
-    beforeEach(function() {
+    beforeEach(() => {
         fileReader = new ArrayBufferFileReader(arrBuffer);
     });
 
-    it("should be able to read the right type of files", function() {
+    it("should be able to read the right type of files", () => {
         expect(ArrayBufferFileReader.canReadFile(arrBuffer)).toBe(true);
     });
 
-    it("should have the right size information", function() {
-        return new Promise(function(resolve, reject) {
+    it("should have the right size information", async () => {
+        await new Promise<void>(resolve => {
             fileReader.init(throwOnError(resolve));
             jest.runAllTimers();
-        }).then(function() {
-            expect(fileReader.getSize()).toBe(8);
         });
+        expect(fileReader.getSize()).toBe(8);
     });
 
-    it("should read a byte", function() {
-        return new Promise(function(resolve, reject) {
+    it("should read a byte", async () => {
+        await new Promise<void>(resolve => {
             fileReader.loadRange([0, 4], throwOnError(resolve));
             jest.runAllTimers();
-        }).then(function(tags) {
-            expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
         });
+        expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
     });
 
 });

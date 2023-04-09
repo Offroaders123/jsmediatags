@@ -1,15 +1,16 @@
-import MediaFileReader from './MediaFileReader.js';
-import MediaTagReader from './MediaTagReader.js';
+import MediaFileReader from "./MediaFileReader.js";
+import MediaTagReader from "./MediaTagReader.js";
 
-import type { LoadCallbackType, ByteRange, TagType } from './FlowTypes.js';
+import type { LoadCallbackType, ByteRange, TagType, PictureType } from "./FlowTypes.js";
 
-/**
+/*
  * The first 4 bytes of a FLAC file describes the header for the file. If these
  * bytes respectively read "fLaC", we can determine it is a FLAC file.
  */
+
 const FLAC_HEADER_SIZE = 4;
 
-/**
+/*
  * FLAC metadata is stored in blocks containing data ranging from STREAMINFO to
  * VORBIS_COMMENT, which is what we want to work with.
  *
@@ -28,8 +29,14 @@ const FLAC_HEADER_SIZE = 4;
  * All values for METADATA_BLOCK_HEADER can be found here.
  * https://xiph.org/flac/format.html#metadata_block_header
  */
-const COMMENT_HEADERS = [4, 132];
-const PICTURE_HEADERS = [6, 134];
+
+type COMMENT_HEADERS = typeof COMMENT_HEADERS[number];
+
+const COMMENT_HEADERS = [4, 132] as const;
+
+type PICTURE_HEADERS = typeof PICTURE_HEADERS[number];
+
+const PICTURE_HEADERS = [6, 134] as const;
 
 /**
  * These are the possible image types as defined by the FLAC specification.
@@ -91,8 +98,8 @@ export default class FLACTagReader extends MediaTagReader {
    * @return True if the header is fLaC, false otherwise.
    */
   static canReadTagFormat(tagIdentifier: number[]): boolean {
-    var id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 4));
-    return id === 'fLaC';
+    const id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 4));
+    return id === "fLaC";
   }
 
   /**
@@ -107,10 +114,9 @@ export default class FLACTagReader extends MediaTagReader {
    * @param callbacks - The callback to call once _loadData is completed.
    */
   _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
-    var self = this;
     mediaFileReader.loadRange([4, 7], {
-      onSuccess: function() {
-        self._loadBlock(mediaFileReader, 4, callbacks);
+      onSuccess: () => {
+        this._loadBlock(mediaFileReader, 4, callbacks);
       }
     });
   }
@@ -131,6 +137,7 @@ export default class FLACTagReader extends MediaTagReader {
    *
    * More info on the FLAC specification may be found here:
    * https://xiph.org/flac/format.html
+   * 
    * @param mediaFileReader - The MediaFileReader used to parse the file.
    * @param offset - The offset to start checking the header from.
    * @param callbacks - The callback to call once the header has been found.
@@ -140,18 +147,17 @@ export default class FLACTagReader extends MediaTagReader {
     offset: number,
     callbacks: LoadCallbackType
   ) {
-    var self = this;
     /**
      * As mentioned above, this first byte is loaded to see what metadata type
      * this block represents.
      */
-    var blockHeader = mediaFileReader.getByteAt(offset);
+    const blockHeader = mediaFileReader.getByteAt(offset);
     /**
      * The last three bytes (integer 24) contain a value representing the length
      * of the following metadata block. The 1 is added in order to shift the offset
      * by one to get the last three bytes in the block header.
      */
-    var blockSize = mediaFileReader.getInteger24At(offset + 1, true);
+    const blockSize = mediaFileReader.getInteger24At(offset + 1, true);
     /**
      * This conditional checks if blockHeader (the byte retrieved representing the
      * type of the header) is one the headers we are looking for.
@@ -164,29 +170,29 @@ export default class FLACTagReader extends MediaTagReader {
      * the exception of adding another 4 bytes to move it to the end of the new metadata
      * header.
      */
-    if (COMMENT_HEADERS.indexOf(blockHeader) !== -1) {
+    if (COMMENT_HEADERS.indexOf(blockHeader as COMMENT_HEADERS) !== -1) {
       /**
        * 4 is added to offset to move it to the head of the actual metadata.
        * The range starting from offsetMatadata (the beginning of the block)
        * and offsetMetadata + blockSize (the end of the block) is loaded.
        */
-      var offsetMetadata = offset + 4;
+      const offsetMetadata = offset + 4;
       mediaFileReader.loadRange([offsetMetadata, offsetMetadata + blockSize], {
-        onSuccess: function() {
-          self._commentOffset = offsetMetadata;
-          self._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
+        onSuccess: () => {
+          this._commentOffset = offsetMetadata;
+          this._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
         }
       });
-    } else if (PICTURE_HEADERS.indexOf(blockHeader) !== -1) {
-      var offsetMetadata = offset + 4;
+    } else if (PICTURE_HEADERS.indexOf(blockHeader as PICTURE_HEADERS) !== -1) {
+      const offsetMetadata = offset + 4;
       mediaFileReader.loadRange([offsetMetadata, offsetMetadata + blockSize], {
-        onSuccess: function() {
-          self._pictureOffset = offsetMetadata;
-          self._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
+        onSuccess: () => {
+          this._pictureOffset = offsetMetadata;
+          this._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
         }
       });
     } else {
-      self._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
+      this._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
     }
   }
 
@@ -200,6 +206,7 @@ export default class FLACTagReader extends MediaTagReader {
    *
    * If the block does not exist, the error callback is called. Otherwise, the function
    * will call the success callback, allowing data parsing to begin.
+   * 
    * @param mediaFileReader - The MediaFileReader used to parse the file.
    * @param offset - The offset that the existing header was located at.
    * @param blockHeader - An integer reflecting the header type of the block.
@@ -213,20 +220,19 @@ export default class FLACTagReader extends MediaTagReader {
     blockSize: number,
     callbacks: LoadCallbackType
   ) {
-    var self = this;
     if (blockHeader > 127) {
-      if (!self._commentOffset) {
+      if (!this._commentOffset) {
         callbacks.onError?.({
-          "type": "loadData",
-          "info": "Comment block could not be found."
+          type: "loadData",
+          info: "Comment block could not be found."
         });
       } else {
         callbacks.onSuccess();
       }
     } else {
       mediaFileReader.loadRange([offset + 4 + blockSize, offset + 4 + 4 + blockSize], {
-        onSuccess: function() {
-          self._loadBlock(mediaFileReader, offset + 4 + blockSize, callbacks);
+        onSuccess: () => {
+          this._loadBlock(mediaFileReader, offset + 4 + blockSize, callbacks);
         }
       });
     }
@@ -248,19 +254,20 @@ export default class FLACTagReader extends MediaTagReader {
    *
    * Note that the longs and integers in this block are encoded in little endian
    * as opposed to big endian for the rest of the FLAC spec.
+   * 
    * @param data - The MediaFileReader to parse the file with.
    * @param tags - Optional tags to also be retrieved from the file.
    * @return - An object containing the tag information for the file.
    */
   _parseData(data: MediaFileReader, tags?: string[]): TagType {
-    var vendorLength = data.getLongAt(this._commentOffset, false);
-    var offsetVendor = this._commentOffset + 4;
+    const vendorLength = data.getLongAt(this._commentOffset, false);
+    const offsetVendor = this._commentOffset + 4;
     /* This line is able to retrieve the vendor string that the VorbisComment block
      * contains. However, it is not part of the tags that JSMediaTags normally retrieves,
      * and is therefore commented out.
      */
-    // var vendor = data.getStringWithCharsetAt(offsetVendor, vendorLength, "utf-8").toString();
-    var offsetList = vendorLength + offsetVendor;
+    // const vendor = data.getStringWithCharsetAt(offsetVendor, vendorLength, "utf-8").toString();
+    const offsetList = vendorLength + offsetVendor;
     /* To get the metadata from the block, we first get the long that contains the
      * number of actual comment values that are existent within the block.
      *
@@ -272,14 +279,19 @@ export default class FLACTagReader extends MediaTagReader {
      * Additions of 4 here are used to move the offset past the first 4 bytes which only contain
      * the length of the comment.
      */
-    var numComments = data.getLongAt(offsetList, false);
-    var dataOffset = offsetList + 4;
-    var title, artist, album, track, genre, picture;
+    const numComments = data.getLongAt(offsetList, false);
+    let dataOffset = offsetList + 4;
+    let title: string | undefined;
+    let artist: string | undefined;
+    let album: string | undefined;
+    let track: string | undefined;
+    let genre: string | undefined;
+    let picture: PictureType | undefined;
     for (let i = 0; i < numComments; i++) {
-      let dataLength = data.getLongAt(dataOffset, false);
-      let s = data.getStringWithCharsetAt(dataOffset + 4, dataLength, "utf-8").toString();
-      let d = s.indexOf("=");
-      let split = [s.slice(0, d), s.slice(d + 1)];
+      const dataLength = data.getLongAt(dataOffset, false);
+      const s = data.getStringWithCharsetAt(dataOffset + 4, dataLength, "utf-8").toString();
+      const d = s.indexOf("=");
+      const split = [s.slice(0, d), s.slice(d + 1)];
       switch (split[0].toUpperCase()) {
         case "TITLE":
           title = split[1];
@@ -307,37 +319,37 @@ export default class FLACTagReader extends MediaTagReader {
      * https://xiph.org/flac/format.html#metadata_block_picture
      */
     if (this._pictureOffset) {
-      var imageType = data.getLongAt(this._pictureOffset, true);
-      var offsetMimeLength = this._pictureOffset + 4;
-      var mimeLength = data.getLongAt(offsetMimeLength, true);
-      var offsetMime = offsetMimeLength + 4;
-      var mime = data.getStringAt(offsetMime, mimeLength);
-      var offsetDescriptionLength = offsetMime + mimeLength;
-      var descriptionLength = data.getLongAt(offsetDescriptionLength, true);
-      var offsetDescription = offsetDescriptionLength + 4;
-      var description = data.getStringWithCharsetAt(offsetDescription, descriptionLength, "utf-8").toString();
-      var offsetDataLength = offsetDescription + descriptionLength + 16;
-      var dataLength = data.getLongAt(offsetDataLength, true);
-      var offsetData = offsetDataLength + 4;
-      var imageData = data.getBytesAt(offsetData, dataLength);
+      const imageType = data.getLongAt(this._pictureOffset, true);
+      const offsetMimeLength = this._pictureOffset + 4;
+      const mimeLength = data.getLongAt(offsetMimeLength, true);
+      const offsetMime = offsetMimeLength + 4;
+      const mime = data.getStringAt(offsetMime, mimeLength);
+      const offsetDescriptionLength = offsetMime + mimeLength;
+      const descriptionLength = data.getLongAt(offsetDescriptionLength, true);
+      const offsetDescription = offsetDescriptionLength + 4;
+      const description = data.getStringWithCharsetAt(offsetDescription, descriptionLength, "utf-8").toString();
+      const offsetDataLength = offsetDescription + descriptionLength + 16;
+      const dataLength = data.getLongAt(offsetDataLength, true);
+      const offsetData = offsetDataLength + 4;
+      const imageData = data.getBytesAt(offsetData, dataLength);
       picture = {
         format: mime,
         type: IMAGE_TYPES[imageType],
-        description: description,
+        description,
         data: imageData
       }
     }
     
-    var tag = {
+    const tag = {
       type: "FLAC",
       version: "1",
       tags: {
-        "title": title,
-        "artist": artist,
-        "album": album,
-        "track": track,
-        "genre": genre,
-        "picture": picture
+        title,
+        artist,
+        album,
+        track,
+        genre,
+        picture
       }
     }
     return tag;

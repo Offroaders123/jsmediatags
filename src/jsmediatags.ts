@@ -8,10 +8,10 @@ import ID3v2TagReader from "./ID3v2TagReader.js";
 import MP4TagReader from "./MP4TagReader.js";
 import FLACTagReader from "./FLACTagReader.js";
 
-import type { CallbackType, LoadCallbackType, ByteRange } from './FlowTypes.js';
+import type { CallbackType, LoadCallbackType, ByteRange } from "./FlowTypes.js";
 
-var mediaFileReaders: typeof MediaFileReader[] = [];
-var mediaTagReaders: typeof MediaTagReader[] = [];
+const mediaFileReaders: typeof MediaFileReader[] = [];
+const mediaTagReaders: typeof MediaTagReader[] = [];
 
 export function read(location: Object, callbacks: CallbackType) {
   new Reader(location).read(callbacks);
@@ -53,16 +53,15 @@ export class Reader {
   }
 
   read(callbacks: CallbackType) {
-    var FileReader = this._getFileReader();
-    var fileReader = new FileReader(this._file);
-    var self = this;
+    const FileReader = this._getFileReader();
+    const fileReader = new FileReader(this._file);
 
     fileReader.init({
-      onSuccess: function() {
-        self._getTagReader(fileReader, {
-          onSuccess: function(TagReader: typeof MediaTagReader) {
+      onSuccess: () => {
+        this._getTagReader(fileReader, {
+          onSuccess: (TagReader: typeof MediaTagReader) => {
             new TagReader(fileReader)
-              .setTagsToRead(self._tagsToRead)
+              .setTagsToRead(this._tagsToRead)
               .read(callbacks);
           },
           onError: callbacks.onError
@@ -81,7 +80,7 @@ export class Reader {
   }
 
   _findFileReader(): typeof MediaFileReader {
-    for (var i = 0; i < mediaFileReaders.length; i++) {
+    for (let i = 0; i < mediaFileReaders.length; i++) {
       if (mediaFileReaders[i].canReadFile(this._file)) {
         return mediaFileReaders[i];
       }
@@ -92,7 +91,7 @@ export class Reader {
 
   _getTagReader(fileReader: MediaFileReader, callbacks: CallbackType) {
     if (this._tagReader) {
-      var tagReader = this._tagReader;
+      const tagReader = this._tagReader;
       setTimeout(function() {
         callbacks.onSuccess(tagReader);
       }, 1);
@@ -112,12 +111,12 @@ export class Reader {
     // To get around this we divide the tag readers into two categories, the
     // ones that read their tag identifiers from the start of the file and the
     // ones that read from the end of the file.
-    var tagReadersAtFileStart = [];
-    var tagReadersAtFileEnd = [];
-    var fileSize = fileReader.getSize();
+    const tagReadersAtFileStart = [];
+    const tagReadersAtFileEnd = [];
+    const fileSize = fileReader.getSize();
 
-    for (var i = 0; i < mediaTagReaders.length; i++) {
-      var range = mediaTagReaders[i].getTagIdentifierByteRange();
+    for (let i = 0; i < mediaTagReaders.length; i++) {
+      const range = mediaTagReaders[i].getTagIdentifierByteRange();
       if (!isRangeValid(range, fileSize)) {
         continue;
       }
@@ -132,8 +131,8 @@ export class Reader {
       }
     }
 
-    var tagsLoaded = false;
-    var loadTagIdentifiersCallbacks = {
+    let tagsLoaded = false;
+    const loadTagIdentifiersCallbacks = {
       onSuccess: function() {
         if (!tagsLoaded) {
           // We're expecting to load two sets of tag identifiers. This flag
@@ -142,22 +141,23 @@ export class Reader {
           return;
         }
 
-        for (var i = 0; i < mediaTagReaders.length; i++) {
-          var range = mediaTagReaders[i].getTagIdentifierByteRange();
+        for (let i = 0; i < mediaTagReaders.length; i++) {
+          const range = mediaTagReaders[i].getTagIdentifierByteRange();
           if (!isRangeValid(range, fileSize)) {
             continue;
           }
 
+          let tagIndentifier: number[];
           try {
-            var tagIndentifier = fileReader.getBytesAt(
+            tagIndentifier = fileReader.getBytesAt(
               range.offset >= 0 ? range.offset : range.offset + fileSize,
               range.length
             );
           } catch (ex: any) {
             if (callbacks.onError) {
               callbacks.onError({
-                "type": "fileReader",
-                "info": ex.message
+                type: "fileReader",
+                info: ex.message
               });
             }
             return;
@@ -171,8 +171,8 @@ export class Reader {
 
         if (callbacks.onError) {
           callbacks.onError({
-            "type": "tagFormat",
-            "info": "No suitable tag reader found"
+            type: "tagFormat",
+            info: "No suitable tag reader found"
           });
         }
       },
@@ -194,16 +194,16 @@ export class Reader {
       return;
     }
 
-    var tagIdentifierRange: [number,number] = [Number.MAX_VALUE, 0];
-    var fileSize = fileReader.getSize();
+    const tagIdentifierRange: [number,number] = [Number.MAX_VALUE, 0];
+    const fileSize = fileReader.getSize();
 
     // Create a super set of all ranges so we can load them all at once.
     // Might need to rethink this approach if there are tag ranges too far
     // a part from each other. We're good for now though.
-    for (var i = 0; i < tagReaders.length; i++) {
-      var range = tagReaders[i].getTagIdentifierByteRange();
-      var start = range.offset >= 0 ? range.offset : range.offset + fileSize;
-      var end = start + range.length - 1;
+    for (let i = 0; i < tagReaders.length; i++) {
+      const range = tagReaders[i].getTagIdentifierByteRange();
+      const start = range.offset >= 0 ? range.offset : range.offset + fileSize;
+      const end = start + range.length - 1;
 
       tagIdentifierRange[0] = Math.min(start, tagIdentifierRange[0]);
       tagIdentifierRange[1] = Math.max(end, tagIdentifierRange[1]);
@@ -225,7 +225,7 @@ export class Config {
   }
 
   static removeTagReader(tagReader: typeof MediaTagReader): typeof Config {
-    var tagReaderIx = mediaTagReaders.indexOf(tagReader);
+    const tagReaderIx = mediaTagReaders.indexOf(tagReader);
 
     if (tagReaderIx >= 0) {
       mediaTagReaders.splice(tagReaderIx, 1);
@@ -265,10 +265,10 @@ Config
 // @ts-expect-error
 if (typeof process !== "undefined" && !process.browser) {
   if (typeof navigator !== "undefined" && navigator.product === "ReactNative") {
-    const { default: ReactNativeFileReader } = await import('./ReactNativeFileReader.js');
+    const { default: ReactNativeFileReader } = await import("./ReactNativeFileReader.js");
     Config.addFileReader(ReactNativeFileReader);
   } else {
-    const { default: NodeFileReader } = await import('./NodeFileReader.js');
+    const { default: NodeFileReader } = await import("./NodeFileReader.js");
     Config.addFileReader(NodeFileReader);
   }
 }

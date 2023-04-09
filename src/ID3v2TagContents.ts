@@ -9,9 +9,9 @@
  * TODO: Padding and Footer
  */
 
-import { bin, getSynchsafeInteger32, getInteger32, getInteger24 } from './ByteArrayUtils.js';
+import { bin, getSynchsafeInteger32, getInteger32, getInteger24 } from "./ByteArrayUtils.js";
 
-import type { ByteArray, TagHeaderFlags, TagFrameFlags } from './FlowTypes.js';
+import type { ByteArray, TagHeaderFlags, TagFrameFlags } from "./FlowTypes.js";
 
 // Offsets
 const FLAGS = 5;
@@ -42,7 +42,7 @@ export default class ID3v2TagContents {
 
   constructor(major: number, revision: number) {
     if (major < 2 || major > 4) {
-      throw new Error('Major version not supported');
+      throw new Error("Major version not supported");
     }
 
     this._major = major;
@@ -58,9 +58,9 @@ export default class ID3v2TagContents {
     this._updateSize();
     this._extendedHeader = {
       // key: length
-      'UPDATE': 0,
-      'CRC': 0,
-      'RESTRICTIONS': 0
+      UPDATE: 0,
+      CRC: 0,
+      RESTRICTIONS: 0
     };
   }
 
@@ -73,7 +73,7 @@ export default class ID3v2TagContents {
   }
 
   _updateFlags(flags: Partial<TagHeaderFlags>, binaryFlags?: number): ID3v2TagContents {
-    if (typeof binaryFlags !== 'number') {
+    if (typeof binaryFlags !== "number") {
       binaryFlags = this._contents[FLAGS] || 0;
     }
 
@@ -85,16 +85,16 @@ export default class ID3v2TagContents {
       }
     }
 
-    if (flags.hasOwnProperty('unsynchronisation')) {
+    if (flags.hasOwnProperty("unsynchronisation")) {
       binaryFlags = setOrUnsetBit(!!flags.unsynchronisation, binaryFlags, 7);
     }
-    if (flags.hasOwnProperty('extended_header')) {
+    if (flags.hasOwnProperty("extended_header")) {
       binaryFlags = setOrUnsetBit(!!flags.extended_header, binaryFlags, 6);
     }
-    if (flags.hasOwnProperty('experimental_indicator')) {
+    if (flags.hasOwnProperty("experimental_indicator")) {
       binaryFlags = setOrUnsetBit(!!flags.experimental_indicator, binaryFlags, 5);
     }
-    if (flags.hasOwnProperty('footer_present')) {
+    if (flags.hasOwnProperty("footer_present")) {
       binaryFlags = setOrUnsetBit(!!flags.footer_present, binaryFlags, 4);
     }
 
@@ -110,12 +110,12 @@ export default class ID3v2TagContents {
     if (this._major === 3) {
       this._setBitAtOffset(EXTENDED_FLAGS_V3, 7);
       this._setData(START_EXTENDED_DATA_V3, crc);
-      this._extendedHeader['CRC'] = crc.length;
+      this._extendedHeader["CRC"] = crc.length;
       // Update extended header size.
       this._setData(EXTENDED_HEADER, getInteger32(10));
     } else if (this._major === 4) {
       this._setBitAtOffset(EXTENDED_FLAGS_V4, 5);
-      this._addExtendedHeaderData('CRC', crc);
+      this._addExtendedHeaderData("CRC", crc);
     }
 
     this._updateSize();
@@ -197,7 +197,7 @@ export default class ID3v2TagContents {
     if (this._major === 4) {
       this._setBitAtOffset(EXTENDED_FLAGS_V4, 4);
       // 0x03 = 0b11
-      this._addExtendedHeaderData('RESTRICTIONS', [
+      this._addExtendedHeaderData("RESTRICTIONS", [
         (size & 0x3) << 6 |
         (textEncoding & 0x1) << 5 |
         (textSize & 0x3) << 3 |
@@ -221,20 +221,20 @@ export default class ID3v2TagContents {
     flags?: TagFrameFlags,
     noFlagsDataLength?: number
   ): ID3v2TagContents {
-    var size: number | ByteArray = 0;
-    var frameFlags = [0, 0];
+    let size: number | ByteArray = 0;
+    const frameFlags = [0, 0];
     if (flags) {
       flags.message = flags.message || {};
       flags.format = flags.format || {};
     }
     data = data || [];
 
-    var dataLength = data.length;
-    var isTagUnsynchronised = this._contents[FLAGS] & (1<<7);
+    let dataLength = data.length;
+    const isTagUnsynchronised = this._contents[FLAGS] & (1<<7);
     if (isTagUnsynchronised) {
-      var unsynchronisedByteCount = 0;
+      let unsynchronisedByteCount = 0;
 
-      for (var i = 0; i < data.length - 1; i++) {
+      for (let i = 0; i < data.length - 1; i++) {
         if (data[i] === 0xff && data[i+1] === 0x00) {
           unsynchronisedByteCount++;
         }
@@ -273,7 +273,7 @@ export default class ID3v2TagContents {
       throw Error("Major version not supported");
     }
 
-    var frame = [].concat(
+    const frame = [].concat(
       // @ts-expect-error
       bin(id),
       size,
@@ -294,7 +294,7 @@ export default class ID3v2TagContents {
   }
 
   _addExtendedHeaderData(tagKey: string, tagData: ByteArray) {
-    var offset = START_EXTENDED_DATA_V4;
+    const offset = START_EXTENDED_DATA_V4;
 
     // Each flag that is set in the extended header has data attached, which
     // comes in the order in which the flags are encountered (i.e. the data
@@ -303,7 +303,7 @@ export default class ID3v2TagContents {
     // size of the data. To know where to add a particular tag data we just need
     // to sum all the data lengths of the tags that come before this tagKey
     // because the keys in the map are in order.
-    for (var key in this._extendedHeader) {
+    for (let key in this._extendedHeader) {
       if (this._extendedHeader.hasOwnProperty(key)) {
         if (key === tagKey) {
           break;
@@ -314,7 +314,7 @@ export default class ID3v2TagContents {
       }
     }
 
-    var data = [tagData.length].concat(tagData);
+    const data = [tagData.length].concat(tagData);
     // @ts-expect-error
     this._extendedHeader[tagKey] = data.length;
     this._addData(offset, data);
@@ -344,13 +344,13 @@ export default class ID3v2TagContents {
 
   _updateSize() {
     // Header (10 bytes) is not included in the size.
-    var size = 0;
+    let size = 0;
 
     if (this._hasExtendedHeader) {
       // Extended header size
       size += this._major === 4 ? 6 : 10;
       // Extended header data size
-      for (var key in this._extendedHeader) {
+      for (let key in this._extendedHeader) {
         if (this._extendedHeader.hasOwnProperty(key)) {
           // @ts-expect-error
           size += this._extendedHeader[key];
@@ -358,9 +358,9 @@ export default class ID3v2TagContents {
       }
     }
 
-    for (var frameId in this._frames) {
+    for (let frameId in this._frames) {
       if (this._frames.hasOwnProperty(frameId)) {
-        for (var i = 0, frame; frame = this._frames[frameId][i]; i++) {
+        for (let i = 0, frame; frame = this._frames[frameId][i]; i++) {
           size += frame.length;
         }
       }
@@ -373,7 +373,7 @@ export default class ID3v2TagContents {
   }
 
   _setBitAtOffset(offset: number, bit: number) {
-    var data = this._getData(offset, 1);
+    const data = this._getData(offset, 1);
     data[0] |= 1<<bit;
     this._setData(offset, data);
   }

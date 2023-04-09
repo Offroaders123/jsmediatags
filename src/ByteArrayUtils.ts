@@ -1,11 +1,11 @@
-import type { ByteArray } from './FlowTypes.js';
+import type { ByteArray } from "./FlowTypes.js";
 
 /**
  * Converts a string to a binary array
  */
 export function bin(string: string): ByteArray {
-  var binaryArray: ByteArray = new Array(string.length);
-  for (var i = 0; i < string.length; i++) {
+  const binaryArray: ByteArray = new Array(string.length);
+  for (let i = 0; i < string.length; i++) {
     binaryArray[i] = string.charCodeAt(i);
   }
   return binaryArray;
@@ -15,7 +15,7 @@ export function bin(string: string): ByteArray {
  * Pads an array with \0 until it is size length.
  */
 export function pad(array: any[], size: number): any[] {
-  for (var i = array.length; i < size; i++) {
+  for (let i = array.length; i < size; i++) {
     array.push(0);
   }
   return array;

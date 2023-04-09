@@ -5,9 +5,9 @@
  * http://atomicparsley.sourceforge.net/mpeg-4files.html
  */
 
-import { bin, pad, getInteger32 } from './ByteArrayUtils.js';
+import { bin, pad, getInteger32 } from "./ByteArrayUtils.js";
 
-import type { ByteArray } from './FlowTypes.js';
+import type { ByteArray } from "./FlowTypes.js";
 
 export default class MP4TagContents {
   declare _atoms: Atom[];
@@ -34,12 +34,12 @@ export default class MP4TagContents {
   }
 
   static createMetadataAtom(atomName: string, type: string, data: ByteArray): Atom {
-    var klass = {
-      "uint8": 0,
-      "uint8b": 21, // Apple changed from 21 to 0 in latest versions
-      "text": 1,
-      "jpeg": 13,
-      "png": 14,
+    const klass = {
+      uint8: 0,
+      uint8b: 21, // Apple changed from 21 to 0 in latest versions
+      text: 1,
+      jpeg: 13,
+      png: 14,
     }[type];
 
     return this.createContainerAtom(atomName, [
@@ -65,11 +65,11 @@ class Atom {
   }
 
   toArray(): ByteArray {
-    var atomsArray = this._atoms.reduce(function(array, atom) {
+    const atomsArray = this._atoms.reduce(function(array, atom) {
       // @ts-expect-error
       return array.concat(atom.toArray());
     }, []);
-    var length = 4 + this._name.length + this._data.length + atomsArray.length;
+    const length = 4 + this._name.length + this._data.length + atomsArray.length;
 
     return [].concat(
       // @ts-expect-error

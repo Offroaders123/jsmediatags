@@ -1,7 +1,7 @@
-import { readUTF8String, readUTF16String, readNullTerminatedString } from './StringUtils.js';
+import { readUTF8String, readUTF16String, readNullTerminatedString } from "./StringUtils.js";
 
-import type { DecodedString } from './StringUtils.js';
-import type { LoadCallbackType, CharsetType } from './FlowTypes.js';
+import type { DecodedString } from "./StringUtils.js";
+import type { LoadCallbackType, CharsetType } from "./FlowTypes.js";
 
 export default class MediaFileReader {
   declare _isInitialized: boolean;
@@ -24,14 +24,12 @@ export default class MediaFileReader {
    * Loads the necessary initial information from the file.
    */
   init(callbacks: LoadCallbackType): void {
-    var self = this;
-
     if (this._isInitialized) {
       setTimeout(callbacks.onSuccess, 1);
     } else {
       return this._init({
-        onSuccess: function() {
-          self._isInitialized = true;
+        onSuccess: () => {
+          this._isInitialized = true;
           callbacks.onSuccess();
         },
         onError: callbacks.onError
@@ -67,20 +65,20 @@ export default class MediaFileReader {
   }
 
   getBytesAt(offset: number, length: number): number[] {
-    var bytes = new Array(length);
-    for( var i = 0; i < length; i++ ) {
+    const bytes = new Array(length);
+    for(let i = 0; i < length; i++) {
       bytes[i] = this.getByteAt(offset+i);
     }
     return bytes;
   }
 
   isBitSetAt(offset: number, bit: number): boolean {
-    var iByte = this.getByteAt(offset);
+    const iByte = this.getByteAt(offset);
     return (iByte & (1 << bit)) != 0;
   }
 
   getSByteAt(offset: number): number {
-    var iByte = this.getByteAt(offset);
+    const iByte = this.getByteAt(offset);
     if (iByte > 127) {
       return iByte - 256;
     } else {
@@ -89,7 +87,7 @@ export default class MediaFileReader {
   }
 
   getShortAt(offset: number, isBigEndian: boolean): number {
-    var iShort = isBigEndian
+    let iShort = isBigEndian
       ? (this.getByteAt(offset) << 8) + this.getByteAt(offset + 1)
       : (this.getByteAt(offset + 1) << 8) + this.getByteAt(offset);
     if (iShort < 0) {
@@ -99,7 +97,7 @@ export default class MediaFileReader {
   }
 
   getSShortAt(offset: number, isBigEndian: boolean): number {
-    var iUShort = this.getShortAt(offset, isBigEndian);
+    const iUShort = this.getShortAt(offset, isBigEndian);
     if (iUShort > 32767) {
       return iUShort - 65536;
     } else {
@@ -108,12 +106,12 @@ export default class MediaFileReader {
   }
 
   getLongAt(offset: number, isBigEndian: boolean): number {
-    var iByte1 = this.getByteAt(offset),
+    const iByte1 = this.getByteAt(offset),
       iByte2 = this.getByteAt(offset + 1),
       iByte3 = this.getByteAt(offset + 2),
       iByte4 = this.getByteAt(offset + 3);
 
-    var iLong = isBigEndian
+    let iLong = isBigEndian
       ? (((((iByte1 << 8) + iByte2) << 8) + iByte3) << 8) + iByte4
       : (((((iByte4 << 8) + iByte3) << 8) + iByte2) << 8) + iByte1;
 
@@ -125,7 +123,7 @@ export default class MediaFileReader {
   }
 
   getSLongAt(offset: number, isBigEndian: boolean): number {
-    var iULong = this.getLongAt(offset, isBigEndian);
+    const iULong = this.getLongAt(offset, isBigEndian);
 
     if (iULong > 2147483647) {
       return iULong - 4294967296;
@@ -135,11 +133,11 @@ export default class MediaFileReader {
   }
 
   getInteger24At(offset: number, isBigEndian: boolean): number {
-    var iByte1 = this.getByteAt(offset),
+    const iByte1 = this.getByteAt(offset),
       iByte2 = this.getByteAt(offset + 1),
       iByte3 = this.getByteAt(offset + 2);
 
-    var iInteger = isBigEndian
+    let iInteger = isBigEndian
       ? ((((iByte1 << 8) + iByte2) << 8) + iByte3)
       : ((((iByte3 << 8) + iByte2) << 8) + iByte1);
 
@@ -151,8 +149,8 @@ export default class MediaFileReader {
   }
 
   getStringAt(offset: number, length: number): string {
-    var string = [];
-    for (var i = offset, j = 0; i < offset+length; i++, j++) {
+    const string = [];
+    for (let i = offset, j = 0; i < offset+length; i++, j++) {
       string[j] = String.fromCharCode(this.getByteAt(i));
     }
     return string.join("");
@@ -163,10 +161,10 @@ export default class MediaFileReader {
     length: number,
     charset?: CharsetType
   ): DecodedString {
-    var bytes = this.getBytesAt(offset, length);
-    var string;
+    const bytes = this.getBytesAt(offset, length);
+    let string: DecodedString;
 
-    switch ((charset||'').toLowerCase()) {
+    switch ((charset || "").toLowerCase()) {
       case "utf-16":
       case "utf-16le":
       case "utf-16be":
@@ -196,12 +194,12 @@ export default class MediaFileReader {
    * as $00 00 02 01.
    */
   getSynchsafeInteger32At(offset: number): number {
-    var size1 = this.getByteAt(offset);
-    var size2 = this.getByteAt(offset+1);
-    var size3 = this.getByteAt(offset+2);
-    var size4 = this.getByteAt(offset+3);
+    const size1 = this.getByteAt(offset);
+    const size2 = this.getByteAt(offset+1);
+    const size3 = this.getByteAt(offset+2);
+    const size4 = this.getByteAt(offset+3);
     // 0x7f = 0b01111111
-    var size =size4 & 0x7f
+    const size =size4 & 0x7f
       | ((size3 & 0x7f) << 7)
       | ((size2 & 0x7f) << 14)
       | ((size1 & 0x7f) << 21);

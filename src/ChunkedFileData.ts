@@ -1,4 +1,4 @@
-import type { ChunkType, DataType, TypedArray } from './FlowTypes.js';
+import type { ChunkType, DataType, TypedArray } from "./FlowTypes.js";
 
 const NOT_FOUND = -1;
 
@@ -12,7 +12,6 @@ const NOT_FOUND = -1;
  * to add and read data from the file.
  */
 export default class ChunkedFileData {
-  // $FlowIssue - get/set properties not yet supported
   static get NOT_FOUND() { return NOT_FOUND; }
   declare _fileData: ChunkType[];
 
@@ -24,8 +23,8 @@ export default class ChunkedFileData {
    * Adds data to the file storage at a specific offset.
    */
   addData(offset: number, data: DataType): void {
-    var offsetEnd = offset+data.length-1;
-    var chunkRange = this._getChunkRange(offset, offsetEnd);
+    const offsetEnd = offset+data.length-1;
+    const chunkRange = this._getChunkRange(offset, offsetEnd);
 
     if (chunkRange.startIx === NOT_FOUND) {
       this._fileData.splice(chunkRange.insertIx || 0, 0, {
@@ -36,12 +35,12 @@ export default class ChunkedFileData {
       // If the data to add collides with existing chunks we prepend and
       // append data from the half colliding chunks to make the collision at
       // 100%. The new data can then replace all the colliding chunkes.
-      var firstChunk = this._fileData[chunkRange.startIx];
-      var lastChunk = this._fileData[chunkRange.endIx];
-      var needsPrepend = offset > firstChunk.offset;
-      var needsAppend = offsetEnd < lastChunk.offset + lastChunk.data.length - 1;
+      const firstChunk = this._fileData[chunkRange.startIx];
+      const lastChunk = this._fileData[chunkRange.endIx];
+      const needsPrepend = offset > firstChunk.offset;
+      const needsAppend = offsetEnd < lastChunk.offset + lastChunk.data.length - 1;
 
-      var chunk = {
+      const chunk = {
         offset: Math.min(offset, firstChunk.offset),
         data: data
       };
@@ -79,17 +78,13 @@ export default class ChunkedFileData {
       typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView &&
       ArrayBuffer.isView(dataA)
     ) {
-      // $FlowIssue - flow thinks dataAandB is a string but it's not
-      // @ts-expect-error
-      var dataAandB = new (dataA.constructor as TypedArray)(dataA.length + dataB.length);
-      // $FlowIssue - flow thinks dataAandB is a string but it's not
+      // @ts-expect-error - flow thinks dataAandB is a string but it's not
+      const dataAandB = new (dataA.constructor as TypedArray)(dataA.length + dataB.length);
       dataAandB.set(dataA, 0);
-      // $FlowIssue - flow thinks dataAandB is a string but it's not
       dataAandB.set(dataB, dataA.length);
       return dataAandB;
     } else {
-      // $FlowIssue - flow thinks dataAandB is a TypedArray but it's not
-      // @ts-expect-error
+      // @ts-expect-error - flow thinks dataAandB is a TypedArray but it's not
       return dataA.concat(dataB);
     }
   }
@@ -116,14 +111,14 @@ export default class ChunkedFileData {
     offsetStart: number,
     offsetEnd: number
   ): {startIx: number, endIx: number, insertIx?: number} {
-    var startChunkIx = NOT_FOUND;
-    var endChunkIx = NOT_FOUND;
-    var insertIx = 0;
+    let startChunkIx = NOT_FOUND;
+    let endChunkIx = NOT_FOUND;
+    let insertIx = 0;
 
     // Could use binary search but not expecting that many blocks to exist.
-    for (var i = 0; i < this._fileData.length; i++, insertIx = i) {
-      var chunkOffsetStart = this._fileData[i].offset;
-      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
+    for (let i = 0; i < this._fileData.length; i++, insertIx = i) {
+      const chunkOffsetStart = this._fileData[i].offset;
+      const chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
 
       if (offsetEnd < chunkOffsetStart-1) {
         // This offset range doesn't overlap with any chunks.
@@ -149,9 +144,9 @@ export default class ChunkedFileData {
     }
 
     // Find the ending chunk.
-    for (var i = startChunkIx; i < this._fileData.length; i++) {
-      var chunkOffsetStart = this._fileData[i].offset;
-      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
+    for (let i = startChunkIx; i < this._fileData.length; i++) {
+      const chunkOffsetStart = this._fileData[i].offset;
+      const chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
 
       if (offsetEnd >= chunkOffsetStart-1) {
         // Candidate for the end chunk, it doesn't mean it is yet.
@@ -173,8 +168,8 @@ export default class ChunkedFileData {
   }
 
   hasDataRange(offsetStart: number, offsetEnd: number): boolean {
-    for (var i = 0; i < this._fileData.length; i++) {
-      var chunk = this._fileData[i];
+    for (let i = 0; i < this._fileData.length; i++) {
+      const chunk = this._fileData[i];
       if (offsetEnd < chunk.offset) {
         return false;
       }
@@ -189,11 +184,11 @@ export default class ChunkedFileData {
   }
 
   getByteAt(offset: number): any {
-    var dataChunk;
+    let dataChunk;
 
-    for (var i = 0; i < this._fileData.length; i++) {
-      var dataChunkStart = this._fileData[i].offset;
-      var dataChunkEnd = dataChunkStart + this._fileData[i].data.length - 1;
+    for (let i = 0; i < this._fileData.length; i++) {
+      const dataChunkStart = this._fileData[i].offset;
+      const dataChunkEnd = dataChunkStart + this._fileData[i].data.length - 1;
 
       if (offset >= dataChunkStart && offset <= dataChunkEnd) {
         dataChunk = this._fileData[i];

@@ -1,6 +1,6 @@
-import MediaFileReader from './MediaFileReader.js';
+import MediaFileReader from "./MediaFileReader.js";
 
-import type { CallbackType, LoadCallbackType, ByteRange, TagType } from './FlowTypes.js';
+import type { CallbackType, LoadCallbackType, ByteRange, TagType } from "./FlowTypes.js";
 
 export default class MediaTagReader {
   declare _mediaFileReader: MediaFileReader;
@@ -35,15 +35,13 @@ export default class MediaTagReader {
   }
 
   read(callbacks: CallbackType) {
-    var self = this;
-
     this._mediaFileReader.init({
-      onSuccess: function() {
-        self._loadData(self._mediaFileReader, {
-          onSuccess: function() {
-            var tags!: TagType;
+      onSuccess: () => {
+        this._loadData(this._mediaFileReader, {
+          onSuccess: () => {
+            let tags!: TagType;
             try {
-              tags = self._parseData(self._mediaFileReader, self._tags);
+              tags = this._parseData(this._mediaFileReader, this._tags);
             } catch (ex: any) {
               if (callbacks.onError) {
                 callbacks.onError({
@@ -92,9 +90,9 @@ export default class MediaTagReader {
       return null;
     }
 
-    var tags: string[] = [];
-    var shortcuts = this.getShortcuts();
-    for (var i = 0, tagOrShortcut; tagOrShortcut = tagsWithShortcuts[i]; i++ ) {
+    let tags: string[] = [];
+    const shortcuts = this.getShortcuts();
+    for (let i = 0, tagOrShortcut; tagOrShortcut = tagsWithShortcuts[i]; i++ ) {
       tags = tags.concat(shortcuts[tagOrShortcut]||[tagOrShortcut]);
     }
 

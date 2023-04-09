@@ -1,9 +1,9 @@
-import * as fs from 'node:fs';
+import * as fs from "node:fs";
 
-import ChunkedFileData from './ChunkedFileData.js';
-import MediaFileReader from './MediaFileReader.js';
+import ChunkedFileData from "./ChunkedFileData.js";
+import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType } from './FlowTypes.js';
+import type { LoadCallbackType } from "./FlowTypes.js";
 
 export default class NodeFileReader extends MediaFileReader {
   declare _path: string;
@@ -17,8 +17,8 @@ export default class NodeFileReader extends MediaFileReader {
 
   static canReadFile(file: any): boolean {
     return (
-      typeof file === 'string' &&
-      !/^[a-z]+:\/\//i.test(file)
+      typeof file === "string"
+      && !/^[a-z]+:\/\//i.test(file)
     );
   }
 
@@ -27,28 +27,28 @@ export default class NodeFileReader extends MediaFileReader {
   }
 
   _init(callbacks: LoadCallbackType) {
-    var self = this;
-
-    fs.stat(self._path, function(err, stats) {
+    fs.stat(this._path, (err, stats) => {
       if (err) {
         if (callbacks.onError) {
-          callbacks.onError({"type": "fs", "info": err});
+          callbacks.onError({
+            type: "fs",
+            info: err
+          });
         }
       } else {
-        self._size = stats.size;
+        this._size = stats.size;
         callbacks.onSuccess();
       }
     });
   }
 
   loadRange(range: [number, number], callbacks: LoadCallbackType) {
-    var fd = -1;
-    var self = this;
-    var fileData = this._fileData;
+    let fd = -1;
+    const fileData = this._fileData;
 
-    var length = range[1] - range[0] + 1;
-    var onSuccess = callbacks.onSuccess;
-    var onError = callbacks.onError || function(object){};
+    const length = range[1] - range[0] + 1;
+    const onSuccess = callbacks.onSuccess;
+    const onError = callbacks.onError || function(object){};
 
     if (fileData.hasDataRange(range[0], range[1])) {
       process.nextTick(onSuccess);
@@ -57,14 +57,17 @@ export default class NodeFileReader extends MediaFileReader {
 
     function readData(err: NodeJS.ErrnoException | null, _fd: number) {
       if (err) {
-        onError({"type": "fs", "info": err});
+        onError({
+          type: "fs",
+          info: err
+        });
         return;
       }
 
       fd = _fd;
       // TODO: Should create a pool of Buffer objects across all instances of
       //       NodeFileReader. This is fine for now.
-      var buffer = new Buffer(length);
+      const buffer = new Buffer(length);
       fs.read(_fd, buffer, 0, length, range[0], processData);
     };
 
@@ -76,7 +79,10 @@ export default class NodeFileReader extends MediaFileReader {
       });
 
       if (err) {
-        onError({"type": "fs", "info": err});
+        onError({
+          type: "fs",
+          info: err
+        });
         return;
       }
 
@@ -85,7 +91,7 @@ export default class NodeFileReader extends MediaFileReader {
     };
 
     function storeBuffer(buffer: Buffer) {
-      var data = Array.prototype.slice.call(buffer, 0, length);
+      const data = Array.prototype.slice.call(buffer, 0, length);
       fileData.addData(range[0], data);
     }
 

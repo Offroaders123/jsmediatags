@@ -1,6 +1,6 @@
-import MediaFileReader from './MediaFileReader.js';
+import MediaFileReader from "./MediaFileReader.js";
 
-import type { Byte, ByteArray, LoadCallbackType } from './FlowTypes.js';
+import type { Byte, ByteArray, LoadCallbackType } from "./FlowTypes.js";
 
 export default class ArrayFileReader extends MediaFileReader {
   declare _array: ByteArray;
@@ -17,21 +17,21 @@ export default class ArrayFileReader extends MediaFileReader {
   static canReadFile(file: any): boolean {
     return (
       Array.isArray(file) ||
-      (typeof Buffer === 'function' && Buffer.isBuffer(file))
+      (typeof Buffer === "function" && Buffer.isBuffer(file))
     );
   }
 
-  init(callbacks: LoadCallbackType) {
-    setTimeout(callbacks.onSuccess, 0);
+  init({ onSuccess }: LoadCallbackType) {
+    setTimeout(onSuccess, 0);
   }
 
-  loadRange(range: [number, number], callbacks: LoadCallbackType) {
-    setTimeout(callbacks.onSuccess, 0);
+  loadRange(range: [number, number], { onSuccess }: LoadCallbackType) {
+    setTimeout(onSuccess, 0);
   }
 
   getByteAt(offset: number): Byte {
     if (offset >= this._array.length) {
-      throw new Error("Offset " + offset + " hasn't been loaded yet.");
+      throw new Error(`Offset ${offset} hasn't been loaded yet.`);
     }
     return this._array[offset];
   }

@@ -1,7 +1,7 @@
-import ChunkedFileData from './ChunkedFileData.js';
-import MediaFileReader from './MediaFileReader.js';
+import ChunkedFileData from "./ChunkedFileData.js";
+import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType, CallbackType } from './FlowTypes.js';
+import type { LoadCallbackType, CallbackType } from "./FlowTypes.js";
 
 const CHUNK_SIZE = 1024;
 
@@ -29,19 +29,19 @@ export default class XhrFileReader extends MediaFileReader {
 
   static canReadFile(file: any): boolean {
     return (
-      typeof file === 'string' &&
+      typeof file === "string" &&
       /^[a-z]+:\/\//i.test(file)
     );
   }
 
   static setConfig(config: Partial<typeof this._config>) {
-    for (var key in config) if (config.hasOwnProperty(key)) {
+    for (const key in config) if (config.hasOwnProperty(key)) {
       // @ts-expect-error
       this._config[key] = config[key];
     }
 
-    var disallowedXhrHeaders = this._config.disallowedXhrHeaders;
-    for (var i = 0; i < disallowedXhrHeaders.length; i++) {
+    const disallowedXhrHeaders = this._config.disallowedXhrHeaders;
+    for (let i = 0; i < disallowedXhrHeaders.length; i++) {
       disallowedXhrHeaders[i] = disallowedXhrHeaders[i].toLowerCase();
     }
   }
@@ -55,18 +55,16 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   _fetchSizeWithHeadRequest(callbacks: LoadCallbackType): void {
-    var self = this;
-
     this._makeXHRRequest("HEAD", null, {
-      onSuccess: function(xhr: XMLHttpRequest) {
-        var contentLength = self._parseContentLength(xhr);
+      onSuccess: (xhr: XMLHttpRequest) => {
+        const contentLength = this._parseContentLength(xhr);
         if (contentLength) {
-          self._size = contentLength;
+          this._size = contentLength;
           callbacks.onSuccess();
         } else {
           // Content-Length not provided by the server, fallback to
           // GET requests.
-          self._fetchSizeWithGetRequest(callbacks);
+          this._fetchSizeWithGetRequest(callbacks);
         }
       },
       onError: callbacks.onError
@@ -74,28 +72,27 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   _fetchSizeWithGetRequest(callbacks: LoadCallbackType): void {
-    var self = this;
-    var range = this._roundRangeToChunkMultiple([0, 0]);
+    const range = this._roundRangeToChunkMultiple([0, 0]);
 
     this._makeXHRRequest("GET", range, {
-      onSuccess: function(xhr: XMLHttpRequest) {
-        var contentRange = self._parseContentRange(xhr);
-        var data = self._getXhrResponseContent(xhr);
+      onSuccess: (xhr: XMLHttpRequest) => {
+        const contentRange = this._parseContentRange(xhr);
+        const data = this._getXhrResponseContent(xhr);
 
         if (contentRange) {
           if (contentRange.instanceLength == null) {
             // Last resort, server is not able to tell us the content length,
             // need to fetch entire file then.
-            self._fetchEntireFile(callbacks);
+            this._fetchEntireFile(callbacks);
             return;
           }
-          self._size = contentRange.instanceLength;
+          this._size = contentRange.instanceLength;
         } else {
           // Range request not supported, we got the entire file
-          self._size = data.length;
+          this._size = data.length;
         }
 
-        self._fileData.addData(0, data);
+        this._fileData.addData(0, data);
         callbacks.onSuccess();
       },
       onError: callbacks.onError
@@ -103,12 +100,11 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   _fetchEntireFile(callbacks: LoadCallbackType): void {
-    var self = this;
     this._makeXHRRequest("GET", null, {
-      onSuccess: function(xhr: XMLHttpRequest) {
-        var data = self._getXhrResponseContent(xhr);
-        self._size = data.length;
-        self._fileData.addData(0, data);
+      onSuccess: (xhr: XMLHttpRequest) => {
+        const data = this._getXhrResponseContent(xhr);
+        this._size = data.length;
+        this._fileData.addData(0, data);
         callbacks.onSuccess();
       },
       onError: callbacks.onError
@@ -121,7 +117,7 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   _parseContentLength(xhr: XMLHttpRequest): number | null {
-    var contentLength = this._getResponseHeader(xhr, "Content-Length");
+    const contentLength = this._getResponseHeader(xhr, "Content-Length");
 
     if (contentLength == null) {
       return contentLength;
@@ -131,10 +127,10 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   _parseContentRange(xhr: XMLHttpRequest): ContentRangeType | null {
-    var contentRange = this._getResponseHeader(xhr, "Content-Range");
+    const contentRange = this._getResponseHeader(xhr, "Content-Range");
 
     if (contentRange) {
-      var parsedContentRange = contentRange.match(
+      const parsedContentRange = contentRange.match(
         /bytes (\d+)-(\d+)\/(?:(\d+)|\*)/i
       );
       if (!parsedContentRange) {
@@ -152,9 +148,7 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   loadRange(range: [number, number], callbacks: LoadCallbackType): void {
-    var self = this;
-
-    if (self._fileData.hasDataRange(range[0], Math.min(self._size, range[1]))) {
+    if (this._fileData.hasDataRange(range[0], Math.min(this._size, range[1]))) {
       setTimeout(callbacks.onSuccess, 1);
       return;
     }
@@ -166,12 +160,12 @@ export default class XhrFileReader extends MediaFileReader {
     range = this._roundRangeToChunkMultiple(range);
 
     // Upper range should not be greater than max file size
-    range[1] = Math.min(self._size, range[1]);
+    range[1] = Math.min(this._size, range[1]);
 
     this._makeXHRRequest("GET", range, {
-      onSuccess: function(xhr: XMLHttpRequest) {
-        var data = self._getXhrResponseContent(xhr);
-        self._fileData.addData(range[0], data);
+      onSuccess: (xhr: XMLHttpRequest) => {
+        const data = this._getXhrResponseContent(xhr);
+        this._fileData.addData(range[0], data);
         callbacks.onSuccess();
       },
       onError: callbacks.onError
@@ -179,8 +173,8 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   _roundRangeToChunkMultiple(range: [number, number]): [number, number] {
-    var length = range[1] - range[0] + 1;
-    var newLength = Math.ceil(length/CHUNK_SIZE) * CHUNK_SIZE;
+    const length = range[1] - range[0] + 1;
+    const newLength = Math.ceil(length/CHUNK_SIZE) * CHUNK_SIZE;
     return [range[0], range[0] + newLength - 1];
   }
 
@@ -189,10 +183,10 @@ export default class XhrFileReader extends MediaFileReader {
     range: [number, number] | null,
     callbacks: CallbackType
   ) {
-    var xhr = this._createXHRObject();
+    const xhr = this._createXHRObject();
     xhr.open(method, this._url);
 
-    var onXHRLoad = function() {
+    const onXHRLoad = function() {
       // 200 - OK
       // 206 - Partial Content
       // $FlowIssue - xhr will not be null here
@@ -200,23 +194,23 @@ export default class XhrFileReader extends MediaFileReader {
         callbacks.onSuccess(xhr);
       } else if (callbacks.onError) {
         callbacks.onError({
-          "type": "xhr",
-          "info": "Unexpected HTTP status " + xhr.status + ".",
-          "xhr": xhr
+          type: "xhr",
+          info: `Unexpected HTTP status ${xhr.status}.`,
+          xhr
         });
       }
       // @ts-ignore
       xhr = null;
     };
 
-    if (typeof xhr.onload !== 'undefined') {
+    if (typeof xhr.onload !== "undefined") {
       xhr.onload = onXHRLoad;
       xhr.onerror = function() {
         if (callbacks.onError) {
           callbacks.onError({
-            "type": "xhr",
-            "info": "Generic XHR error, check xhr object.",
-            "xhr": xhr,
+            type: "xhr",
+            info: "Generic XHR error, check xhr object.",
+            xhr,
           });
         }
       }
@@ -234,10 +228,10 @@ export default class XhrFileReader extends MediaFileReader {
       xhr.ontimeout = function() {
         if (callbacks.onError) {
           callbacks.onError({
-            "type": "xhr",
+            type: "xhr",
             // $FlowIssue - xhr.timeout will not be null
-            "info": "Timeout after " + (xhr.timeout/1000) + "s. Use jsmediatags.Config.setXhrTimeout to override.",
-            "xhr": xhr,
+            info: `Timeout after ${xhr.timeout/1000}s. Use jsmediatags.Config.setXhrTimeout to override.`,
+            xhr,
           });
         }
       }
@@ -245,7 +239,7 @@ export default class XhrFileReader extends MediaFileReader {
 
     xhr.overrideMimeType("text/plain; charset=x-user-defined");
     if (range) {
-      this._setRequestHeader(xhr, "Range", "bytes=" + range[0] + "-" + range[1]);
+      this._setRequestHeader(xhr, "Range", `bytes=${range[0]}-${range[1]}`);
     }
     this._setRequestHeader(xhr, "If-Modified-Since", "Sat, 01 Jan 1970 00:00:00 GMT");
     xhr.send(null);
@@ -258,15 +252,15 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   _hasResponseHeader(xhr: XMLHttpRequest, headerName: string): boolean {
-    var allResponseHeaders = xhr.getAllResponseHeaders();
+    const allResponseHeaders = xhr.getAllResponseHeaders();
 
     if (!allResponseHeaders) {
       return false;
     }
 
-    var headers = allResponseHeaders.split("\r\n");
-    var headerNames = [];
-    for (var i = 0; i < headers.length; i++) {
+    const headers = allResponseHeaders.split("\r\n");
+    const headerNames = [];
+    for (let i = 0; i < headers.length; i++) {
       headerNames[i] = headers[i].split(":")[0].toLowerCase();
     }
 
@@ -282,14 +276,14 @@ export default class XhrFileReader extends MediaFileReader {
   }
 
   getByteAt(offset: number): number {
-    var character = this._fileData.getByteAt(offset);
+    const character = this._fileData.getByteAt(offset);
     return character.charCodeAt(0) & 0xff;
   }
 
   _isWebWorker(): boolean {
     return (
       // @ts-expect-error
-      typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope
+      typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope
     );
   }
 

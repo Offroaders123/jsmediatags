@@ -1,36 +1,36 @@
-import ChunkedFileData from './ChunkedFileData.js';
-import MediaFileReader from './MediaFileReader.js';
+import ChunkedFileData from "./ChunkedFileData.js";
+import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType } from './FlowTypes.js';
+import type { LoadCallbackType } from "./FlowTypes.js";
 
 export default class ArrayBufferFileReader extends MediaFileReader {
-    declare _buffer: ArrayBuffer;
-    declare _fileData: ChunkedFileData;
-    declare _size: number;
+  declare _buffer: ArrayBuffer;
+  declare _fileData: ChunkedFileData;
+  declare _size: number;
 
-    constructor(buffer: ArrayBuffer) {
-        super();
-        this._buffer = buffer;
-        this._fileData = new ChunkedFileData();
-    }
+  constructor(buffer: ArrayBuffer) {
+    super();
+    this._buffer = buffer;
+    this._fileData = new ChunkedFileData();
+  }
 
-    static canReadFile(file: any): boolean {
-        return typeof ArrayBuffer === 'function' && file instanceof ArrayBuffer
-    }
+  static canReadFile(file: any): boolean {
+    return file instanceof ArrayBuffer
+  }
 
-    _init(callbacks: LoadCallbackType): void {
-        this._size = this._buffer.byteLength;
-        setTimeout(callbacks.onSuccess, 1);
-    }
+  _init({ onSuccess }: LoadCallbackType): void {
+    this._size = this._buffer.byteLength;
+    setTimeout(onSuccess, 1);
+  }
 
-    loadRange(range: [number, number], callbacks: LoadCallbackType): void {
-        var arrayBuf = this._buffer.slice(range[0], range[1] + 1);
-        var viewData = new Uint8Array(arrayBuf);
-        this._fileData.addData(range[0], viewData);
-        callbacks.onSuccess();
-    }
+  loadRange(range: [number, number], { onSuccess }: LoadCallbackType): void {
+    const arrayBuf = this._buffer.slice(range[0], range[1] + 1);
+    const viewData = new Uint8Array(arrayBuf);
+    this._fileData.addData(range[0], viewData);
+    onSuccess();
+  }
 
-    getByteAt(offset: number): number {
-        return this._fileData.getByteAt(offset);
-    }
+  getByteAt(offset: number): number {
+    return this._fileData.getByteAt(offset);
+  }
 }

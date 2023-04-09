@@ -1,4 +1,4 @@
-import MediaFileReader from './MediaFileReader.js';
+import MediaFileReader from "./MediaFileReader.js";
 
 export type CallbackType = {
   onSuccess: (data: any) => void,
@@ -105,6 +105,13 @@ export type TagType = {
   tags: {
     [key: string]: FrameType | ShortcutType
   }
+};
+
+export type PictureType = {
+  format: string,
+  type: string,
+  description: string,
+  data: ByteArray
 };
 
 export type FrameType = {

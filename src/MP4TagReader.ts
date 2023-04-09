@@ -6,10 +6,10 @@
  * Authored by Joshua Kifer <joshua.kifer gmail.com>
  */
 
-import MediaTagReader from './MediaTagReader.js';
-import MediaFileReader from './MediaFileReader.js';
+import MediaTagReader from "./MediaTagReader.js";
+import MediaFileReader from "./MediaFileReader.js";
 
-import type { CallbackType, LoadCallbackType, CharsetType, ByteRange, TagType, TagFrame } from './FlowTypes.js';
+import type { CallbackType, LoadCallbackType, CharsetType, ByteRange, TagType, TagFrame } from "./FlowTypes.js";
 
 export default class MP4TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
@@ -23,7 +23,7 @@ export default class MP4TagReader extends MediaTagReader {
   }
 
   static canReadTagFormat(tagIdentifier: number[]): boolean {
-    var id = String.fromCharCode.apply(String, tagIdentifier.slice(4, 8));
+    const id = String.fromCharCode.apply(String, tagIdentifier.slice(4, 8));
     return id === "ftyp";
   }
 
@@ -40,11 +40,10 @@ export default class MP4TagReader extends MediaTagReader {
     // associated with metadata.
     // The metadata atoms can be find under the "moov.udta.meta.ilst" hierarchy.
 
-    var self = this;
     // Load the header of the first atom
     mediaFileReader.loadRange([0, 16], {
-      onSuccess: function() {
-        self._loadAtom(mediaFileReader, 0, "", callbacks);
+      onSuccess: () => {
+        this._loadAtom(mediaFileReader, 0, "", callbacks);
       },
       onError: callbacks.onError
     });
@@ -61,16 +60,15 @@ export default class MP4TagReader extends MediaTagReader {
       return;
     }
 
-    var self = this;
     // 8 is the size of the atomSize and atomName fields.
     // When reading the current block we always read 8 more bytes in order
     // to also read the header of the next block.
-    var atomSize = mediaFileReader.getLongAt(offset, true);
+    const atomSize = mediaFileReader.getLongAt(offset, true);
     if (atomSize == 0 || isNaN(atomSize)) {
       callbacks.onSuccess();
       return;
     }
-    var atomName = mediaFileReader.getStringAt(offset + 4, 4);
+    const atomName = mediaFileReader.getStringAt(offset + 4, 4);
     // console.log(parentAtomFullName, atomName, atomSize);
     // Container atoms (no actual data)
     if (this._isContainerAtom(atomName)) {
@@ -78,21 +76,21 @@ export default class MP4TagReader extends MediaTagReader {
         // The "meta" atom breaks convention and is a container with data.
         offset += 4; // next_item_id (uint32)
       }
-      var atomFullName = (parentAtomFullName ? parentAtomFullName+"." : "") + atomName;
+      const atomFullName = (parentAtomFullName ? parentAtomFullName+"." : "") + atomName;
       if (atomFullName === "moov.udta.meta.ilst") {
         mediaFileReader.loadRange([offset, offset + atomSize], callbacks);
       } else {
         mediaFileReader.loadRange([offset+8, offset+8 + 8], {
-          onSuccess: function() {
-            self._loadAtom(mediaFileReader, offset + 8, atomFullName, callbacks);
+          onSuccess: () => {
+            this._loadAtom(mediaFileReader, offset + 8, atomFullName, callbacks);
           },
           onError: callbacks.onError
         });
       }
     } else {
       mediaFileReader.loadRange([offset+atomSize, offset+atomSize + 8], {
-        onSuccess: function() {
-          self._loadAtom(mediaFileReader, offset+atomSize, parentAtomFullName, callbacks);
+        onSuccess: () => {
+          this._loadAtom(mediaFileReader, offset+atomSize, parentAtomFullName, callbacks);
         },
         onError: callbacks.onError
       });
@@ -108,15 +106,15 @@ export default class MP4TagReader extends MediaTagReader {
   }
 
   _parseData(data: MediaFileReader, tagsToRead?: string[] | null): TagType {
-    var tags = {};
+    const tags = {};
 
     tagsToRead = this._expandShortcutTags(tagsToRead);
     this._readAtom(tags, data, 0, data.getSize(), tagsToRead);
 
     // create shortcuts for most common data.
-    for (var name in SHORTCUTS) if (SHORTCUTS.hasOwnProperty(name)) {
+    for (let name in SHORTCUTS) if (SHORTCUTS.hasOwnProperty(name)) {
       // @ts-expect-error
-      var tag = tags[SHORTCUTS[name]];
+      const tag = tags[SHORTCUTS[name]];
       if (tag) {
         if (name === "track") {
           // @ts-expect-error
@@ -129,10 +127,10 @@ export default class MP4TagReader extends MediaTagReader {
     }
 
     return {
-      "type": "MP4",
-      "ftyp": data.getStringAt(8, 4),
-      "version": data.getLongAt(12, true).toString(),
-      "tags": tags
+      type: "MP4",
+      ftyp: data.getStringAt(8, 4),
+      version: data.getLongAt(12, true).toString(),
+      tags
     };
   }
 
@@ -147,20 +145,20 @@ export default class MP4TagReader extends MediaTagReader {
   ) {
     indent = indent === undefined ? "" : indent + "  ";
 
-    var seek = offset;
+    let seek = offset;
     while (seek < offset + length) {
-      var atomSize = data.getLongAt(seek, true);
+      const atomSize = data.getLongAt(seek, true);
       if (atomSize == 0) {
         return;
       }
-      var atomName = data.getStringAt(seek + 4, 4);
+      const atomName = data.getStringAt(seek + 4, 4);
 
       // console.log(seek, parentAtomFullName, atomName, atomSize);
       if (this._isContainerAtom(atomName)) {
         if (atomName == "meta") {
           seek += 4; // next_item_id (uint32)
         }
-        var atomFullName = (parentAtomFullName ? parentAtomFullName+"." : "") + atomName;
+        const atomFullName = (parentAtomFullName ? parentAtomFullName+"." : "") + atomName;
         this._readAtom(tags, data, seek + 8, atomSize - 8, tagsToRead, atomFullName, indent);
         return;
       }
@@ -185,35 +183,34 @@ export default class MP4TagReader extends MediaTagReader {
     // 8: 4 bytes track + 4 bytes total
     const METADATA_HEADER = 16;
 
-    var atomSize = data.getLongAt(offset, true);
-    var atomName = data.getStringAt(offset + 4, 4);
+    const atomSize = data.getLongAt(offset, true);
+    const atomName = data.getStringAt(offset + 4, 4);
 
-    var klass = data.getInteger24At(offset + METADATA_HEADER + 1, true);
+    const klass = data.getInteger24At(offset + METADATA_HEADER + 1, true);
     // @ts-expect-error
-    var type = TYPES[klass];
-    var atomData;
-    var bigEndian = true;
+    let type = TYPES[klass];
+    let atomData: string | number | Record<string,string | number | number[]> | undefined;
+    const bigEndian = true;
     if (atomName == "trkn") {
       atomData = {
-        "track": data.getShortAt(offset + METADATA_HEADER + 10, bigEndian),
-        "total": data.getShortAt(offset + METADATA_HEADER + 14, bigEndian)
+        track: data.getShortAt(offset + METADATA_HEADER + 10, bigEndian),
+        total: data.getShortAt(offset + METADATA_HEADER + 14, bigEndian)
       };
     } else if (atomName == "disk") {
       atomData = {
-        "disk": data.getShortAt(offset + METADATA_HEADER + 10, bigEndian),
-        "total": data.getShortAt(offset + METADATA_HEADER + 14, bigEndian)
+        disk: data.getShortAt(offset + METADATA_HEADER + 10, bigEndian),
+        total: data.getShortAt(offset + METADATA_HEADER + 14, bigEndian)
       };
     } else {
       // 4: atom version (1 byte) + atom flags (3 bytes)
       // 4: NULL (usually locale indicator)
-      var atomHeader = METADATA_HEADER + 4 + 4;
-      var dataStart = offset + atomHeader;
-      var dataLength = atomSize - atomHeader;
-      var atomData;
+      const atomHeader = METADATA_HEADER + 4 + 4;
+      const dataStart = offset + atomHeader;
+      const dataLength = atomSize - atomHeader;
 
       // Workaround for covers being parsed as 'uint8' type despite being an 'covr' atom
-      if (atomName === 'covr' && type === 'uint8') {
-        type = 'jpeg'
+      if (atomName === "covr" && type === "uint8") {
+        type = "jpeg"
       }
 
       switch (type) {
@@ -234,7 +231,7 @@ export default class MP4TagReader extends MediaTagReader {
         // only current 64-bit atom handled, it is parsed from its 32-bit
         // low word as an unsigned long.
         //
-        var intReader = type == 'int'
+        const intReader = type == "int"
                           ? ( dataLength == 1 ? data.getSByteAt :
                               dataLength == 2 ? data.getSShortAt :
                               dataLength == 4 ? data.getSLongAt :
@@ -249,8 +246,8 @@ export default class MP4TagReader extends MediaTagReader {
         case "jpeg":
         case "png":
         atomData = {
-          "format": "image/" + type,
-          "data": data.getBytesAt(dataStart, dataLength)
+          format: `image/${type}`,
+          data: data.getBytesAt(dataStart, dataLength)
         };
         break;
       }
@@ -276,63 +273,63 @@ export default class MP4TagReader extends MediaTagReader {
  * https://developer.apple.com/library/content/documentation/QuickTime/QTFF/Metadata/Metadata.html#//apple_ref/doc/uid/TP40000939-CH1-SW35
 */
 const TYPES = {
-  "0": "uint8",
-  "1": "text",
-  "13": "jpeg",
-  "14": "png",
-  "21": "int",
-  "22": "uint"
+  0: "uint8",
+  1: "text",
+  13: "jpeg",
+  14: "png",
+  21: "int",
+  22: "uint"
 } as const;
 
 const ATOM_DESCRIPTIONS = {
   "©alb": "Album",
   "©ART": "Artist",
-  "aART": "Album Artist",
+  aART: "Album Artist",
   "©day": "Release Date",
   "©nam": "Title",
   "©gen": "Genre",
-  "gnre": "Genre",
-  "trkn": "Track Number",
+  gnre: "Genre",
+  trkn: "Track Number",
   "©wrt": "Composer",
   "©too": "Encoding Tool",
   "©enc": "Encoded By",
-  "cprt": "Copyright",
-  "covr": "Cover Art",
+  cprt: "Copyright",
+  covr: "Cover Art",
   "©grp": "Grouping",
-  "keyw": "Keywords",
+  keyw: "Keywords",
   "©lyr": "Lyrics",
   "©cmt": "Comment",
-  "tmpo": "Tempo",
-  "cpil": "Compilation",
-  "disk": "Disc Number",
-  "tvsh": "TV Show Name",
-  "tven": "TV Episode ID",
-  "tvsn": "TV Season",
-  "tves": "TV Episode",
-  "tvnn": "TV Network",
-  "desc": "Description",
-  "ldes": "Long Description",
-  "sonm": "Sort Name",
-  "soar": "Sort Artist",
-  "soaa": "Sort Album",
-  "soco": "Sort Composer",
-  "sosn": "Sort Show",
-  "purd": "Purchase Date",
-  "pcst": "Podcast",
-  "purl": "Podcast URL",
-  "catg": "Category",
-  "hdvd": "HD Video",
-  "stik": "Media Type",
-  "rtng": "Content Rating",
-  "pgap": "Gapless Playback",
-  "apID": "Purchase Account",
-  "sfID": "Country Code",
-  "atID": "Artist ID",
-  "cnID": "Catalog ID",
-  "plID": "Collection ID",
-  "geID": "Genre ID",
+  tmpo: "Tempo",
+  cpil: "Compilation",
+  disk: "Disc Number",
+  tvsh: "TV Show Name",
+  tven: "TV Episode ID",
+  tvsn: "TV Season",
+  tves: "TV Episode",
+  tvnn: "TV Network",
+  desc: "Description",
+  ldes: "Long Description",
+  sonm: "Sort Name",
+  soar: "Sort Artist",
+  soaa: "Sort Album",
+  soco: "Sort Composer",
+  sosn: "Sort Show",
+  purd: "Purchase Date",
+  pcst: "Podcast",
+  purl: "Podcast URL",
+  catg: "Category",
+  hdvd: "HD Video",
+  stik: "Media Type",
+  rtng: "Content Rating",
+  pgap: "Gapless Playback",
+  apID: "Purchase Account",
+  sfID: "Country Code",
+  atID: "Artist ID",
+  cnID: "Catalog ID",
+  plID: "Collection ID",
+  geID: "Genre ID",
   "xid ": "Vendor Information",
-  "flvr": "Codec Flavor"
+  flvr: "Codec Flavor"
 } as const;
 
 const UNSUPPORTED_ATOMS = {
@@ -340,13 +337,13 @@ const UNSUPPORTED_ATOMS = {
 } as const;
 
 const SHORTCUTS = {
-  "title"     : "©nam",
-  "artist"    : "©ART",
-  "album"     : "©alb",
-  "year"      : "©day",
-  "comment"   : "©cmt",
-  "track"     : "trkn",
-  "genre"     : "©gen",
-  "picture"   : "covr",
-  "lyrics"    : "©lyr"
+  title     : "©nam",
+  artist    : "©ART",
+  album     : "©alb",
+  year      : "©day",
+  comment   : "©cmt",
+  track     : "trkn",
+  genre     : "©gen",
+  picture   : "covr",
+  lyrics    : "©lyr"
 } as const;

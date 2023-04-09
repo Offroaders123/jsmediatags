@@ -1,10 +1,10 @@
-import * as RNFS from 'react-native-fs';
-import { Buffer } from 'buffer';
+import * as RNFS from "react-native-fs";
+import { Buffer } from "buffer";
 
-import ChunkedFileData from './ChunkedFileData.js';
-import MediaFileReader from './MediaFileReader.js';
+import ChunkedFileData from "./ChunkedFileData.js";
+import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType } from './FlowTypes.js';
+import type { LoadCallbackType } from "./FlowTypes.js";
 
 export default class ReactNativeFileReader extends MediaFileReader {
   declare _path: string;
@@ -18,7 +18,7 @@ export default class ReactNativeFileReader extends MediaFileReader {
 
   static canReadFile(file: any): boolean {
     return (
-      typeof file === 'string' &&
+      typeof file === "string" &&
       !/^[a-z]+:\/\//i.test(file)
     );
   }
@@ -28,36 +28,38 @@ export default class ReactNativeFileReader extends MediaFileReader {
   }
 
   _init(callbacks: LoadCallbackType) {
-    var self = this;
-
-    RNFS.stat(self._path)
+    RNFS.stat(this._path)
       .then(statResult => {
-        self._size = statResult.size;
+        this._size = statResult.size;
         callbacks.onSuccess();
       })
       .catch(error => {
-        callbacks.onError?.({"type": "fs", "info": error});
+        callbacks.onError?.({
+          type: "fs",
+          info: error
+        });
       })
   }
 
   loadRange(range: [number, number], callbacks: LoadCallbackType) {
-    var fd = -1;
-    var self = this;
-    var fileData = this._fileData;
+    const fileData = this._fileData;
 
-    var length = range[1] - range[0] + 1;
-    var onSuccess = callbacks.onSuccess;
-    var onError = callbacks.onError || function(object){};
+    const length = range[1] - range[0] + 1;
+    const onSuccess = callbacks.onSuccess;
+    const onError = callbacks.onError || function(){};
 
-    RNFS.read(this._path, length, range[0], {encoding: 'base64'})
+    RNFS.read(this._path, length, range[0], {encoding: "base64"})
       .then(readData => {
-        const buffer = Buffer.from(readData, 'base64');
+        const buffer = Buffer.from(readData, "base64");
         const data = Array.prototype.slice.call(buffer, 0, length);
         fileData.addData(range[0], data);
         onSuccess();
       })
       .catch(err => {
-        onError({"type": "fs", "info": err});
+        onError({
+          type: "fs",
+          info: err
+        });
       });
   }
 }

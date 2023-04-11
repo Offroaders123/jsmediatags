@@ -64,8 +64,11 @@
     "google-closure-compiler": "20170626.0.0",
     "jest": "^29.5.0",
     "jest-cli": "^26.6.3",
+    "jest-ts-webcompat-resolver": "^1.0.0",
     "react": "^16.2.0",
     "react-native": "^0.64.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4",
     "watchify": "^4.0.0"
   },
   "scripts": {
@@ -77,10 +80,20 @@
     "dist": "npm run dist-dev && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level QUIET --compilation_level SIMPLE_OPTIMIZATIONS --js dist/jsmediatags.js > dist/jsmediatags.min.js"
   },
   "jest": {
-    "rootDir": "./src",
-    "timers": "fake",
+    "preset": "ts-jest",
+    "resolver": "jest-ts-webcompat-resolver",
     "transform": {
-      ".js$": "babel-jest"
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "./tsconfig.json",
+          "useESM": true
+        }
+      ]
+    },
+    "fakeTimers": {
+      "enableGlobally": true,
+      "legacyFakeTimers": true
     }
   },
   "engines": {

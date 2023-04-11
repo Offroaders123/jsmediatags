@@ -1,8 +1,8 @@
-import MP4TagReader from '../src/MP4TagReader.js';
-import MP4TagContents, { type Atom } from '../src/MP4TagContents.js';
-import ArrayFileReader from '../src/ArrayFileReader.js';
+import MP4TagReader from "../src/MP4TagReader.js";
+import MP4TagContents, { type Atom } from "../src/MP4TagContents.js";
+import ArrayFileReader from "../src/ArrayFileReader.js";
 
-import { bin, pad } from '../src/ByteArrayUtils.js';
+import { bin } from "../src/ByteArrayUtils.js";
 
 jest.autoMockOff();
 
@@ -22,10 +22,10 @@ function createMP4FileContents(atoms: Atom[]) {
   );
 }
 
-describe("MP4TagReader", function() {
-  var tagReader: MP4TagReader;
-  var mediaFileReader: ArrayFileReader;
-  var mp4FileContents = createMP4FileContents([
+describe("MP4TagReader", () => {
+  let tagReader: MP4TagReader;
+  let mediaFileReader: ArrayFileReader;
+  const mp4FileContents = createMP4FileContents([
     MP4TagContents.createMetadataAtom("©nam", "text", bin("A Title")),
     MP4TagContents.createMetadataAtom("©ART", "text", bin("A Artist")),
     MP4TagContents.createMetadataAtom("©alb", "text", bin("A Album")),
@@ -44,21 +44,21 @@ describe("MP4TagReader", function() {
     MP4TagContents.createMetadataAtom("covr", "jpeg", [0x01, 0x02, 0x03])
   ]);
 
-  beforeEach(function() {
+  beforeEach(() => {
     mediaFileReader = new ArrayFileReader(mp4FileContents.toArray());
     tagReader = new MP4TagReader(mediaFileReader);
   });
 
-  it("can read any ftyp type", function() {
-    var canReadM4A = MP4TagReader.canReadTagFormat([0x0, 0x0, 0x0, 0x0].concat(bin("ftypM4A ")));
-    var canReadISOM = MP4TagReader.canReadTagFormat([0x0, 0x0, 0x0, 0x0].concat(bin("ftypisom")));
+  it("can read any ftyp type", () => {
+    const canReadM4A = MP4TagReader.canReadTagFormat([0x0, 0x0, 0x0, 0x0].concat(bin("ftypM4A ")));
+    const canReadISOM = MP4TagReader.canReadTagFormat([0x0, 0x0, 0x0, 0x0].concat(bin("ftypisom")));
 
     expect(canReadM4A).toBeTruthy();
     expect(canReadISOM).toBeTruthy();
   });
 
-  it("reads the type and version", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads the type and version", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -70,8 +70,8 @@ describe("MP4TagReader", function() {
     expect(tag.ftyp).toBe("M4A ");
   });
 
-  it("reads string tag", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads string tag", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -79,12 +79,12 @@ describe("MP4TagReader", function() {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
-    expect(tags['©nam'].data).toBe("A Title");
+    const tags = tag.tags;
+    expect(tags["©nam"].data).toBe("A Title");
   });
 
-  it("reads uint8 tag", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads uint8 tag", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -92,12 +92,12 @@ describe("MP4TagReader", function() {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect(tags.cpil.data).toBeTruthy();
   });
 
-  it("reads jpeg tag", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads jpeg tag", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -105,14 +105,14 @@ describe("MP4TagReader", function() {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect("covr" in tags).toBeTruthy();
     expect(tags.covr.data.format).toBe("image/jpeg");
     expect(tags.covr.data.data).toEqual([1, 2, 3]);
   });
 
-  it("reads multiple int tags", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads multiple int tags", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -120,15 +120,15 @@ describe("MP4TagReader", function() {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect(tags.trkn.data.track).toBe(2);
     expect(tags.trkn.data.total).toBe(9);
     expect(tags.disk.data.disk).toBe(2);
     expect(tags.disk.data.total).toBe(3);
   });
 
-  it("reads all tags", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads all tags", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -136,7 +136,7 @@ describe("MP4TagReader", function() {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect("©nam" in tags).toBeTruthy();
     expect("©ART" in tags).toBeTruthy();
     expect("©alb" in tags).toBeTruthy();
@@ -146,8 +146,8 @@ describe("MP4TagReader", function() {
     expect("covr" in tags).toBeTruthy();
   });
 
-  it("creates shorcuts", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("creates shorcuts", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -155,13 +155,13 @@ describe("MP4TagReader", function() {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect("artist" in tags).toBeTruthy();
     expect(tags.artist).toBe(tags["©ART"].data);
   });
 
-  it("reads the specificed tag", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads the specificed tag", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.setTagsToRead(["©cmt"])
         .read({
           onSuccess: resolve,
@@ -174,8 +174,8 @@ describe("MP4TagReader", function() {
     expect(Object.keys(tag.tags)).toContain("©cmt");
   });
 
-  it("reads the specificed shortcut tag", async function() {
-    const tag = await new Promise<any>(function (resolve, reject) {
+  it("reads the specificed shortcut tag", async () => {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.setTagsToRead(["title"])
         .read({
           onSuccess: resolve,
@@ -187,14 +187,14 @@ describe("MP4TagReader", function() {
     expect(Object.keys(tag.tags)).toContain("title");
   });
 
-  it("reads jpeg tag despite uint8 type", async function() {
-    var mp4FileContents = createMP4FileContents([
+  it("reads jpeg tag despite uint8 type", async () => {
+    const mp4FileContents = createMP4FileContents([
       MP4TagContents.createMetadataAtom("covr", "uint8", [0x01, 0x02, 0x03])
     ]);
-    var mediaFileReader = new ArrayFileReader(mp4FileContents.toArray());
-    var tagReader = new MP4TagReader(mediaFileReader);
+    const mediaFileReader = new ArrayFileReader(mp4FileContents.toArray());
+    const tagReader = new MP4TagReader(mediaFileReader);
 
-    const tag = await new Promise<any>(function (resolve, reject) {
+    const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
         // @ts-expect-error
@@ -202,7 +202,7 @@ describe("MP4TagReader", function() {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect("covr" in tags).toBeTruthy();
     expect(tags.covr.data.format).toBe("image/jpeg");
     expect(tags.covr.data.data).toEqual([1, 2, 3]);

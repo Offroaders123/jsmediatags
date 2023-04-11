@@ -1,14 +1,14 @@
-import ID3v1TagReader from '../src/ID3v1TagReader.js';
-import ArrayFileReader from '../src/ArrayFileReader.js';
+import ID3v1TagReader from "../src/ID3v1TagReader.js";
+import ArrayFileReader from "../src/ArrayFileReader.js";
 
-import { bin } from '../src/ByteArrayUtils.js';
-import { pad } from '../src/ByteArrayUtils.js';
+import { bin } from "../src/ByteArrayUtils.js";
+import { pad } from "../src/ByteArrayUtils.js";
 
 jest.autoMockOff();
 
 describe("ID3v1TagReader", () => {
   it("reads 1.0 tags", async () => {
-    var id3ArrayFile = [].concat(
+    const id3ArrayFile = [].concat(
       // @ts-expect-error
       bin("TAG"),
       pad(bin("Song Title"), 30),
@@ -18,8 +18,8 @@ describe("ID3v1TagReader", () => {
       pad(bin("A Comment"), 30),
       30
     );
-    var mediaFileReader = new ArrayFileReader(id3ArrayFile);
-    var tagReader = new ID3v1TagReader(mediaFileReader);
+    const mediaFileReader = new ArrayFileReader(id3ArrayFile);
+    const tagReader = new ID3v1TagReader(mediaFileReader);
 
     const tags = await new Promise((resolve, reject) => {
       tagReader.read({
@@ -30,21 +30,21 @@ describe("ID3v1TagReader", () => {
       jest.runAllTimers();
     });
     expect(tags).toEqual({
-      type: 'ID3',
-      version: '1.0',
+      type: "ID3",
+      version: "1.0",
       tags: {
-        title: 'Song Title',
-        artist: 'The Artist',
-        album: 'The Album',
-        year: '1995',
-        comment: 'A Comment',
-        genre: 'Fusion'
+        title: "Song Title",
+        artist: "The Artist",
+        album: "The Album",
+        year: "1995",
+        comment: "A Comment",
+        genre: "Fusion"
       }
     });
   });
 
   it("reads 1.1 tags", async () => {
-    var id3ArrayFile = [].concat(
+    const id3ArrayFile = [].concat(
       // @ts-expect-error
       bin("TAG"),
       pad(bin("Song Title"), 30),
@@ -55,8 +55,8 @@ describe("ID3v1TagReader", () => {
       3,
       30
     );
-    var mediaFileReader = new ArrayFileReader(id3ArrayFile);
-    var tagReader = new ID3v1TagReader(mediaFileReader);
+    const mediaFileReader = new ArrayFileReader(id3ArrayFile);
+    const tagReader = new ID3v1TagReader(mediaFileReader);
 
     const tags = await new Promise((resolve, reject) => {
       tagReader.read({
@@ -67,16 +67,16 @@ describe("ID3v1TagReader", () => {
       jest.runAllTimers();
     });
     expect(tags).toEqual({
-      type: 'ID3',
-      version: '1.1',
+      type: "ID3",
+      version: "1.1",
       tags: {
-        title: 'Song Title',
-        artist: 'The Artist',
-        album: 'The Album',
-        year: '1995',
-        comment: 'A Comment',
+        title: "Song Title",
+        artist: "The Artist",
+        album: "The Album",
+        year: "1995",
+        comment: "A Comment",
         track: 3,
-        genre: 'Fusion'
+        genre: "Fusion"
       }
     });
   });

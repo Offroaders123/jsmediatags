@@ -1,9 +1,9 @@
-import BlobFileReader from '../src/BlobFileReader.js';
+import BlobFileReader from "../src/BlobFileReader.js";
 
 jest
-  .dontMock('../src/BlobFileReader.js')
-  .dontMock('../src/MediaFileReader.js')
-  .dontMock('../src/ChunkedFileData.js');
+  .dontMock("../src/BlobFileReader.js")
+  .dontMock("../src/MediaFileReader.js")
+  .dontMock("../src/ChunkedFileData.js");
 
 function throwOnError(onSuccess: () => void) {
   return {
@@ -15,7 +15,7 @@ function throwOnError(onSuccess: () => void) {
 }
 
 describe("BlobFileReader", () => {
-  var fileReader: BlobFileReader;
+  let fileReader: BlobFileReader;
 
   beforeEach(() => {
     fileReader = new BlobFileReader(new Blob(["This is a simple file"]));

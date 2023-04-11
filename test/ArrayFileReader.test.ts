@@ -1,8 +1,8 @@
-import ArrayFileReader from '../src/ArrayFileReader.js';
+import ArrayFileReader from "../src/ArrayFileReader.js";
 
 jest
-  .dontMock('../src/ArrayFileReader.js')
-  .dontMock('../src/MediaFileReader.js');
+  .dontMock("../src/ArrayFileReader.js")
+  .dontMock("../src/MediaFileReader.js");
 
 function throwOnError(onSuccess: () => void) {
   return {
@@ -14,14 +14,14 @@ function throwOnError(onSuccess: () => void) {
 }
 
 describe("ArrayFileReader", () => {
-  var fileReader: ArrayFileReader;
+  let fileReader: ArrayFileReader;
 
   beforeEach(() => {
     fileReader = new ArrayFileReader([...Buffer.from("This is a simple file")]);
   });
 
   it("should be able to read the right type of files", () => {
-    expect(ArrayFileReader.canReadFile(Buffer.from('Test'))).toBe(true);
+    expect(ArrayFileReader.canReadFile(Buffer.from("Test"))).toBe(true);
     expect(ArrayFileReader.canReadFile([10, 24])).toBe(true);
     expect(ArrayFileReader.canReadFile("fakefile")).toBe(false);
     expect(ArrayFileReader.canReadFile("http://localhost")).toBe(false);

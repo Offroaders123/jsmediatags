@@ -1,19 +1,19 @@
-import ArrayFileReader from '../src/ArrayFileReader.js';
-import FLACTagContents from '../src/FLACTagContents.js';
-import FLACTagReader from '../src/FLACTagReader.js';
+import ArrayFileReader from "../src/ArrayFileReader.js";
+import FLACTagContents from "../src/FLACTagContents.js";
+import FLACTagReader from "../src/FLACTagReader.js";
 
 jest.autoMockOff();
 
 describe("FLACTagReader", () => {
-  var flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(
+  const flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(
     ["TITLE", "A Title"],
     ["ARTIST", "An Artist"],
     ["ALBUM", "An Album"],
     ["TRACKNUMBER", "1"],
     ["GENRE", "A Genre"]
   ), FLACTagContents.createPictureBlock()]);
-  var mediaFileReader: ArrayFileReader;
-  var tagReader: FLACTagReader;
+  let mediaFileReader: ArrayFileReader;
+  let tagReader: FLACTagReader;
 
   beforeEach(() => {
     mediaFileReader = new ArrayFileReader(flacFileContents.toArray());
@@ -42,7 +42,7 @@ describe("FLACTagReader", () => {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect(tags.title).toBe("A Title");
   });
 
@@ -55,7 +55,7 @@ describe("FLACTagReader", () => {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect(tags.picture.description).toBe("A Picture");
   });
 
@@ -68,7 +68,7 @@ describe("FLACTagReader", () => {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect(tags.title).toBeTruthy();
     expect(tags.artist).toBeTruthy();
     expect(tags.album).toBeTruthy();
@@ -77,7 +77,7 @@ describe("FLACTagReader", () => {
   });
 
   it("reads tags no matter their case", async () => {
-    var flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(
+    const flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(
       ["Title", "A Title"],
       ["artist", "An Artist"],
     )]);
@@ -91,15 +91,15 @@ describe("FLACTagReader", () => {
       });
       jest.runAllTimers();
     });
-    var tags = tag.tags;
+    const tags = tag.tags;
     expect(tags.title).toBeTruthy();
     expect(tags.artist).toBeTruthy();
   });
 
   it("calls failure callback if file doesn't have comments", async () => {
-    var flacFileEmpty = new FLACTagContents();
-    var fileReaderEmpty = new ArrayFileReader(flacFileEmpty.toArray());
-    var tagReaderEmpty = new FLACTagReader(fileReaderEmpty);
+    const flacFileEmpty = new FLACTagContents();
+    const fileReaderEmpty = new ArrayFileReader(flacFileEmpty.toArray());
+    const tagReaderEmpty = new FLACTagReader(fileReaderEmpty);
     try {
       return await new Promise<any>((resolve, reject) => {
         tagReaderEmpty.read({

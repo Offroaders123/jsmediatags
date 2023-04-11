@@ -1,15 +1,15 @@
-import ID3v2TagReader from '../src/ID3v2TagReader.js';
-import ID3v2TagContents from '../src/ID3v2TagContents.js';
-import ArrayFileReader from '../src/ArrayFileReader.js';
+import ID3v2TagReader from "../src/ID3v2TagReader.js";
+import ID3v2TagContents from "../src/ID3v2TagContents.js";
+import ArrayFileReader from "../src/ArrayFileReader.js";
 
-import { bin } from '../src/ByteArrayUtils';
+import { bin } from "../src/ByteArrayUtils";
 
 jest.autoMockOff();
 
 describe("ID3v2TagReader", () => {
-  var tagReader: ID3v2TagReader;
-  var mediaFileReader: ArrayFileReader;
-  var id3FileContents =
+  let tagReader: ID3v2TagReader;
+  let mediaFileReader: ArrayFileReader;
+  const id3FileContents =
     new ID3v2TagContents(4, 3)
       .addFrame("TIT2", [].concat(
         // @ts-expect-error
@@ -56,7 +56,7 @@ describe("ID3v2TagReader", () => {
     
     it("reads an header with extended header", async () => {
       const tags = await new Promise<any>((resolve, reject) => {
-        var id3FileContents = new ID3v2TagContents(4, 3)
+        const id3FileContents = new ID3v2TagContents(4, 3)
           .addFrame("TIT2", [].concat(
             // @ts-expect-error
             [0],
@@ -192,7 +192,7 @@ describe("ID3v2TagReader", () => {
 
   describe("unsynchronisation", () => {
     it("reads global unsynchronised content", async () => {
-      var id3FileContents =
+      const id3FileContents =
         new ID3v2TagContents(4, 3)
         // @ts-ignore
           .setFlags({
@@ -227,7 +227,7 @@ describe("ID3v2TagReader", () => {
     });
 
     it("reads local unsynchronised content", async () => {
-      var id3FileContents =
+      const id3FileContents =
         new ID3v2TagContents(4, 3)
           .addFrame("TIT2", [].concat(
             // @ts-expect-error
@@ -262,7 +262,7 @@ describe("ID3v2TagReader", () => {
     });
 
     it("reads unsynchronised content with data length indicator", async () => {
-      var id3FileContents =
+      const id3FileContents =
         new ID3v2TagContents(4, 3)
           .addFrame("TIT2", [].concat(
             // @ts-expect-error
@@ -299,7 +299,7 @@ describe("ID3v2TagReader", () => {
     });
 
     it("doesn't unsynchronise frames twice", async () => {
-      var id3FileContents =
+      const id3FileContents =
         new ID3v2TagContents(4, 3)
         // @ts-ignore
           .setFlags({
@@ -339,7 +339,7 @@ describe("ID3v2TagReader", () => {
   });
 
   it("should process frames with no content", async () => {
-    var id3FileContents =
+    const id3FileContents =
       new ID3v2TagContents(4, 3)
       // @ts-ignore
         .addFrame("WOAF") // empty frame contents
@@ -362,7 +362,7 @@ describe("ID3v2TagReader", () => {
   });
 
   it("should correctly assign shortcuts to when there are multiple instances of the same frame", async () => {
-    var id3FileContents =
+    const id3FileContents =
       new ID3v2TagContents(4, 3)
         .addFrame("TIT2", [].concat(
           // @ts-expect-error

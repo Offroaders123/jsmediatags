@@ -1,5 +1,7 @@
 import ChunkedFileData from "./ChunkedFileData.js";
 import MediaFileReader from "./MediaFileReader.js";
+// @ts-expect-error
+import { XMLHttpRequest } from "xhr2";
 
 import type { LoadCallbackType, CallbackType } from "./FlowTypes.js";
 
@@ -56,7 +58,7 @@ export default class XhrFileReader extends MediaFileReader {
 
   _fetchSizeWithHeadRequest(callbacks: LoadCallbackType): void {
     this._makeXHRRequest("HEAD", null, {
-      onSuccess: (xhr: XMLHttpRequest) => {
+      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const contentLength = this._parseContentLength(xhr);
         if (contentLength) {
           this._size = contentLength;
@@ -75,7 +77,7 @@ export default class XhrFileReader extends MediaFileReader {
     const range = this._roundRangeToChunkMultiple([0, 0]);
 
     this._makeXHRRequest("GET", range, {
-      onSuccess: (xhr: XMLHttpRequest) => {
+      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const contentRange = this._parseContentRange(xhr);
         const data = this._getXhrResponseContent(xhr);
 
@@ -101,7 +103,7 @@ export default class XhrFileReader extends MediaFileReader {
 
   _fetchEntireFile(callbacks: LoadCallbackType): void {
     this._makeXHRRequest("GET", null, {
-      onSuccess: (xhr: XMLHttpRequest) => {
+      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const data = this._getXhrResponseContent(xhr);
         this._size = data.length;
         this._fileData.addData(0, data);
@@ -111,12 +113,12 @@ export default class XhrFileReader extends MediaFileReader {
     });
   }
 
-  _getXhrResponseContent(xhr: XMLHttpRequest): string {
+  _getXhrResponseContent(xhr: globalThis.XMLHttpRequest): string {
     // @ts-expect-error
     return xhr.responseBody || xhr.response || xhr.responseText || "";
   }
 
-  _parseContentLength(xhr: XMLHttpRequest): number | null {
+  _parseContentLength(xhr: globalThis.XMLHttpRequest): number | null {
     const contentLength = this._getResponseHeader(xhr, "Content-Length");
 
     if (contentLength == null) {
@@ -126,7 +128,7 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  _parseContentRange(xhr: XMLHttpRequest): ContentRangeType | null {
+  _parseContentRange(xhr: globalThis.XMLHttpRequest): ContentRangeType | null {
     const contentRange = this._getResponseHeader(xhr, "Content-Range");
 
     if (contentRange) {
@@ -163,7 +165,7 @@ export default class XhrFileReader extends MediaFileReader {
     range[1] = Math.min(this._size, range[1]);
 
     this._makeXHRRequest("GET", range, {
-      onSuccess: (xhr: XMLHttpRequest) => {
+      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const data = this._getXhrResponseContent(xhr);
         this._fileData.addData(range[0], data);
         callbacks.onSuccess();
@@ -245,13 +247,13 @@ export default class XhrFileReader extends MediaFileReader {
     xhr.send(null);
   }
 
-  _setRequestHeader(xhr: XMLHttpRequest, headerName: string, headerValue: string) {
+  _setRequestHeader(xhr: globalThis.XMLHttpRequest, headerName: string, headerValue: string) {
     if (XhrFileReader._config.disallowedXhrHeaders.indexOf(headerName.toLowerCase()) < 0) {
       xhr.setRequestHeader(headerName, headerValue);
     }
   }
 
-  _hasResponseHeader(xhr: XMLHttpRequest, headerName: string): boolean {
+  _hasResponseHeader(xhr: globalThis.XMLHttpRequest, headerName: string): boolean {
     const allResponseHeaders = xhr.getAllResponseHeaders();
 
     if (!allResponseHeaders) {
@@ -267,7 +269,7 @@ export default class XhrFileReader extends MediaFileReader {
     return headerNames.indexOf(headerName.toLowerCase()) >= 0;
   }
 
-  _getResponseHeader(xhr: XMLHttpRequest, headerName: string): string | null {
+  _getResponseHeader(xhr: globalThis.XMLHttpRequest, headerName: string): string | null {
     if (!this._hasResponseHeader(xhr, headerName)) {
       return null;
     }
@@ -287,10 +289,10 @@ export default class XhrFileReader extends MediaFileReader {
     );
   }
 
-  _createXHRObject(): XMLHttpRequest {
+  _createXHRObject(): globalThis.XMLHttpRequest {
     if (typeof window === "undefined" && !this._isWebWorker()) {
       // $FlowIssue - flow is not able to recognize this module.
-      return new (require("xhr2").XMLHttpRequest)();
+      return new XMLHttpRequest();
     }
 
     if (typeof XMLHttpRequest !== "undefined") {

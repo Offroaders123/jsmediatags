@@ -180,4 +180,4 @@ const XMLHttpRequest = new XMLHttpRequestMock();
 xhr2Mock.__setMockUrls = __setMockUrls;
 xhr2Mock.XMLHttpRequest = XMLHttpRequest;
 // @ts-expect-error
-window.XMLHttpRequest = () => XMLHttpRequest;
+globalThis.XMLHttpRequest = () => XMLHttpRequest;

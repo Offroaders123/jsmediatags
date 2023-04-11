@@ -1,4 +1,4 @@
-import * as jsmediatags from "../src/jsmediatags.js";
+import * as jsmediatags from "../src/index.js";
 import NodeFileReader from "../src/NodeFileReader.js";
 import XhrFileReader from "../src/XhrFileReader.js";
 import ArrayFileReader from "../src/ArrayFileReader.js";

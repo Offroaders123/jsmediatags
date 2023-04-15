@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import ChunkedFileData from "../src/ChunkedFileData.js";
 
 jest

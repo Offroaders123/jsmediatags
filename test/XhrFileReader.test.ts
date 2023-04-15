@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import XhrFileReader from "../src/XhrFileReader.js";
 // @ts-expect-error
 import * as xhr2 from "xhr2";

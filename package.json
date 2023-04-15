@@ -57,12 +57,12 @@
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "test": "jest",
+    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "tsc",
     "dev": "tsc -w"
   },
   "jest": {
-    "preset": "ts-jest",
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "jest-ts-webcompat-resolver",
     "transform": {
       "^.+\\.tsx?$": [

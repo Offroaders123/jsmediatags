@@ -1,4 +1,6 @@
-const xhr2Mock = jest.genMockFromModule("xhr2") as any;
+import { jest } from "@jest/globals";
+
+const xhr2Mock = jest.createMockFromModule("xhr2") as any;
 
 export default xhr2Mock;
 
@@ -94,10 +96,10 @@ function getTimeout(url: string) {
 
 interface XMLHttpRequestMock {
   onload(): void;
-  open(): void;
+  open(method: string, url: string): void;
   overrideMimeType(): void;
-  setRequestHeader(): void;
-  getResponseHeader(): string | void;
+  setRequestHeader(headerName: string, headerValue: string): void;
+  getResponseHeader(headerName: string): string | number | void | null;
   _getContentRange(): string | void;
   getAllResponseHeaders(): void;
   send(): void;
@@ -112,20 +114,20 @@ function XMLHttpRequestMock(this: XMLHttpRequestMock) {
   let _range: [number,number] | null;
 
   this.onload = () => {};
-  this.open = jest.fn().mockImplementation((method, url) => {
+  this.open = jest.fn<typeof this.open>().mockImplementation((method, url) => {
     _url = url;
     _range = null;
   });
-  this.overrideMimeType = jest.fn();
-  this.setRequestHeader = jest.fn().mockImplementation(
+  this.overrideMimeType = jest.fn<typeof this.overrideMimeType>();
+  this.setRequestHeader = jest.fn<typeof this.setRequestHeader>().mockImplementation(
     (headerName, headerValue) => {
       if (headerName.toLowerCase() === "range") {
-        const matches = headerValue.match(/bytes=(\d+)-(\d+)/);
+        const matches = headerValue.match(/bytes=(\d+)-(\d+)/)!;
         _range = [Number(matches[1]), Number(matches[2])];
       }
     }
   );
-  this.getResponseHeader = jest.fn().mockImplementation(
+  this.getResponseHeader = jest.fn<typeof this.getResponseHeader>().mockImplementation(
     headerName => {
       if (headerName.toLowerCase() === "content-length") {
         return getUrlContentLength(_url, _range);

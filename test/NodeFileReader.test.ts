@@ -1,8 +1,10 @@
+import { jest } from "@jest/globals";
+
 import * as fs from "node:fs";
 import NodeFileReader from "../src/NodeFileReader.js";
 
 jest
-  .mock("node:fs")
+  .mock<typeof import("node:fs")>("node:fs")
   .dontMock("../src/NodeFileReader.js")
   .dontMock("../src/MediaFileReader.js")
   .dontMock("../src/ChunkedFileData.js");

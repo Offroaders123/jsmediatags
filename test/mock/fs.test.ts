@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 /**
  * Extended from https://facebook.github.io/jest/docs/manual-mocks.html
  */
@@ -5,7 +7,7 @@
 import * as path from "node:path";
 
 // Get the automatic mock for `fs`
-const fsMock = jest.genMockFromModule("fs") as typeof import("node:fs");
+const fsMock = jest.createMockFromModule<typeof import("node:fs")>("node:fs");
 
 export default fsMock;
 

@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import ArrayBufferFileReader from "../src/ArrayBufferFileReader.js";
 
 jest

@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import ArrayFileReader from "../src/ArrayFileReader.js";
 import FLACTagContents from "../src/FLACTagContents.js";
 import FLACTagReader from "../src/FLACTagReader.js";

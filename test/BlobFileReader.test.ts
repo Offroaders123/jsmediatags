@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import BlobFileReader from "../src/BlobFileReader.js";
 
 jest

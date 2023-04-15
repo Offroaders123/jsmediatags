@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import MediaFileReader from "../src/MediaFileReader.js";
 
 jest
@@ -11,7 +13,7 @@ describe("MediaFileReader", () => {
   beforeEach(() => {
     mediaFileReader = new MediaFileReader();
     mediaFileReader.getByteAt =
-      jest.fn().mockImplementation(offset => {
+      jest.fn<typeof mediaFileReader.getByteAt>().mockImplementation(offset => {
         return mediaFileBytes[offset];
       });
   });

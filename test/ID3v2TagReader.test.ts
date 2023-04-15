@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import ID3v2TagReader from "../src/ID3v2TagReader.js";
 import ID3v2TagContents from "../src/ID3v2TagContents.js";
 import ArrayFileReader from "../src/ArrayFileReader.js";
@@ -98,10 +100,9 @@ describe("ID3v2TagReader", () => {
   });
 
   it("loads the entire tag", async () => {
-    mediaFileReader.loadRange = jest.fn().mockImplementation(
-      () => {
-        // @ts-expect-error
-        return ArrayFileReader.prototype.loadRange.apply(this, arguments);
+    mediaFileReader.loadRange = jest.fn<typeof mediaFileReader.loadRange>().mockImplementation(
+      (...args) => {
+        return ArrayFileReader.prototype.loadRange.apply(this, args);
       }
     );
 

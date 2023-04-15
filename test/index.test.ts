@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import * as jsmediatags from "../src/index.js";
 import NodeFileReader from "../src/NodeFileReader.js";
 import XhrFileReader from "../src/XhrFileReader.js";
@@ -33,14 +35,14 @@ describe("jsmediatags", () => {
     jsmediatags.Config.removeTagReader(MP4TagReader);
     jsmediatags.Config.removeTagReader(FLACTagReader);
     // Reset auto mock to its original state.
-    NodeFileReader.canReadFile = jest.fn();
-    NodeFileReader.prototype.init = jest.fn()
+    NodeFileReader.canReadFile = jest.fn<typeof NodeFileReader.canReadFile>();
+    NodeFileReader.prototype.init = jest.fn<typeof NodeFileReader.prototype.init>()
       .mockImplementation(callbacks => {
         setTimeout(() => {
           callbacks.onSuccess();
         }, 1);
       });
-    NodeFileReader.prototype.loadRange = jest.fn()
+    NodeFileReader.prototype.loadRange = jest.fn<typeof NodeFileReader.prototype.loadRange>()
       .mockImplementation((range, callbacks) => {
         setTimeout(() => {
           callbacks.onSuccess();
@@ -51,7 +53,7 @@ describe("jsmediatags", () => {
     ID3v2TagReader.getTagIdentifierByteRange.mockReturnValue(
       {offset: 0, length: 0}
     );
-    ID3v2TagReader.prototype.setTagsToRead = jest.fn().mockReturnThis();
+    ID3v2TagReader.prototype.setTagsToRead = jest.fn<typeof ID3v2TagReader.prototype.setTagsToRead>().mockReturnThis();
   });
 
   it("should read tags with the shortcut function", async () => {
@@ -59,7 +61,7 @@ describe("jsmediatags", () => {
     NodeFileReader.canReadFile.mockReturnValue(true);
     // @ts-ignore
     ID3v2TagReader.canReadTagFormat.mockReturnValue(true);
-    ID3v2TagReader.prototype.read = jest.fn()
+    ID3v2TagReader.prototype.read = jest.fn<typeof ID3v2TagReader.prototype.read>()
       .mockImplementation(callbacks => {
         callbacks.onSuccess(mockTags);
       });
@@ -138,11 +140,10 @@ describe("jsmediatags", () => {
 
       // @ts-ignore
       ID3v2TagReader.canReadTagFormat.mockReturnValue(false);
-      MockTagReader.getTagIdentifierByteRange = jest.fn()
+      MockTagReader.getTagIdentifierByteRange = jest.fn<typeof MockTagReader.getTagIdentifierByteRange>()
       // @ts-ignore
         .mockReturnValue([]);
-      MockTagReader.canReadTagFormat = jest.fn()
-      // @ts-ignore
+      MockTagReader.canReadTagFormat = jest.fn<typeof MockTagReader.canReadTagFormat>()
         .mockReturnValue(true);
 
       const TagReader = await new Promise((resolve, reject) => {
@@ -178,11 +179,9 @@ describe("jsmediatags", () => {
       ID3v2TagReader.getTagIdentifierByteRange.mockReturnValue(
         {offset: 2, length: 3}
       );
-      MockTagReader.getTagIdentifierByteRange = jest.fn()
-      // @ts-ignore
+      MockTagReader.getTagIdentifierByteRange = jest.fn<typeof MockTagReader.getTagIdentifierByteRange>()
         .mockReturnValue({offset: 5, length: 2});
-      MockTagReader.canReadTagFormat = jest.fn()
-      // @ts-ignore
+      MockTagReader.canReadTagFormat = jest.fn<typeof MockTagReader.canReadTagFormat>()
         .mockReturnValue(true);
 
       await new Promise((resolve, reject) => {
@@ -213,11 +212,9 @@ describe("jsmediatags", () => {
       ID3v2TagReader.getTagIdentifierByteRange.mockReturnValue(
         {offset: 0, length: 3}
       );
-      MockTagReader.getTagIdentifierByteRange = jest.fn()
-      // @ts-ignore
+      MockTagReader.getTagIdentifierByteRange = jest.fn<typeof MockTagReader.getTagIdentifierByteRange>()
         .mockReturnValue({offset: -3, length: 3});
-      MockTagReader.canReadTagFormat = jest.fn()
-      // @ts-ignore
+      MockTagReader.canReadTagFormat = jest.fn<typeof MockTagReader.canReadTagFormat>()
         .mockReturnValue(true);
 
       await new Promise((resolve, reject) => {

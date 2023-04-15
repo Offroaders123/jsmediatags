@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 import ID3v2FrameReader from "../src/ID3v2FrameReader.js";
 import ArrayFileReader from "../src/ArrayFileReader.js";
 import { bin } from "../src/ByteArrayUtils.js";

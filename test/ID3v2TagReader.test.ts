@@ -33,8 +33,7 @@ describe("ID3v2TagReader", () => {
       const tags = await new Promise<any>((resolve, reject) => {
         tagReader.read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
         jest.runAllTimers();
       });
@@ -74,8 +73,7 @@ describe("ID3v2TagReader", () => {
 
         tagReader.read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
         jest.runAllTimers();
       });
@@ -110,8 +108,7 @@ describe("ID3v2TagReader", () => {
     const tags = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -125,8 +122,7 @@ describe("ID3v2TagReader", () => {
     const tags = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -143,8 +139,7 @@ describe("ID3v2TagReader", () => {
     const tags = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -155,8 +150,7 @@ describe("ID3v2TagReader", () => {
     const tags = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -169,8 +163,7 @@ describe("ID3v2TagReader", () => {
       tagReader.setTagsToRead(["TCOM"])
         .read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
       jest.runAllTimers();
     });
@@ -182,8 +175,7 @@ describe("ID3v2TagReader", () => {
     const tags = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -217,8 +209,7 @@ describe("ID3v2TagReader", () => {
       const tags = await new Promise<any>((resolve, reject) => {
         tagReader.read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
         jest.runAllTimers();
       });
@@ -253,8 +244,7 @@ describe("ID3v2TagReader", () => {
       const tags = await new Promise<any>((resolve, reject) => {
         tagReader.read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
         jest.runAllTimers();
       });
@@ -289,8 +279,7 @@ describe("ID3v2TagReader", () => {
       const tags = await new Promise<any>((resolve, reject) => {
         tagReader.read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
         jest.runAllTimers();
       });
@@ -329,8 +318,7 @@ describe("ID3v2TagReader", () => {
       const tags = await new Promise<any>((resolve, reject) => {
         tagReader.read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
         jest.runAllTimers();
       });
@@ -380,8 +368,7 @@ describe("ID3v2TagReader", () => {
     const tags = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });

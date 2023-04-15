@@ -28,26 +28,24 @@ export default class BlobFileReader extends MediaFileReader {
     setTimeout(onSuccess, 1);
   }
 
-  loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType): void {
-    const self = this;
-    // @ts-expect-error - flow isn't aware of mozSlice or webkitSlice
-    const blobSlice = this._blob.slice || this._blob.mozSlice || this._blob.webkitSlice;
-    const blob = blobSlice.call(this._blob, range[0], range[1] + 1);
-    const browserFileReader = new FileReader();
+  async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType): Promise<void> {
+    const blob = this._blob.slice(range[0], range[1] + 1);
+    let buffer: ArrayBuffer;
 
-    browserFileReader.onloadend = () => {
-      const intArray = new Uint8Array(browserFileReader.result! as ArrayBuffer);
-      self._fileData.addData(range[0], intArray);
-      onSuccess();
-    };
-    browserFileReader.onerror =
-    browserFileReader.onabort = () => {
-      if (onError) {
-        onError({"type": "blob", "info": browserFileReader.error});
-      }
-    };
+    try {
+      buffer = await blob.arrayBuffer();
+    } catch (error){
+      onError?.({
+        type: "blob",
+        info: error
+      });
+      return;
+    }
 
-    browserFileReader.readAsArrayBuffer(blob);
+    const intArray = new Uint8Array(buffer);
+    this._fileData.addData(range[0],intArray);
+
+    onSuccess();
   }
 
   getByteAt(offset: number): number {

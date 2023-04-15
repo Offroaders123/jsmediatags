@@ -24,8 +24,7 @@ describe("ID3v1TagReader", () => {
     const tags = await new Promise((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -61,8 +60,7 @@ describe("ID3v1TagReader", () => {
     const tags = await new Promise((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });

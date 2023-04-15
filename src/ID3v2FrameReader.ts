@@ -494,24 +494,34 @@ frameReaderFunctions["CTOC"] = function readTableOfContentsFrame(
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
+  interface TableOfContentsResult {
+    childElementIds: string[];
+    id: string;
+    topLevel: boolean;
+    ordered: boolean;
+    entryCount: number;
+    subFrames?: string;
+  }
+
   const originalOffset = offset;
-  const result = {} as {
-    childElementIds: string[],
-    id: string,
-    topLevel: boolean,
-    ordered: boolean,
-    entryCount: number,
-    subFrames: string
+  const ID = StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));
+  const id = ID.toString();
+  offset += ID.bytesReadCount;
+  const topLevel = data.isBitSetAt(offset, 1);
+  const ordered = data.isBitSetAt(offset, 0);
+  offset++;
+  const entryCount = data.getByteAt(offset);
+  offset++;
+
+  const result: TableOfContentsResult = {
+    childElementIds: [],
+    id,
+    topLevel,
+    ordered,
+    entryCount
   };
-  const id = StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));
-  result.id = id.toString();
-  offset += id.bytesReadCount;
-  result.topLevel = data.isBitSetAt(offset, 1);
-  result.ordered = data.isBitSetAt(offset, 0);
-  offset++;
-  result.entryCount = data.getByteAt(offset);
-  offset++;
+
   for (let i = 0; i < result.entryCount; i++) {
     const childId = StringUtils.readNullTerminatedString(data.getBytesAt(offset, length - (offset - originalOffset)));
     result.childElementIds.push(childId.toString());

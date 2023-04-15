@@ -24,8 +24,7 @@ describe("FLACTagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -37,8 +36,7 @@ describe("FLACTagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -50,8 +48,7 @@ describe("FLACTagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -63,8 +60,7 @@ describe("FLACTagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -86,8 +82,7 @@ describe("FLACTagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });

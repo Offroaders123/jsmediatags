@@ -61,8 +61,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -74,8 +73,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -87,8 +85,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -100,8 +97,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -115,8 +111,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -131,8 +126,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -150,8 +144,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });
@@ -165,8 +158,7 @@ describe("MP4TagReader", () => {
       tagReader.setTagsToRead(["©cmt"])
         .read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
       jest.runAllTimers();
     });
@@ -179,8 +171,7 @@ describe("MP4TagReader", () => {
       tagReader.setTagsToRead(["title"])
         .read({
           onSuccess: resolve,
-          // @ts-expect-error
-          onFailure: reject
+          onError: reject
         });
       jest.runAllTimers();
     });
@@ -197,8 +188,7 @@ describe("MP4TagReader", () => {
     const tag = await new Promise<any>((resolve, reject) => {
       tagReader.read({
         onSuccess: resolve,
-        // @ts-expect-error
-        onFailure: reject
+        onError: reject
       });
       jest.runAllTimers();
     });

@@ -14,23 +14,23 @@ export default class ArrayBufferFileReader extends MediaFileReader {
     this._fileData = new ChunkedFileData();
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return file instanceof ArrayBuffer
   }
 
-  _init({ onSuccess }: LoadCallbackType): void {
+  override _init({ onSuccess }: LoadCallbackType): void {
     this._size = this._buffer.byteLength;
     setTimeout(onSuccess, 1);
   }
 
-  loadRange(range: [number, number], { onSuccess }: LoadCallbackType): void {
+  override loadRange(range: [number, number], { onSuccess }: LoadCallbackType): void {
     const arrayBuf = this._buffer.slice(range[0], range[1] + 1);
     const viewData = new Uint8Array(arrayBuf);
     this._fileData.addData(range[0], viewData);
     onSuccess();
   }
 
-  getByteAt(offset: number): number {
+  override getByteAt(offset: number): number {
     return this._fileData.getByteAt(offset);
   }
 }

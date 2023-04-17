@@ -7,7 +7,7 @@ import type { CallbackType, LoadCallbackType, TagFrames, TagFrame, TagHeader, Ta
 const ID3_HEADER_SIZE = 10;
 
 export default class ID3v2TagReader extends MediaTagReader {
-  static getTagIdentifierByteRange(): ByteRange {
+  static override getTagIdentifierByteRange(): ByteRange {
     // ID3 header
     return {
       offset: 0,
@@ -15,12 +15,12 @@ export default class ID3v2TagReader extends MediaTagReader {
     };
   }
 
-  static canReadTagFormat(tagIdentifier: number[]): boolean {
+  static override canReadTagFormat(tagIdentifier: number[]): boolean {
     const id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
     return id === "ID3";
   }
 
-  _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
     mediaFileReader.loadRange([6, 9], {
       onSuccess: () => {
         mediaFileReader.loadRange(
@@ -33,7 +33,7 @@ export default class ID3v2TagReader extends MediaTagReader {
     });
   }
 
-  _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
+  override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
     let offset = 0;
     const major = data.getByteAt(offset+3);
     if (major > 4) {
@@ -128,7 +128,7 @@ export default class ID3v2TagReader extends MediaTagReader {
     }
   }
 
-  getShortcuts(): {
+  override getShortcuts(): {
     [key: string]: string | string[];
   } {
     // @ts-expect-error

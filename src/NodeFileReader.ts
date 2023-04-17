@@ -15,18 +15,18 @@ export default class NodeFileReader extends MediaFileReader {
     this._fileData = new ChunkedFileData();
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return (
       typeof file === "string"
       && !/^[a-z]+:\/\//i.test(file)
     );
   }
 
-  getByteAt(offset: number): number {
+  override getByteAt(offset: number): number {
     return this._fileData.getByteAt(offset);
   }
 
-  _init(callbacks: LoadCallbackType) {
+  override _init(callbacks: LoadCallbackType) {
     fs.stat(this._path, (err, stats) => {
       if (err) {
         callbacks.onError?.({
@@ -40,7 +40,7 @@ export default class NodeFileReader extends MediaFileReader {
     });
   }
 
-  loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
+  override loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
     let fd = -1;
     const fileData = this._fileData;
 

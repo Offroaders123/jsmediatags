@@ -29,7 +29,7 @@ export default class XhrFileReader extends MediaFileReader {
     this._fileData = new ChunkedFileData();
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return (
       typeof file === "string" &&
       /^[a-z]+:\/\//i.test(file)
@@ -48,7 +48,7 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  _init(callbacks: LoadCallbackType): void {
+  override _init(callbacks: LoadCallbackType): void {
     if (XhrFileReader._config.avoidHeadRequests) {
       this._fetchSizeWithGetRequest(callbacks);
     } else {
@@ -149,7 +149,7 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  loadRange(range: [number, number], { onSuccess, onError }: XHRCallbackType): void {
+  override loadRange(range: [number, number], { onSuccess, onError }: XHRCallbackType): void {
     if (this._fileData.hasDataRange(range[0], Math.min(this._size, range[1]))) {
       setTimeout(onSuccess, 1);
       return;
@@ -273,7 +273,7 @@ export default class XhrFileReader extends MediaFileReader {
     return xhr.getResponseHeader(headerName);
   }
 
-  getByteAt(offset: number): number {
+  override getByteAt(offset: number): number {
     const character = this._fileData.getByteAt(offset);
     return character.charCodeAt(0) & 0xff;
   }

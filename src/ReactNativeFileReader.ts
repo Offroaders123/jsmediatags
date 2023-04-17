@@ -16,18 +16,18 @@ export default class ReactNativeFileReader extends MediaFileReader {
     this._fileData = new ChunkedFileData();
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return (
       typeof file === "string" &&
       !/^[a-z]+:\/\//i.test(file)
     );
   }
 
-  getByteAt(offset: number): number {
+  override getByteAt(offset: number): number {
     return this._fileData.getByteAt(offset);
   }
 
-  async _init({ onSuccess, onError }: LoadCallbackType) {
+  override async _init({ onSuccess, onError }: LoadCallbackType) {
     try {
       const statResult = await RNFS.stat(this._path);
       this._size = statResult.size;
@@ -40,7 +40,7 @@ export default class ReactNativeFileReader extends MediaFileReader {
     }
   }
 
-  async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
+  override async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
     const fileData = this._fileData;
     const length = range[1] - range[0] + 1;
 

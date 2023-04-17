@@ -14,7 +14,7 @@ export default class BlobFileReader extends MediaFileReader {
     this._fileData = new ChunkedFileData();
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return (
       (typeof Blob !== "undefined" && file instanceof Blob) ||
       // File extends Blob but it seems that File instanceof Blob doesn't
@@ -23,12 +23,12 @@ export default class BlobFileReader extends MediaFileReader {
     );
   }
 
-  _init({ onSuccess }: LoadCallbackType): void {
+  override _init({ onSuccess }: LoadCallbackType): void {
     this._size = this._blob.size;
     setTimeout(onSuccess, 1);
   }
 
-  async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType): Promise<void> {
+  override async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType): Promise<void> {
     const blob = this._blob.slice(range[0], range[1] + 1);
     let buffer: ArrayBuffer;
 
@@ -48,7 +48,7 @@ export default class BlobFileReader extends MediaFileReader {
     onSuccess();
   }
 
-  getByteAt(offset: number): number {
+  override getByteAt(offset: number): number {
     return this._fileData.getByteAt(offset);
   }
 }

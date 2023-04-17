@@ -1,26 +1,46 @@
-import MediaFileReader from "./MediaFileReader.js";
+import type MediaFileReader from "./MediaFileReader.js";
+import type MediaTagReader from "./MediaTagReader.js";
 
-export type CallbackType = {
-  onSuccess: (data: any) => void,
-  onError?: (error: Object) => void
-};
+export interface jsmediatagsError {
+  type: string;
+  info: string;
+  xhr?: XMLHttpRequest;
+}
 
-export type LoadCallbackType = {
-  onSuccess: () => void,
-  onError?: (error: Object) => void
-};
+export interface CallbackType {
+  onSuccess: (data: TagType) => void;
+  onError?: (error: jsmediatagsError) => void;
+}
+
+export interface LoadCallbackType {
+  onSuccess: () => void;
+  onError?: (error: jsmediatagsError) => void;
+}
+
+export interface TagReaderCallbackType {
+  onSuccess: (TagReader: typeof MediaTagReader) => void;
+  onError?: (error: jsmediatagsError) => void;
+}
+
+export interface XHRCallbackType {
+  onSuccess: (xhr: XMLHttpRequest) => void;
+  onError?: (error: jsmediatagsError) => void;
+}
 
 export type CharsetType =
-  "utf-16" |
-  "utf-16le" |
-  "utf-16be" |
-  "utf-8" |
-  "iso-8859-1";
+  | "utf-16"
+  | "utf-16le"
+  | "utf-16be"
+  | "utf-8"
+  | "iso-8859-1";
 
-export type ByteRange = {
-  offset: number, // negative offset is relative to the end of the file.
-  length: number
-};
+export interface ByteRange {
+  /**
+   * A negative offset is relative to the end of the file.
+  */
+  offset: number;
+  length: number;
+}
 
 export type TypedArray =
   | Int8Array
@@ -33,12 +53,12 @@ export type TypedArray =
   | Float32Array
   | Float64Array;
 
-export type DataType = number[] | TypedArray | string;
+export type DataType = string | number[] | TypedArray;
 
-export type ChunkType = {
-  offset: number,
-  data: DataType
-};
+export interface ChunkType {
+  offset: number;
+  data: DataType;
+}
 
 export type Byte = number;
 
@@ -52,83 +72,95 @@ export type FrameReaderSignature = (
   id3header?: TagHeader
 ) => any;
 
-export type TagFrames = {[key: string]: TagFrame};
+export interface TagFrames {
+  [key: string]: TagFrame;
+}
 
-export type TagFrame = {
-  id: string,
-  size: number,
-  description: string,
-  data: any
-};
+export interface TagFrame {
+  id: string;
+  size: number;
+  description: string;
+  data: any;
+}
 
-export type TagFrameHeader = {
-  id: string,
-  size: number,
-  headerSize: number,
-  flags?: TagFrameFlags | null
-};
+export interface TagFrameHeader {
+  id: string;
+  size: number;
+  headerSize: number;
+  flags?: TagFrameFlags | null;
+}
 
-export type TagFrameFlags = {
+export interface TagFrameFlags {
   message: {
-    tag_alter_preservation: boolean,
-    file_alter_preservation: boolean,
-    read_only: boolean
-  },
+    tag_alter_preservation: boolean;
+    file_alter_preservation: boolean;
+    read_only: boolean;
+  };
   format: {
-    grouping_identity: boolean,
-    compression: boolean,
-    encryption: boolean,
-    unsynchronisation: boolean,
-    data_length_indicator: boolean
-  }
-};
+    grouping_identity: boolean;
+    compression: boolean;
+    encryption: boolean;
+    unsynchronisation: boolean;
+    data_length_indicator: boolean;
+  };
+}
 
-export type TagHeader = {
-  version: string,
-  major: number,
-  revision: number,
-  flags: TagHeaderFlags,
-  size: number
-};
+export interface TagHeader {
+  version: string;
+  major: number;
+  revision: number;
+  flags: TagHeaderFlags;
+  size: number;
+}
 
-export type TagHeaderFlags = {
-  unsynchronisation: boolean,
-  extended_header: boolean,
-  experimental_indicator: boolean,
-  footer_present: boolean
-};
+export interface TagHeaderFlags {
+  unsynchronisation: boolean;
+  extended_header: boolean;
+  experimental_indicator: boolean;
+  footer_present: boolean;
+}
 
-export type TagType = {
-  type: string,
-  ftyp?: string,
-  version?: string,
-  tags: {
-    [key: string]: FrameType | ShortcutType
-  }
-};
+export interface TagType {
+  type: string;
+  ftyp?: string;
+  version?: string;
+  tags: Tags;
+}
 
-export type PictureType = {
-  format: string,
-  type: string,
-  description: string,
-  data: ByteArray
-};
+export type Tags = ShortcutTags & TagFrames;
 
-export type FrameType = {
-  id: string,
-  description: string,
-  data: any
-};
+export interface ShortcutTags {
+  title?: string;
+  artist?: string;
+  album?: string;
+  year?: string;
+  comment?: string;
+  track?: number;
+  genre?: string;
+  picture?: PictureType;
+  lyrics?: string;
+}
 
-type ShortcutType = any;
+export interface PictureType {
+  format: string;
+  type: string;
+  description: string;
+  data: ByteArray;
+}
 
-type ShortcutNameType =
-  "title" |
-  "artist" |
-  "album" |
-  "year" |
-  "comment" |
-  "track" |
-  "genre" |
-  "picture" |
-  "lyrics";
+export interface FrameType {
+  id: string;
+  description: string;
+  data: any;
+}
+
+export type ShortcutNameType =
+  | "title"
+  | "artist"
+  | "album"
+  | "year"
+  | "comment"
+  | "track"
+  | "genre"
+  | "picture"
+  | "lyrics";

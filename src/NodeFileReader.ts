@@ -31,7 +31,7 @@ export default class NodeFileReader extends MediaFileReader {
       if (err) {
         callbacks.onError?.({
           type: "fs",
-          info: err
+          info: err as any
         });
       } else {
         this._size = stats.size;
@@ -55,7 +55,7 @@ export default class NodeFileReader extends MediaFileReader {
       if (err) {
         onError?.({
           type: "fs",
-          info: err
+          info: err as any
         });
         return;
       }
@@ -77,7 +77,7 @@ export default class NodeFileReader extends MediaFileReader {
       if (err) {
         onError?.({
           type: "fs",
-          info: err
+          info: err as any
         });
         return;
       }

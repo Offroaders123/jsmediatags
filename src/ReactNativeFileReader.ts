@@ -35,7 +35,7 @@ export default class ReactNativeFileReader extends MediaFileReader {
     } catch (error){
       onError?.({
         type: "fs",
-        info: error
+        info: error as any
       });
     }
   }
@@ -55,7 +55,7 @@ export default class ReactNativeFileReader extends MediaFileReader {
     } catch (err){
       onError?.({
         type: "fs",
-        info: err
+        info: err as any
       });
     }
   }

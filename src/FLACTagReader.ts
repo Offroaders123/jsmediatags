@@ -339,7 +339,7 @@ export default class FLACTagReader extends MediaTagReader {
         data: imageData
       }
     }
-    
+
     const tag = {
       type: "FLAC",
       version: "1",
@@ -351,7 +351,7 @@ export default class FLACTagReader extends MediaTagReader {
         genre,
         picture
       }
-    }
+    } as TagType;
     return tag;
   }
 }

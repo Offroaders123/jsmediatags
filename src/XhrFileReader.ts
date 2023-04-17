@@ -3,7 +3,7 @@ import MediaFileReader from "./MediaFileReader.js";
 // @ts-expect-error
 import { XMLHttpRequest } from "xhr2";
 
-import type { LoadCallbackType, CallbackType } from "./FlowTypes.js";
+import type { LoadCallbackType, XHRCallbackType } from "./FlowTypes.js";
 
 const CHUNK_SIZE = 1024;
 
@@ -56,13 +56,13 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  _fetchSizeWithHeadRequest(callbacks: LoadCallbackType): void {
+  _fetchSizeWithHeadRequest(callbacks: XHRCallbackType): void {
     this._makeXHRRequest("HEAD", null, {
       onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const contentLength = this._parseContentLength(xhr);
         if (contentLength) {
           this._size = contentLength;
-          callbacks.onSuccess();
+          callbacks.onSuccess(xhr);
         } else {
           // Content-Length not provided by the server, fallback to
           // GET requests.
@@ -73,7 +73,7 @@ export default class XhrFileReader extends MediaFileReader {
     });
   }
 
-  _fetchSizeWithGetRequest(callbacks: LoadCallbackType): void {
+  _fetchSizeWithGetRequest(callbacks: XHRCallbackType): void {
     const range = this._roundRangeToChunkMultiple([0, 0]);
 
     this._makeXHRRequest("GET", range, {
@@ -95,19 +95,19 @@ export default class XhrFileReader extends MediaFileReader {
         }
 
         this._fileData.addData(0, data);
-        callbacks.onSuccess();
+        callbacks.onSuccess(xhr);
       },
       onError: callbacks.onError
     });
   }
 
-  _fetchEntireFile({ onSuccess, onError }: LoadCallbackType): void {
+  _fetchEntireFile({ onSuccess, onError }: XHRCallbackType): void {
     this._makeXHRRequest("GET", null, {
       onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const data = this._getXhrResponseContent(xhr);
         this._size = data.length;
         this._fileData.addData(0, data);
-        onSuccess();
+        onSuccess(xhr);
       },
       onError
     });
@@ -149,7 +149,7 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType): void {
+  loadRange(range: [number, number], { onSuccess, onError }: XHRCallbackType): void {
     if (this._fileData.hasDataRange(range[0], Math.min(this._size, range[1]))) {
       setTimeout(onSuccess, 1);
       return;
@@ -168,7 +168,7 @@ export default class XhrFileReader extends MediaFileReader {
       onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const data = this._getXhrResponseContent(xhr);
         this._fileData.addData(range[0], data);
-        onSuccess();
+        onSuccess(xhr);
       },
       onError
     });
@@ -183,7 +183,7 @@ export default class XhrFileReader extends MediaFileReader {
   _makeXHRRequest(
     method: string,
     range: [number, number] | null,
-    { onSuccess, onError }: CallbackType
+    { onSuccess, onError }: XHRCallbackType
   ) {
     const xhr = this._createXHRObject();
     xhr.open(method, this._url);

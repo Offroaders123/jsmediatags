@@ -55,7 +55,7 @@ export default class ID3v1TagReader extends MediaTagReader {
       genre = "";
     }
 
-    const tag: TagType = {
+    const tag = {
       type: "ID3",
       version: version,
       tags: {
@@ -66,10 +66,9 @@ export default class ID3v1TagReader extends MediaTagReader {
         comment,
         genre
       }
-    };
+    } as TagType;
 
     if (track) {
-      // $FlowIssue - flow is not happy with adding properties
       tag.tags.track = track;
     }
 

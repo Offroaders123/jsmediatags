@@ -34,7 +34,7 @@ export default class BlobFileReader extends MediaFileReader {
 
     try {
       buffer = await blob.arrayBuffer();
-    } catch (error){
+    } catch (error: any){
       onError?.({
         type: "blob",
         info: error

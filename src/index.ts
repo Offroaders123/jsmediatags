@@ -8,7 +8,7 @@ import ID3v2TagReader from "./ID3v2TagReader.js";
 import MP4TagReader from "./MP4TagReader.js";
 import FLACTagReader from "./FLACTagReader.js";
 
-import type { CallbackType, LoadCallbackType, ByteRange } from "./FlowTypes.js";
+import type { CallbackType, LoadCallbackType, TagReaderCallbackType, ByteRange } from "./FlowTypes.js";
 
 const mediaFileReaders: typeof MediaFileReader[] = [];
 const mediaTagReaders: typeof MediaTagReader[] = [];
@@ -59,7 +59,7 @@ export class Reader {
     fileReader.init({
       onSuccess: () => {
         this._getTagReader(fileReader, {
-          onSuccess: (TagReader: typeof MediaTagReader) => {
+          onSuccess: TagReader => {
             new TagReader(fileReader)
               .setTagsToRead(this._tagsToRead)
               .read(callbacks);
@@ -89,7 +89,7 @@ export class Reader {
     throw new Error("No suitable file reader found for " + this._file);
   }
 
-  _getTagReader(fileReader: MediaFileReader, callbacks: CallbackType) {
+  _getTagReader(fileReader: MediaFileReader, callbacks: TagReaderCallbackType) {
     if (this._tagReader) {
       const tagReader = this._tagReader;
       setTimeout(() => {
@@ -100,7 +100,7 @@ export class Reader {
     }
   }
 
-  _findTagReader(fileReader: MediaFileReader, callbacks: CallbackType) {
+  _findTagReader(fileReader: MediaFileReader, callbacks: TagReaderCallbackType) {
     // We don't want to make multiple fetches per tag reader to get the tag
     // identifier. The strategy here is to combine all the tag identifier
     // ranges into one and make a single fetch. This is particularly important

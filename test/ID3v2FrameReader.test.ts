@@ -476,7 +476,7 @@ describe("ID3v2FrameReader", () => {
     const fileReader = new ArrayFileReader(fileData);
     const id3header = {major: 4};
 
-    const tags = ID3v2FrameReader.readFrames(
+    ID3v2FrameReader.readFrames(
       0,
       fileData.length,
       fileReader,

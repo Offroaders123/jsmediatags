@@ -101,15 +101,15 @@ export default class XhrFileReader extends MediaFileReader {
     });
   }
 
-  _fetchEntireFile(callbacks: LoadCallbackType): void {
+  _fetchEntireFile({ onSuccess, onError }: LoadCallbackType): void {
     this._makeXHRRequest("GET", null, {
       onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const data = this._getXhrResponseContent(xhr);
         this._size = data.length;
         this._fileData.addData(0, data);
-        callbacks.onSuccess();
+        onSuccess();
       },
-      onError: callbacks.onError
+      onError
     });
   }
 
@@ -149,9 +149,9 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  loadRange(range: [number, number], callbacks: LoadCallbackType): void {
+  loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType): void {
     if (this._fileData.hasDataRange(range[0], Math.min(this._size, range[1]))) {
-      setTimeout(callbacks.onSuccess, 1);
+      setTimeout(onSuccess, 1);
       return;
     }
 
@@ -168,9 +168,9 @@ export default class XhrFileReader extends MediaFileReader {
       onSuccess: (xhr: globalThis.XMLHttpRequest) => {
         const data = this._getXhrResponseContent(xhr);
         this._fileData.addData(range[0], data);
-        callbacks.onSuccess();
+        onSuccess();
       },
-      onError: callbacks.onError
+      onError
     });
   }
 
@@ -183,19 +183,19 @@ export default class XhrFileReader extends MediaFileReader {
   _makeXHRRequest(
     method: string,
     range: [number, number] | null,
-    callbacks: CallbackType
+    { onSuccess, onError }: CallbackType
   ) {
     const xhr = this._createXHRObject();
     xhr.open(method, this._url);
 
-    const onXHRLoad = function() {
+    const onXHRLoad = () => {
       // 200 - OK
       // 206 - Partial Content
       // $FlowIssue - xhr will not be null here
       if (xhr.status === 200 || xhr.status === 206) {
-        callbacks.onSuccess(xhr);
-      } else if (callbacks.onError) {
-        callbacks.onError({
+        onSuccess(xhr);
+      } else {
+        onError?.({
           type: "xhr",
           info: `Unexpected HTTP status ${xhr.status}.`,
           xhr
@@ -207,17 +207,15 @@ export default class XhrFileReader extends MediaFileReader {
 
     if (typeof xhr.onload !== "undefined") {
       xhr.onload = onXHRLoad;
-      xhr.onerror = function() {
-        if (callbacks.onError) {
-          callbacks.onError({
-            type: "xhr",
-            info: "Generic XHR error, check xhr object.",
-            xhr,
-          });
-        }
+      xhr.onerror = () => {
+        onError?.({
+          type: "xhr",
+          info: "Generic XHR error, check xhr object.",
+          xhr,
+        });
       }
     } else {
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = () => {
         // $FlowIssue - xhr will not be null here
         if (xhr.readyState === 4) {
           onXHRLoad();
@@ -227,15 +225,13 @@ export default class XhrFileReader extends MediaFileReader {
 
     if (XhrFileReader._config.timeoutInSec) {
       xhr.timeout = XhrFileReader._config.timeoutInSec * 1000;
-      xhr.ontimeout = function() {
-        if (callbacks.onError) {
-          callbacks.onError({
-            type: "xhr",
-            // $FlowIssue - xhr.timeout will not be null
-            info: `Timeout after ${xhr.timeout/1000}s. Use jsmediatags.Config.setXhrTimeout to override.`,
-            xhr,
-          });
-        }
+      xhr.ontimeout = () => {
+        onError?.({
+          type: "xhr",
+          // $FlowIssue - xhr.timeout will not be null
+          info: `Timeout after ${xhr.timeout/1000}s. Use jsmediatags.Config.setXhrTimeout to override.`,
+          xhr,
+        });
       }
     }
 

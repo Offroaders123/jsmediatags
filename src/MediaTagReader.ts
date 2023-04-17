@@ -34,7 +34,7 @@ export default class MediaTagReader {
     return this;
   }
 
-  read(callbacks: CallbackType) {
+  read({ onSuccess, onError }: CallbackType) {
     this._mediaFileReader.init({
       onSuccess: () => {
         this._loadData(this._mediaFileReader, {
@@ -43,22 +43,20 @@ export default class MediaTagReader {
             try {
               tags = this._parseData(this._mediaFileReader, this._tags);
             } catch (ex: any) {
-              if (callbacks.onError) {
-                callbacks.onError({
-                  "type": "parseData",
-                  "info": ex.message
-                });
-                return;
-              }
+              onError?.({
+                type: "parseData",
+                info: ex.message
+              });
+              return;
             }
 
             // TODO: destroy mediaFileReader
-            callbacks.onSuccess(tags);
+            onSuccess(tags);
           },
-          onError: callbacks.onError
+          onError
         });
       },
-      onError: callbacks.onError
+      onError
     });
   }
 

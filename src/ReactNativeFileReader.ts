@@ -27,39 +27,36 @@ export default class ReactNativeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  _init(callbacks: LoadCallbackType) {
-    RNFS.stat(this._path)
-      .then(statResult => {
-        this._size = statResult.size;
-        callbacks.onSuccess();
-      })
-      .catch(error => {
-        callbacks.onError?.({
-          type: "fs",
-          info: error
-        });
-      })
+  async _init({ onSuccess, onError }: LoadCallbackType) {
+    try {
+      const statResult = await RNFS.stat(this._path);
+      this._size = statResult.size;
+      onSuccess();
+    } catch (error){
+      onError?.({
+        type: "fs",
+        info: error
+      });
+    }
   }
 
-  loadRange(range: [number, number], callbacks: LoadCallbackType) {
+  async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
     const fileData = this._fileData;
-
     const length = range[1] - range[0] + 1;
-    const onSuccess = callbacks.onSuccess;
-    const onError = callbacks.onError || function(){};
 
-    RNFS.read(this._path, length, range[0], {encoding: "base64"})
-      .then(readData => {
-        const buffer = Buffer.from(readData, "base64");
-        const data = Array.prototype.slice.call(buffer, 0, length);
-        fileData.addData(range[0], data);
-        onSuccess();
-      })
-      .catch(err => {
-        onError({
-          type: "fs",
-          info: err
-        });
+    try {
+      const readData = await RNFS.read(this._path, length, range[0], { encoding: "base64" });
+
+      const buffer = Buffer.from(readData, "base64");
+      const data = Array.prototype.slice.call(buffer, 0, length);
+      fileData.addData(range[0], data);
+
+      onSuccess();
+    } catch (err){
+      onError?.({
+        type: "fs",
+        info: err
       });
+    }
   }
 }

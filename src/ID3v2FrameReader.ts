@@ -238,7 +238,7 @@ export default class ID3v2FrameReader {
         break;
       }
 
-      // var unsyncData;
+      // let unsyncData;
       if (flags && flags.format.unsynchronisation && !id3header.flags.unsynchronisation) {
         frameData = this.getUnsyncFileReader(frameData, frameDataOffset, frameSize);
         frameDataOffset = 0;
@@ -248,7 +248,7 @@ export default class ID3v2FrameReader {
       // the first 4 bytes are the real data size
       // (after unsynchronisation && encryption)
       if (flags && flags.format.data_length_indicator) {
-        // var frameDataSize = frameData.getSynchsafeInteger32At(frameDataOffset);
+        // const frameDataSize = frameData.getSynchsafeInteger32At(frameDataOffset);
         frameDataOffset += 4;
         frameSize -= 4;
       }
@@ -557,13 +557,13 @@ frameReaderFunctions["COMM"] = function readCommentsFrame(
 
 frameReaderFunctions["COM"] = frameReaderFunctions["COMM"];
 
-frameReaderFunctions["PIC"] = function(
+frameReaderFunctions["PIC"] = (
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+): any => {
   return frameReaderFunctions["APIC"]!(offset, length, data, flags, id3header);
 };
 

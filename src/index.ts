@@ -92,7 +92,7 @@ export class Reader {
   _getTagReader(fileReader: MediaFileReader, callbacks: CallbackType) {
     if (this._tagReader) {
       const tagReader = this._tagReader;
-      setTimeout(function() {
+      setTimeout(() => {
         callbacks.onSuccess(tagReader);
       }, 1);
     } else {
@@ -133,7 +133,7 @@ export class Reader {
 
     let tagsLoaded = false;
     const loadTagIdentifiersCallbacks = {
-      onSuccess: function() {
+      onSuccess: () => {
         if (!tagsLoaded) {
           // We're expecting to load two sets of tag identifiers. This flag
           // indicates when the first one has been loaded.
@@ -154,12 +154,10 @@ export class Reader {
               range.length
             );
           } catch (ex: any) {
-            if (callbacks.onError) {
-              callbacks.onError({
-                type: "fileReader",
-                info: ex.message
-              });
-            }
+            callbacks.onError?.({
+              type: "fileReader",
+              info: ex.message
+            });
             return;
           }
 
@@ -169,12 +167,10 @@ export class Reader {
           }
         }
 
-        if (callbacks.onError) {
-          callbacks.onError({
-            type: "tagFormat",
-            info: "No suitable tag reader found"
-          });
-        }
+        callbacks.onError?.({
+          type: "tagFormat",
+          info: "No suitable tag reader found"
+        });
       },
       onError: callbacks.onError
     };

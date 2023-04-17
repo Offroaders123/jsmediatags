@@ -8,7 +8,7 @@ jest
 
 function throwOnError(onSuccess: () => void) {
   return {
-    onSuccess: onSuccess,
+    onSuccess,
     onError: () => {
       throw new Error();
     }

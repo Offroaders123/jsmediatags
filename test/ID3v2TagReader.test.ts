@@ -32,11 +32,8 @@ describe("ID3v2TagReader", () => {
 
   describe("header", () => {
     it("reads an header", async () => {
-      const tags = await new Promise<any>((resolve, reject) => {
-        tagReader.read({
-          onSuccess: resolve,
-          onError: reject
-        });
+      const tags = await new Promise<any>((onSuccess, onError) => {
+        tagReader.read({ onSuccess, onError });
         jest.runAllTimers();
       });
       delete tags.tags;
@@ -56,7 +53,7 @@ describe("ID3v2TagReader", () => {
     });
     
     it("reads an header with extended header", async () => {
-      const tags = await new Promise<any>((resolve, reject) => {
+      const tags = await new Promise<any>((onSuccess, onError) => {
         const id3FileContents = new ID3v2TagContents(4, 3)
           .addFrame("TIT2", [].concat(
             // @ts-expect-error
@@ -73,10 +70,7 @@ describe("ID3v2TagReader", () => {
         mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
         tagReader = new ID3v2TagReader(mediaFileReader);
 
-        tagReader.read({
-          onSuccess: resolve,
-          onError: reject
-        });
+        tagReader.read({ onSuccess, onError });
         jest.runAllTimers();
       });
       expect("TIT2" in tags.tags).toBeTruthy();
@@ -106,11 +100,8 @@ describe("ID3v2TagReader", () => {
       }
     );
 
-    const tags = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     // The first call is the initial load to figure out the tag ID.
@@ -120,11 +111,8 @@ describe("ID3v2TagReader", () => {
   });
 
   it("reads tags", async () => {
-    const tags = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tags = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect("TIT2" in tags.tags).toBeTruthy();
@@ -137,22 +125,16 @@ describe("ID3v2TagReader", () => {
   });
 
   it("reads tags as shortcuts", async () => {
-    const tags = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tags = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect(tags.tags.title).toBe("The title");
   });
 
   it("reads all tags when none is specified", async () => {
-    const tags = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tags = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect(Object.keys(tags.tags)).toContain("TIT2");
@@ -160,24 +142,18 @@ describe("ID3v2TagReader", () => {
   });
 
   it("reads the specificed tag", async () => {
-    const tags_1 = await new Promise<any>((resolve, reject) => {
+    const tags = await new Promise<any>((onSuccess, onError) => {
       tagReader.setTagsToRead(["TCOM"])
-        .read({
-          onSuccess: resolve,
-          onError: reject
-        });
+        .read({ onSuccess, onError });
       jest.runAllTimers();
     });
-    expect(Object.keys(tags_1.tags)).not.toContain("TIT2");
-    expect(Object.keys(tags_1.tags)).toContain("TCOM");
+    expect(Object.keys(tags.tags)).not.toContain("TIT2");
+    expect(Object.keys(tags.tags)).toContain("TCOM");
   });
 
   it("should ignore empty tags", async () => {
-    const tags = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tags = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect(Object.keys(tags.tags)).not.toContain("\u0000\u0000\u0000\u0000");
@@ -207,11 +183,8 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      const tags = await new Promise<any>((resolve, reject) => {
-        tagReader.read({
-          onSuccess: resolve,
-          onError: reject
-        });
+      const tags = await new Promise<any>((onSuccess, onError) => {
+        tagReader.read({ onSuccess, onError });
         jest.runAllTimers();
       });
       expect(tags.tags.title).toBe("The title");
@@ -242,11 +215,8 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      const tags = await new Promise<any>((resolve, reject) => {
-        tagReader.read({
-          onSuccess: resolve,
-          onError: reject
-        });
+      const tags = await new Promise<any>((onSuccess, onError) => {
+        tagReader.read({ onSuccess, onError });
         jest.runAllTimers();
       });
       expect(tags.tags.picture.data).toEqual([1, 2, 255, 3, 4, 5]);
@@ -277,11 +247,8 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      const tags = await new Promise<any>((resolve, reject) => {
-        tagReader.read({
-          onSuccess: resolve,
-          onError: reject
-        });
+      const tags = await new Promise<any>((onSuccess, onError) => {
+        tagReader.read({ onSuccess, onError });
         jest.runAllTimers();
       });
       expect(tags.tags.title).toBe("The title");
@@ -316,11 +283,8 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      const tags = await new Promise<any>((resolve, reject) => {
-        tagReader.read({
-          onSuccess: resolve,
-          onError: reject
-        });
+      const tags = await new Promise<any>((onSuccess, onError) => {
+        tagReader.read({ onSuccess, onError });
         jest.runAllTimers();
       });
       expect(tags.tags.picture.data).toEqual([1, 2, 255, 0, 3, 4, 5]);
@@ -340,11 +304,8 @@ describe("ID3v2TagReader", () => {
     mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
     tagReader = new ID3v2TagReader(mediaFileReader);
 
-    const tags = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tags = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect("TIT2" in tags.tags).toBeTruthy();
@@ -366,11 +327,8 @@ describe("ID3v2TagReader", () => {
     mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
     tagReader = new ID3v2TagReader(mediaFileReader);
 
-    const tags = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tags = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect(tags.tags.title).toBe("The title");

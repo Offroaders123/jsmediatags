@@ -9,7 +9,7 @@ jest
 
 function throwOnError(onSuccess: () => void) {
   return {
-    onSuccess: onSuccess,
+    onSuccess,
     onError: () => {
       throw new Error();
     }
@@ -52,5 +52,4 @@ describe("ArrayBufferFileReader", () => {
     });
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
-
 });

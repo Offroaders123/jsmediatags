@@ -204,5 +204,4 @@ describe("MediaFileReader", () => {
 
     expect(string.toString()).toEqual("a");
   });
-
 });

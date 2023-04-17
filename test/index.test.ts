@@ -22,7 +22,7 @@ function throwOnSuccess(onError: () => void) {
     onSuccess: () => {
       throw new Error();
     },
-    onError: onError
+    onError
   }
 }
 
@@ -66,8 +66,8 @@ describe("jsmediatags", () => {
         callbacks.onSuccess(mockTags);
       });
 
-    const tags = await new Promise((resolve, reject) => {
-      jsmediatags.read("fakefile", { onSuccess: resolve, onError: reject });
+    const tags = await new Promise((onSuccess, onError) => {
+      jsmediatags.read("fakefile", { onSuccess, onError });
       jest.runAllTimers();
     });
     expect(tags).toBe(mockTags);
@@ -123,12 +123,12 @@ describe("jsmediatags", () => {
     it("should use the given tag reader", async () => {
       const MockTagReader = jest.fn() as unknown as typeof MediaTagReader;
 
-      const TagReader = await new Promise((resolve, reject) => {
+      const TagReader = await new Promise((onSuccess, onError) => {
         // @ts-ignore
         const reader = new jsmediatags.Reader();
         reader.setTagReader(MockTagReader);
         // @ts-ignore
-        reader._getTagReader(null, { onSuccess: resolve, onError: reject });
+        reader._getTagReader(null, { onSuccess, onError });
         jest.runAllTimers();
       });
       expect(TagReader).toBe(MockTagReader);
@@ -146,11 +146,11 @@ describe("jsmediatags", () => {
       MockTagReader.canReadTagFormat = jest.fn<typeof MockTagReader.canReadTagFormat>()
         .mockReturnValue(true);
 
-      const TagReader = await new Promise((resolve, reject) => {
+      const TagReader = await new Promise((onSuccess, onError) => {
         // @ts-ignore
         const reader = new jsmediatags.Reader();
         // @ts-ignore
-        reader._getTagReader(new NodeFileReader(), { onSuccess: resolve, onError: reject });
+        reader._getTagReader(new NodeFileReader(), { onSuccess, onError });
         jest.runAllTimers();
       });
       jsmediatags.Config.removeTagReader(MockTagReader);
@@ -160,11 +160,11 @@ describe("jsmediatags", () => {
     it("should fail if no tag reader is found", () => {
       // @ts-ignore
       ID3v2TagReader.canReadTagFormat.mockReturnValue(false);
-      return new Promise<void>(resolve => {
+      return new Promise<void>(onSuccess => {
         // @ts-ignore
         const reader = new jsmediatags.Reader();
         // @ts-ignore
-        reader._getTagReader(new NodeFileReader(), throwOnSuccess(resolve));
+        reader._getTagReader(new NodeFileReader(), throwOnSuccess(onSuccess));
         jest.runAllTimers();
       });
     });
@@ -184,11 +184,11 @@ describe("jsmediatags", () => {
       MockTagReader.canReadTagFormat = jest.fn<typeof MockTagReader.canReadTagFormat>()
         .mockReturnValue(true);
 
-      await new Promise((resolve, reject) => {
+      await new Promise((onSuccess, onError) => {
         // @ts-ignore
         const reader = new jsmediatags.Reader();
         // @ts-ignore
-        reader._findTagReader(new NodeFileReader(), { onSuccess: resolve, onError: reject });
+        reader._findTagReader(new NodeFileReader(), { onSuccess, onError });
         jest.runAllTimers();
       });
       jsmediatags.Config.removeTagReader(MockTagReader);
@@ -217,10 +217,10 @@ describe("jsmediatags", () => {
       MockTagReader.canReadTagFormat = jest.fn<typeof MockTagReader.canReadTagFormat>()
         .mockReturnValue(true);
 
-      await new Promise((resolve, reject) => {
+      await new Promise((onSuccess, onError) => {
         // @ts-ignore
         const reader = new jsmediatags.Reader();
-        reader._findTagReader(fileReader, { onSuccess: resolve, onError: reject });
+        reader._findTagReader(fileReader, { onSuccess, onError });
         jest.runAllTimers();
       });
       jsmediatags.Config.removeTagReader(MockTagReader);

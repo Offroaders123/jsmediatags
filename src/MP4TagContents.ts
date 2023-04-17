@@ -19,7 +19,7 @@ export default class MP4TagContents {
   }
 
   toArray(): ByteArray {
-    return this._atoms.reduce(function(array, atom) {
+    return this._atoms.reduce((array, atom) => {
       // @ts-expect-error
       return array.concat(atom.toArray());
     }, []);
@@ -65,7 +65,7 @@ class Atom {
   }
 
   toArray(): ByteArray {
-    const atomsArray = this._atoms.reduce(function(array, atom) {
+    const atomsArray = this._atoms.reduce((array, atom) => {
       // @ts-expect-error
       return array.concat(atom.toArray());
     }, []);

@@ -60,7 +60,7 @@ describe("BlobFileReader", () => {
       jest.runAllTimers();
     });
     expect(() => {
-      var byte0 = fileReader.getByteAt(0);
+      fileReader.getByteAt(0);
     }).toThrow();
   });
 });

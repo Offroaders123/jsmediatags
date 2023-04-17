@@ -29,12 +29,10 @@ export default class NodeFileReader extends MediaFileReader {
   _init(callbacks: LoadCallbackType) {
     fs.stat(this._path, (err, stats) => {
       if (err) {
-        if (callbacks.onError) {
-          callbacks.onError({
-            type: "fs",
-            info: err
-          });
-        }
+        callbacks.onError?.({
+          type: "fs",
+          info: err
+        });
       } else {
         this._size = stats.size;
         callbacks.onSuccess();
@@ -42,13 +40,11 @@ export default class NodeFileReader extends MediaFileReader {
     });
   }
 
-  loadRange(range: [number, number], callbacks: LoadCallbackType) {
+  loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
     let fd = -1;
     const fileData = this._fileData;
 
     const length = range[1] - range[0] + 1;
-    const onSuccess = callbacks.onSuccess;
-    const onError = callbacks.onError || function(object){};
 
     if (fileData.hasDataRange(range[0], range[1])) {
       process.nextTick(onSuccess);
@@ -57,7 +53,7 @@ export default class NodeFileReader extends MediaFileReader {
 
     function readData(err: NodeJS.ErrnoException | null, _fd: number) {
       if (err) {
-        onError({
+        onError?.({
           type: "fs",
           info: err
         });
@@ -72,14 +68,14 @@ export default class NodeFileReader extends MediaFileReader {
     };
 
     function processData(err: NodeJS.ErrnoException | null, bytesRead: number, buffer: Buffer) {
-      fs.close(fd, function(err) {
+      fs.close(fd, err => {
         if (err) {
           console.error(err);
         }
       });
 
       if (err) {
-        onError({
+        onError?.({
           type: "fs",
           info: err
         });

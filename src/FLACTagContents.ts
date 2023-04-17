@@ -15,7 +15,7 @@ export default class FLACTagContents {
 
   toArray(): ByteArray {
     this._blocks[this._blocks.length - 1].setFinal();
-    return this._blocks.reduce(function(array, block) {
+    return this._blocks.reduce((array, block) => {
       return array.concat(block.toArray());
     }, bin("fLaC"));
   }

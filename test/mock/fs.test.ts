@@ -46,7 +46,7 @@ function open(path: string, flags: unknown, mode: unknown, callback: (error: Err
     path: path
   }) - 1;
 
-  process.nextTick(function() {
+  process.nextTick(() => {
     if (callback) {
       callback(null, fd);
     }
@@ -63,11 +63,11 @@ function read(fd: number, buffer: Buffer, offset: number, length: number, positi
     // @ts-expect-error
     const data = _mockFiles[dir][name].substr(position, length);
     buffer.write(data, offset, length);
-    process.nextTick(function() {
+    process.nextTick(() => {
       callback(null, length, buffer);
     });
   } else {
-    process.nextTick(function() {
+    process.nextTick(() => {
       callback(new Error("File not found"));
     });
   }
@@ -79,14 +79,14 @@ function stat(_path: string, callback: (error: Error | null, stat?: { size: numb
 
   // @ts-expect-error
   if (_mockFiles[dir] && _mockFiles[dir][name]) {
-    process.nextTick(function() {
+    process.nextTick(() => {
       callback(null, {
         // @ts-expect-error
         size: _mockFiles[dir][name].length
       });
     });
   } else {
-    process.nextTick(function() {
+    process.nextTick(() => {
       callback({} as Error);
     })
   }

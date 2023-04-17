@@ -23,11 +23,8 @@ describe("FLACTagReader", () => {
   });
 
   it("reads the tag type", async () => {
-    const tag = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tag = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect(tag.type).toBe("FLAC");
@@ -35,38 +32,29 @@ describe("FLACTagReader", () => {
   });
 
   it("reads a string tag", async () => {
-    const tag = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tag = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
-    const tags = tag.tags;
+    const { tags } = tag;
     expect(tags.title).toBe("A Title");
   });
 
   it("reads an image tag", async () => {
-    const tag = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tag = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
-    const tags = tag.tags;
+    const { tags } = tag;
     expect(tags.picture.description).toBe("A Picture");
   });
 
   it("reads all tags", async () => {
-    const tag = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tag = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
-    const tags = tag.tags;
+    const { tags } = tag;
     expect(tags.title).toBeTruthy();
     expect(tags.artist).toBeTruthy();
     expect(tags.album).toBeTruthy();
@@ -81,14 +69,11 @@ describe("FLACTagReader", () => {
     )]);
     mediaFileReader = new ArrayFileReader(flacFileContents.toArray());
     tagReader = new FLACTagReader(mediaFileReader);
-    const tag = await new Promise<any>((resolve, reject) => {
-      tagReader.read({
-        onSuccess: resolve,
-        onError: reject
-      });
+    const tag = await new Promise<any>((onSuccess, onError) => {
+      tagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
-    const tags = tag.tags;
+    const { tags } = tag;
     expect(tags.title).toBeTruthy();
     expect(tags.artist).toBeTruthy();
   });
@@ -98,11 +83,8 @@ describe("FLACTagReader", () => {
     const fileReaderEmpty = new ArrayFileReader(flacFileEmpty.toArray());
     const tagReaderEmpty = new FLACTagReader(fileReaderEmpty);
     try {
-      return await new Promise<any>((resolve, reject) => {
-        tagReaderEmpty.read({
-          onSuccess: resolve,
-          onError: reject
-        });
+      return await new Promise<any>((onSuccess, onError) => {
+        tagReaderEmpty.read({ onSuccess, onError });
         jest.runAllTimers();
       });
     } catch (error: any) {

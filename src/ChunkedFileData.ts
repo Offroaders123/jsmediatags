@@ -46,7 +46,7 @@ export default class ChunkedFileData {
       };
 
       if (needsPrepend) {
-        var slicedData = this._sliceData(
+        const slicedData = this._sliceData(
           firstChunk.data,
           0,
           offset - firstChunk.offset
@@ -56,7 +56,7 @@ export default class ChunkedFileData {
 
       if (needsAppend) {
         // Use the lastChunk because the slice logic is easier to handle.
-        var slicedData = this._sliceData(
+        const slicedData = this._sliceData(
           chunk.data,
           0,
           lastChunk.offset - chunk.offset

@@ -36,8 +36,8 @@ describe("MediaTagReader", () => {
         return expectedTags;
       });
 
-    const tags = await new Promise((resolve, reject) => {
-      mediaTagReader.read({ onSuccess: resolve, onError: reject });
+    const tags = await new Promise((onSuccess, onError) => {
+      mediaTagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect(tags).toBe(expectedTags);
@@ -54,8 +54,8 @@ describe("MediaTagReader", () => {
     );
     mediaTagReader._parseData = jest.fn<typeof mediaTagReader._parseData>();
 
-    const tags = await new Promise((resolve, reject) => {
-      mediaTagReader.read({ onSuccess: resolve, onError: reject });
+    await new Promise((onSuccess, onError) => {
+      mediaTagReader.read({ onSuccess, onError });
       jest.runAllTimers();
     });
     expect(mediaTagReader._loadData).toBeCalled();

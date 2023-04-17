@@ -15,7 +15,7 @@ describe("NodeFileReader", () => {
   beforeEach(() => {
     // @ts-ignore
     fs.__setMockFiles({
-      "fakefile": "This is a simple file"
+      fakefile: "This is a simple file"
     });
   });
 
@@ -28,8 +28,8 @@ describe("NodeFileReader", () => {
   it("should have the right size information", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    const tags = await new Promise<void>((resolve, reject) => {
-      fileReader.init({ onSuccess: resolve, onError: reject });
+    await new Promise<void>((onSuccess, onError) => {
+      fileReader.init({ onSuccess, onError });
     });
     expect(fileReader.getSize()).toBe(21);
   });
@@ -37,8 +37,8 @@ describe("NodeFileReader", () => {
   it("should read a byte", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    const tags = await new Promise<void>((resolve, reject) => {
-      fileReader.loadRange([0, 4], { onSuccess: resolve, onError: reject });
+    await new Promise<void>((onSuccess, onError) => {
+      fileReader.loadRange([0, 4], { onSuccess, onError });
     });
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
@@ -46,12 +46,12 @@ describe("NodeFileReader", () => {
   it("should read a byte after loading the same range twice", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    const tags = await new Promise<void>((resolve, reject) => {
+    await new Promise<void>((onSuccess, onError) => {
       fileReader.loadRange([0, 4], {
         onSuccess() {
-          fileReader.loadRange([0, 4], { onSuccess: resolve, onError: reject });
+          fileReader.loadRange([0, 4], { onSuccess, onError });
         },
-        onError: reject
+        onError
       });
     });
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
@@ -60,24 +60,24 @@ describe("NodeFileReader", () => {
   it("should not read a byte that hasn't been loaded yet", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    const tags = await new Promise<void>((resolve, reject) => {
-      fileReader.init({ onSuccess: resolve, onError: reject });
+    await new Promise<void>((onSuccess, onError) => {
+      fileReader.init({ onSuccess, onError });
     });
     expect(() => {
-      const byte0 = fileReader.getByteAt(0);
+      fileReader.getByteAt(0);
     }).toThrow();
   });
 
   it("should not read a file that does not exist", async () => {
     fileReader = new NodeFileReader("doesnt-exist");
 
-    const tags = await new Promise<void>((resolve, reject) => {
+    await new Promise<void>((onSuccess, onError) => {
       fileReader.init({
-        onSuccess: reject,
+        onSuccess,
         onError(error_1: any) {
           expect(error_1.type).toBe("fs");
           expect(error_1.info).toBeDefined();
-          resolve();
+          onSuccess();
         }
       });
     });

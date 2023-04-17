@@ -22,7 +22,7 @@ export default class ID3v2TagReader extends MediaTagReader {
 
   _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
     mediaFileReader.loadRange([6, 9], {
-      onSuccess: function() {
+      onSuccess: () => {
         mediaFileReader.loadRange(
           // The tag size does not include the header size.
           [0, ID3_HEADER_SIZE + mediaFileReader.getSynchsafeInteger32At(6) - 1],

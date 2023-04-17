@@ -94,7 +94,8 @@ export function readUTF8String(bytes: number[], maxBytes?: number): DecodedStrin
 export function readNullTerminatedString(bytes: number[], maxBytes?: number): DecodedString {
   const arr = [];
   maxBytes = maxBytes || bytes.length;
-  for (var i = 0; i < maxBytes;) {
+  let i = 0;
+  while (i < maxBytes) {
     const byte1 = bytes[i++];
     if ( byte1 == 0x00 ) {
       break;

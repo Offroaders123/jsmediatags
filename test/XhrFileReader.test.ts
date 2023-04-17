@@ -12,7 +12,7 @@ jest
 
 function throwOnError(onSuccess: (error?: any) => void) {
   return {
-    onSuccess: onSuccess,
+    onSuccess,
     onError: () => {
       throw new Error();
     }
@@ -24,7 +24,7 @@ function throwOnSuccess(onError: (error?: any) => void) {
     onSuccess: () => {
       throw new Error();
     },
-    onError: onError
+    onError
   }
 }
 
@@ -157,7 +157,7 @@ describe("XhrFileReader", () => {
       jest.runAllTimers();
     });
     expect(() => {
-      const byte0 = fileReader.getByteAt(2000);
+      fileReader.getByteAt(2000);
     }).toThrow();
   });
 

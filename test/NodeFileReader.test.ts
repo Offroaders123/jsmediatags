@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import NodeFileReader from "../src/NodeFileReader.js";
 

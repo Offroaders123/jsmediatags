@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import ArrayFileReader from "../src/ArrayFileReader.js";
 import FLACTagContents from "../src/FLACTagContents.js";

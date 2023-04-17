@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import XhrFileReader from "../src/XhrFileReader.js";
 

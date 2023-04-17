@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import MP4TagReader from "../src/MP4TagReader.js";
 import MP4TagContents, { type Atom } from "../src/MP4TagContents.js";

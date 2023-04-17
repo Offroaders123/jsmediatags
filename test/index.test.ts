@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import * as jsmediatags from "../src/index.js";
 import NodeFileReader from "../src/NodeFileReader.js";

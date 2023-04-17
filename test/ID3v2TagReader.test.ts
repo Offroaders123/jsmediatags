@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import ID3v2TagReader from "../src/ID3v2TagReader.js";
 import ID3v2TagContents from "../src/ID3v2TagContents.js";

@@ -27,7 +27,7 @@ export default class MP4TagReader extends MediaTagReader {
     return id === "ftyp";
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
     // MP4 metadata isn't located in a specific location of the file. Roughly
     // speaking, it's composed of blocks chained together like a linked list.
     // These blocks are called atoms (or boxes).
@@ -41,22 +41,16 @@ export default class MP4TagReader extends MediaTagReader {
     // The metadata atoms can be find under the "moov.udta.meta.ilst" hierarchy.
 
     // Load the header of the first atom
-    mediaFileReader.loadRange([0, 16], {
-      onSuccess: () => {
-        this._loadAtom(mediaFileReader, 0, "", callbacks);
-      },
-      onError: callbacks.onError
-    });
+    await mediaFileReader.loadRange([0, 16]);
+    await this._loadAtom(mediaFileReader, 0, "");
   }
 
-  _loadAtom(
+  async _loadAtom(
     mediaFileReader: MediaFileReader,
     offset: number,
-    parentAtomFullName: string,
-    callbacks: LoadCallbackType
-  ) {
+    parentAtomFullName: string
+  ): LoadCallbackType {
     if (offset >= mediaFileReader.getSize()) {
-      callbacks.onSuccess();
       return;
     }
 
@@ -65,7 +59,6 @@ export default class MP4TagReader extends MediaTagReader {
     // to also read the header of the next block.
     const atomSize = mediaFileReader.getLongAt(offset, true);
     if (atomSize == 0 || isNaN(atomSize)) {
-      callbacks.onSuccess();
       return;
     }
     const atomName = mediaFileReader.getStringAt(offset + 4, 4);
@@ -78,22 +71,14 @@ export default class MP4TagReader extends MediaTagReader {
       }
       const atomFullName = (parentAtomFullName ? parentAtomFullName+"." : "") + atomName;
       if (atomFullName === "moov.udta.meta.ilst") {
-        mediaFileReader.loadRange([offset, offset + atomSize], callbacks);
+        await mediaFileReader.loadRange([offset, offset + atomSize]);
       } else {
-        mediaFileReader.loadRange([offset+8, offset+8 + 8], {
-          onSuccess: () => {
-            this._loadAtom(mediaFileReader, offset + 8, atomFullName, callbacks);
-          },
-          onError: callbacks.onError
-        });
+        await mediaFileReader.loadRange([offset+8, offset+8 + 8]);
+        await this._loadAtom(mediaFileReader, offset + 8, atomFullName);
       }
     } else {
-      mediaFileReader.loadRange([offset+atomSize, offset+atomSize + 8], {
-        onSuccess: () => {
-          this._loadAtom(mediaFileReader, offset+atomSize, parentAtomFullName, callbacks);
-        },
-        onError: callbacks.onError
-      });
+      await mediaFileReader.loadRange([offset+atomSize, offset+atomSize + 8]);
+      await this._loadAtom(mediaFileReader, offset+atomSize, parentAtomFullName);
     }
   }
 

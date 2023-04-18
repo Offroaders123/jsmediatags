@@ -7,15 +7,6 @@ jest
   .dontMock("../src/MediaFileReader.js")
   .dontMock("../src/ChunkedFileData.js");
 
-function throwOnError(onSuccess: () => void) {
-  return {
-    onSuccess: onSuccess,
-    onError: () => {
-      throw new Error();
-    }
-  }
-}
-
 describe("BlobFileReader", () => {
   let fileReader: BlobFileReader;
 
@@ -30,35 +21,26 @@ describe("BlobFileReader", () => {
   });
 
   it("should have the right size information", async () => {
-    await new Promise<void>(resolve => {
-      fileReader.init(throwOnError(resolve));
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    await fileReader.init();
     expect(fileReader.getSize()).toBe(21);
   });
 
   it("should read a byte", async () => {
-    await new Promise<void>(resolve => {
-      fileReader.loadRange([0, 4], throwOnError(resolve));
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 
   it("should read a byte after loading the same range twice", async () => {
-    await new Promise<void>(resolve => {
-      fileReader.loadRange([0, 4], throwOnError(() => {
-        fileReader.loadRange([0, 4], throwOnError(resolve));
-      }));
-    });
+    await fileReader.loadRange([0, 4]);
+    await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 
   it("should not read a byte that hasn't been loaded yet", async () => {
-    await new Promise<void>(resolve => {
-      fileReader.init(throwOnError(resolve));
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    await fileReader.init();
     expect(() => {
       fileReader.getByteAt(0);
     }).toThrow();

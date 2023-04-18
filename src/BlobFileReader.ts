@@ -23,29 +23,23 @@ export default class BlobFileReader extends MediaFileReader {
     );
   }
 
-  override _init({ onSuccess }: LoadCallbackType): void {
+  override async _init(): LoadCallbackType {
     this._size = this._blob.size;
-    setTimeout(onSuccess, 1);
+    await new Promise(resolve => setTimeout(resolve, 1));
   }
 
-  override async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType): Promise<void> {
+  override async loadRange(range: [number, number]): LoadCallbackType {
     const blob = this._blob.slice(range[0], range[1] + 1);
     let buffer: ArrayBuffer;
 
     try {
       buffer = await blob.arrayBuffer();
     } catch (error: any){
-      onError?.({
-        type: "blob",
-        info: error
-      });
-      return;
+      throw new Error(`blob: ${error.message}`);
     }
 
     const intArray = new Uint8Array(buffer);
     this._fileData.addData(range[0],intArray);
-
-    onSuccess();
   }
 
   override getByteAt(offset: number): number {

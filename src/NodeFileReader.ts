@@ -26,38 +26,32 @@ export default class NodeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  override _init(callbacks: LoadCallbackType) {
-    fs.stat(this._path, (err, stats) => {
-      if (err) {
-        callbacks.onError?.({
-          type: "fs",
-          info: err as any
-        });
-      } else {
-        this._size = stats.size;
-        callbacks.onSuccess();
-      }
+  override async _init(): LoadCallbackType {
+    return new Promise((resolve, reject) => {
+      fs.stat(this._path, (err, stats) => {
+        if (err){
+          reject(`fs: ${err.message}`);
+        } else {
+          this._size = stats.size;
+          resolve();
+        }
+      });
     });
   }
 
-  override loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
+  override async loadRange(range: [number, number]): LoadCallbackType {
     let fd = -1;
     const fileData = this._fileData;
 
     const length = range[1] - range[0] + 1;
 
     if (fileData.hasDataRange(range[0], range[1])) {
-      process.nextTick(onSuccess);
-      return;
+      return new Promise(resolve => process.nextTick(resolve));
     }
 
     function readData(err: NodeJS.ErrnoException | null, _fd: number) {
       if (err) {
-        onError?.({
-          type: "fs",
-          info: err as any
-        });
-        return;
+        throw new Error(`fs: ${err.message}`);
       }
 
       fd = _fd;
@@ -75,15 +69,10 @@ export default class NodeFileReader extends MediaFileReader {
       });
 
       if (err) {
-        onError?.({
-          type: "fs",
-          info: err as any
-        });
-        return;
+        throw new Error(`fs: ${err.message}`);
       }
 
       storeBuffer(buffer);
-      onSuccess();
     };
 
     function storeBuffer(buffer: Buffer) {
@@ -91,6 +80,10 @@ export default class NodeFileReader extends MediaFileReader {
       fileData.addData(range[0], data);
     }
 
-    fs.open(this._path, "r", undefined, readData);
+    const [err, _fd] = await new Promise<[(NodeJS.ErrnoException | null), number]>(resolve => fs.open(this._path, "r", undefined, (err, fd) => {
+      resolve([err, fd]);
+    }));
+
+    readData(err,_fd);
   }
 }

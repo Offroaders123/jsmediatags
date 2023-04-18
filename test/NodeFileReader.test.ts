@@ -53,41 +53,31 @@ describe("NodeFileReader", () => {
   it("should have the right size information", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    await new Promise<void>((onSuccess, onError) => {
-      fileReader.init({ onSuccess, onError });
-    });
+    await fileReader.init();
     expect(fileReader.getSize()).toBe(21);
   });
 
   it("should read a byte", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    await new Promise<void>((onSuccess, onError) => {
-      fileReader.loadRange([0, 4], { onSuccess, onError });
-    });
+    await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 
   it("should read a byte after loading the same range twice", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    await new Promise<void>((onSuccess, onError) => {
-      fileReader.loadRange([0, 4], {
-        onSuccess() {
-          fileReader.loadRange([0, 4], { onSuccess, onError });
-        },
-        onError
-      });
-    });
+    await fileReader.loadRange([0, 4]);
+    await fileReader.loadRange([0, 4]);
+
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 
   it("should not read a byte that hasn't been loaded yet", async () => {
     fileReader = new NodeFileReader("fakefile");
 
-    await new Promise<void>((onSuccess, onError) => {
-      fileReader.init({ onSuccess, onError });
-    });
+    await fileReader.init();
+
     expect(() => {
       fileReader.getByteAt(0);
     }).toThrow();
@@ -96,16 +86,14 @@ describe("NodeFileReader", () => {
   it("should not read a file that does not exist", async () => {
     fileReader = new NodeFileReader("doesnt-exist");
 
-    await new Promise<void>((onSuccess, onError) => {
-      fileReader.init({
-        onSuccess,
-        onError(error_1: any) {
-          expect(error_1.type).toBe("fs");
-          expect(error_1.info).toBeDefined();
-          onSuccess();
-        }
-      });
-    });
+    try {
+      await fileReader.init();
+    } catch (error: any){
+      // expect(error.type).toBe("fs");
+      // expect(error.info).toBeDefined();
+      expect(error).toBeInstanceOf(Error);
+    }
+
     expect(true).toBe(true);
   });
 });

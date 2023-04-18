@@ -18,15 +18,6 @@ jest
   .dontMock("../src/jsmediatags.js")
   .dontMock("../src/ByteArrayUtils.js");
 
-function throwOnSuccess(onError: () => void) {
-  return {
-    onSuccess: () => {
-      throw new Error();
-    },
-    onError
-  }
-}
-
 describe("jsmediatags", () => {
   // const mockFileReader;
   const mockTags = {} as TagType;
@@ -38,16 +29,12 @@ describe("jsmediatags", () => {
     // Reset auto mock to its original state.
     NodeFileReader.canReadFile = jest.fn<typeof NodeFileReader.canReadFile>();
     NodeFileReader.prototype.init = jest.fn<typeof NodeFileReader.prototype.init>()
-      .mockImplementation(callbacks => {
-        setTimeout(() => {
-          callbacks.onSuccess();
-        }, 1);
+      .mockImplementation(async () => {
+        return new Promise(resolve => setTimeout(resolve, 1));
       });
     NodeFileReader.prototype.loadRange = jest.fn<typeof NodeFileReader.prototype.loadRange>()
-      .mockImplementation((range, callbacks) => {
-        setTimeout(() => {
-          callbacks.onSuccess();
-        }, 1);
+      .mockImplementation(async range => {
+        return new Promise(resolve => setTimeout(resolve, 1));
       });
 
       // @ts-ignore
@@ -63,14 +50,11 @@ describe("jsmediatags", () => {
     // @ts-ignore
     ID3v2TagReader.canReadTagFormat.mockReturnValue(true);
     ID3v2TagReader.prototype.read = jest.fn<typeof ID3v2TagReader.prototype.read>()
-      .mockImplementation(callbacks => {
-        callbacks.onSuccess(mockTags);
-      });
+      .mockImplementation(async () => mockTags);
 
-    const tags = await new Promise((onSuccess, onError) => {
-      read("fakefile", { onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tags = await read("fakefile");
+
     expect(tags).toBe(mockTags);
   });
 

@@ -21,12 +21,12 @@ export default class ArrayFileReader extends MediaFileReader {
     );
   }
 
-  override init({ onSuccess }: LoadCallbackType) {
-    setTimeout(onSuccess, 0);
+  override async init(): LoadCallbackType {
+    await new Promise(resolve => setTimeout(resolve, 0));
   }
 
-  override loadRange(range: [number, number], { onSuccess }: LoadCallbackType) {
-    setTimeout(onSuccess, 0);
+  override async loadRange(range: [number, number]): LoadCallbackType {
+    await new Promise(resolve => setTimeout(resolve, 0));
   }
 
   override getByteAt(offset: number): Byte {

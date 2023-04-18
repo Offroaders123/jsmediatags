@@ -7,25 +7,13 @@ export interface jsmediatagsError {
   xhr?: XMLHttpRequest;
 }
 
-export interface CallbackType {
-  onSuccess: (data: TagType) => void;
-  onError?: (error: jsmediatagsError) => void;
-}
+export type CallbackType = Promise<TagType>;
 
-export interface LoadCallbackType {
-  onSuccess: () => void;
-  onError?: (error: jsmediatagsError) => void;
-}
+export type LoadCallbackType = Promise<void>;
 
-export interface TagReaderCallbackType {
-  onSuccess: (TagReader: typeof MediaTagReader) => void;
-  onError?: (error: jsmediatagsError) => void;
-}
+export type TagReaderCallbackType = Promise<typeof MediaTagReader>;
 
-export interface XHRCallbackType {
-  onSuccess: (xhr: XMLHttpRequest) => void;
-  onError?: (error: jsmediatagsError) => void;
-}
+export type XHRCallbackType = Promise<XMLHttpRequest>;
 
 export type CharsetType =
   | "utf-16"

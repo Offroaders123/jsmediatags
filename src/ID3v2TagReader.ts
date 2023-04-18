@@ -20,18 +20,13 @@ export default class ID3v2TagReader extends MediaTagReader {
     return id === "ID3";
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
-    mediaFileReader.loadRange([6, 9], {
-      onSuccess: () => {
-        mediaFileReader.loadRange(
-          // The tag size does not include the header size.
-          [0, ID3_HEADER_SIZE + mediaFileReader.getSynchsafeInteger32At(6) - 1],
-          callbacks
-        );
-      },
-      onError: callbacks.onError
-    });
-  }
+  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
+    await mediaFileReader.loadRange([6, 9]);
+    await mediaFileReader.loadRange(
+      // The tag size does not include the header size.
+      [0, ID3_HEADER_SIZE + mediaFileReader.getSynchsafeInteger32At(6) - 1]
+    );
+}
 
   override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
     let offset = 0;

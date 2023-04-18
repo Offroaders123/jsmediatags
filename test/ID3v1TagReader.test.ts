@@ -23,10 +23,9 @@ describe("ID3v1TagReader", () => {
     const mediaFileReader = new ArrayFileReader(id3ArrayFile);
     const tagReader = new ID3v1TagReader(mediaFileReader);
 
-    const tags = await new Promise((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tags = await tagReader.read();
+
     expect(tags).toEqual({
       type: "ID3",
       version: "1.0",
@@ -56,10 +55,9 @@ describe("ID3v1TagReader", () => {
     const mediaFileReader = new ArrayFileReader(id3ArrayFile);
     const tagReader = new ID3v1TagReader(mediaFileReader);
 
-    const tags = await new Promise((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tags = await tagReader.read();
+
     expect(tags).toEqual({
       type: "ID3",
       version: "1.1",

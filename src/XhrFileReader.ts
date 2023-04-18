@@ -48,70 +48,56 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  override _init(callbacks: LoadCallbackType): void {
+  override async _init(): LoadCallbackType {
     if (XhrFileReader._config.avoidHeadRequests) {
-      this._fetchSizeWithGetRequest(callbacks);
+      await this._fetchSizeWithGetRequest();
     } else {
-      this._fetchSizeWithHeadRequest(callbacks);
+      await this._fetchSizeWithHeadRequest();
     }
   }
 
-  _fetchSizeWithHeadRequest(callbacks: XHRCallbackType): void {
-    this._makeXHRRequest("HEAD", null, {
-      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
-        const contentLength = this._parseContentLength(xhr);
-        if (contentLength) {
-          this._size = contentLength;
-          callbacks.onSuccess(xhr);
-        } else {
-          // Content-Length not provided by the server, fallback to
-          // GET requests.
-          this._fetchSizeWithGetRequest(callbacks);
-        }
-      },
-      onError: callbacks.onError
-    });
+  async _fetchSizeWithHeadRequest(): XHRCallbackType {
+    const xhr = await this._makeXHRRequest("HEAD", null);
+    const contentLength = this._parseContentLength(xhr);
+    if (contentLength) {
+      this._size = contentLength;
+      return xhr;
+    } else {
+      // Content-Length not provided by the server, fallback to
+      // GET requests.
+      return this._fetchSizeWithGetRequest();
+    }
   }
 
-  _fetchSizeWithGetRequest(callbacks: XHRCallbackType): void {
+  async _fetchSizeWithGetRequest(): XHRCallbackType {
     const range = this._roundRangeToChunkMultiple([0, 0]);
+    const xhr = await this._makeXHRRequest("GET", range);
+    const contentRange = this._parseContentRange(xhr);
+    const data = this._getXhrResponseContent(xhr);
 
-    this._makeXHRRequest("GET", range, {
-      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
-        const contentRange = this._parseContentRange(xhr);
-        const data = this._getXhrResponseContent(xhr);
+    if (contentRange) {
+      if (contentRange.instanceLength == null) {
+        // Last resort, server is not able to tell us the content length,
+        // need to fetch entire file then.
+        return this._fetchEntireFile();
+      }
+      this._size = contentRange.instanceLength;
+    } else {
+      // Range request not supported, we got the entire file
+      this._size = data.length;
+    }
 
-        if (contentRange) {
-          if (contentRange.instanceLength == null) {
-            // Last resort, server is not able to tell us the content length,
-            // need to fetch entire file then.
-            this._fetchEntireFile(callbacks);
-            return;
-          }
-          this._size = contentRange.instanceLength;
-        } else {
-          // Range request not supported, we got the entire file
-          this._size = data.length;
-        }
-
-        this._fileData.addData(0, data);
-        callbacks.onSuccess(xhr);
-      },
-      onError: callbacks.onError
-    });
+    this._fileData.addData(0, data);
+    return xhr;
   }
 
-  _fetchEntireFile({ onSuccess, onError }: XHRCallbackType): void {
-    this._makeXHRRequest("GET", null, {
-      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
-        const data = this._getXhrResponseContent(xhr);
-        this._size = data.length;
-        this._fileData.addData(0, data);
-        onSuccess(xhr);
-      },
-      onError
-    });
-  }
+  async _fetchEntireFile(): XHRCallbackType {
+    const xhr = await this._makeXHRRequest("GET", null);
+    const data = this._getXhrResponseContent(xhr);
+    this._size = data.length;
+    this._fileData.addData(0, data);
+    return xhr;
+}
 
   _getXhrResponseContent(xhr: globalThis.XMLHttpRequest): string {
     // @ts-expect-error
@@ -149,10 +135,9 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  override loadRange(range: [number, number], { onSuccess, onError }: XHRCallbackType): void {
+  override async loadRange(range: [number, number]): XHRCallbackType {
     if (this._fileData.hasDataRange(range[0], Math.min(this._size, range[1]))) {
-      setTimeout(onSuccess, 1);
-      return;
+      return new Promise(resolve => setTimeout(resolve, 1));
     }
 
     // Always download in multiples of CHUNK_SIZE. If we're going to make a
@@ -164,14 +149,10 @@ export default class XhrFileReader extends MediaFileReader {
     // Upper range should not be greater than max file size
     range[1] = Math.min(this._size, range[1]);
 
-    this._makeXHRRequest("GET", range, {
-      onSuccess: (xhr: globalThis.XMLHttpRequest) => {
-        const data = this._getXhrResponseContent(xhr);
-        this._fileData.addData(range[0], data);
-        onSuccess(xhr);
-      },
-      onError
-    });
+    const xhr = await this._makeXHRRequest("GET", range);
+    const data = this._getXhrResponseContent(xhr);
+    this._fileData.addData(range[0], data);
+    return xhr;
   }
 
   _roundRangeToChunkMultiple(range: [number, number]): [number, number] {
@@ -180,58 +161,47 @@ export default class XhrFileReader extends MediaFileReader {
     return [range[0], range[0] + newLength - 1];
   }
 
-  _makeXHRRequest(
+  async _makeXHRRequest(
     method: string,
-    range: [number, number] | null,
-    { onSuccess, onError }: XHRCallbackType
-  ) {
+    range: [number, number] | null
+  ): XHRCallbackType {
     const xhr = this._createXHRObject();
     xhr.open(method, this._url);
 
-    const onXHRLoad = () => {
+    function onXHRLoad(){
       // 200 - OK
       // 206 - Partial Content
-      // $FlowIssue - xhr will not be null here
       if (xhr.status === 200 || xhr.status === 206) {
-        onSuccess(xhr);
+        return xhr;
       } else {
-        onError?.({
-          type: "xhr",
-          info: `Unexpected HTTP status ${xhr.status}.`,
-          xhr
-        });
+        console.log(xhr);
+        throw new Error(`xhr: Unexpected HTTP status ${xhr.status}.`);
       }
-      // @ts-ignore
-      xhr = null;
     };
 
     if (typeof xhr.onload !== "undefined") {
-      xhr.onload = onXHRLoad;
-      xhr.onerror = () => {
-        onError?.({
-          type: "xhr",
-          info: "Generic XHR error, check xhr object.",
-          xhr,
-        });
-      }
+      await new Promise((resolve, reject) => {
+        xhr.onload = resolve;
+        xhr.onerror = () => {
+          console.log(xhr);
+          reject("xhr: Generic XHR error, check xhr object.");
+        };
+      });
+      return onXHRLoad();
     } else {
-      xhr.onreadystatechange = () => {
-        // $FlowIssue - xhr will not be null here
-        if (xhr.readyState === 4) {
-          onXHRLoad();
-        }
-      };
+      await new Promise(resolve => {
+        xhr.onreadystatechange = resolve;
+      });
+      if (xhr.readyState === 4) {
+        return onXHRLoad();
+      }
     }
 
     if (XhrFileReader._config.timeoutInSec) {
       xhr.timeout = XhrFileReader._config.timeoutInSec * 1000;
       xhr.ontimeout = () => {
-        onError?.({
-          type: "xhr",
-          // $FlowIssue - xhr.timeout will not be null
-          info: `Timeout after ${xhr.timeout/1000}s. Use jsmediatags.Config.setXhrTimeout to override.`,
-          xhr,
-        });
+        console.log(xhr);
+        throw new Error(`xhr: Timeout after ${xhr.timeout / 1000}s. Use jsmediatags.Config.setXhrTimeout to override.`);
       }
     }
 
@@ -241,6 +211,8 @@ export default class XhrFileReader extends MediaFileReader {
     }
     this._setRequestHeader(xhr, "If-Modified-Since", "Sat, 01 Jan 1970 00:00:00 GMT");
     xhr.send(null);
+
+    throw "not sure what to do here for TypeScript";
   }
 
   _setRequestHeader(xhr: globalThis.XMLHttpRequest, headerName: string, headerValue: string) {

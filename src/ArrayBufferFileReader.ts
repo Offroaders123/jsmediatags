@@ -18,16 +18,15 @@ export default class ArrayBufferFileReader extends MediaFileReader {
     return file instanceof ArrayBuffer
   }
 
-  override _init({ onSuccess }: LoadCallbackType): void {
+  override async _init(): LoadCallbackType {
     this._size = this._buffer.byteLength;
-    setTimeout(onSuccess, 1);
+    await new Promise(resolve => setTimeout(resolve, 1));
   }
 
-  override loadRange(range: [number, number], { onSuccess }: LoadCallbackType): void {
+  override async loadRange(range: [number, number]): LoadCallbackType {
     const arrayBuf = this._buffer.slice(range[0], range[1] + 1);
     const viewData = new Uint8Array(arrayBuf);
     this._fileData.addData(range[0], viewData);
-    onSuccess();
   }
 
   override getByteAt(offset: number): number {

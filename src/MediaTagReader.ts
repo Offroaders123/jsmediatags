@@ -34,30 +34,17 @@ export default class MediaTagReader {
     return this;
   }
 
-  read({ onSuccess, onError }: CallbackType) {
-    this._mediaFileReader.init({
-      onSuccess: () => {
-        this._loadData(this._mediaFileReader, {
-          onSuccess: () => {
-            let tags!: TagType;
-            try {
-              tags = this._parseData(this._mediaFileReader, this._tags);
-            } catch (ex: any) {
-              onError?.({
-                type: "parseData",
-                info: ex.message
-              });
-              return;
-            }
+  async read(): CallbackType {
+    await this._mediaFileReader.init();
+    await this._loadData(this._mediaFileReader);
 
-            // TODO: destroy mediaFileReader
-            onSuccess(tags);
-          },
-          onError
-        });
-      },
-      onError
-    });
+    let tags!: TagType;
+    try {
+      tags = this._parseData(this._mediaFileReader, this._tags);
+    } catch (error: any){
+      throw new Error(`parseData: ${error.message}`);
+    }
+    return tags;
   }
 
   getShortcuts(): {
@@ -69,10 +56,9 @@ export default class MediaTagReader {
   /**
    * Load the necessary bytes from the media file.
    */
-  _loadData(
-    mediaFileReader: MediaFileReader,
-    callbacks: LoadCallbackType
-  ): void {
+  async _loadData(
+    mediaFileReader: MediaFileReader
+  ): LoadCallbackType {
     throw new Error("Must implement _loadData function");
   }
 

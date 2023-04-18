@@ -23,37 +23,29 @@ describe("FLACTagReader", () => {
   });
 
   it("reads the tag type", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
     expect(tag.type).toBe("FLAC");
     expect(tag.version).toBe("1");
   });
 
   it("reads a string tag", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
     const { tags } = tag;
     expect(tags.title).toBe("A Title");
   });
 
   it("reads an image tag", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
     const { tags } = tag;
-    expect(tags.picture.description).toBe("A Picture");
+    expect(tags.picture!.description).toBe("A Picture");
   });
 
   it("reads all tags", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
     const { tags } = tag;
     expect(tags.title).toBeTruthy();
     expect(tags.artist).toBeTruthy();
@@ -69,10 +61,8 @@ describe("FLACTagReader", () => {
     )]);
     mediaFileReader = new ArrayFileReader(flacFileContents.toArray());
     tagReader = new FLACTagReader(mediaFileReader);
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
     const { tags } = tag;
     expect(tags.title).toBeTruthy();
     expect(tags.artist).toBeTruthy();
@@ -83,10 +73,8 @@ describe("FLACTagReader", () => {
     const fileReaderEmpty = new ArrayFileReader(flacFileEmpty.toArray());
     const tagReaderEmpty = new FLACTagReader(fileReaderEmpty);
     try {
-      return await new Promise<any>((onSuccess, onError) => {
-        tagReaderEmpty.read({ onSuccess, onError });
-        jest.runAllTimers();
-      });
+      jest.runAllTimers();
+      return await tagReaderEmpty.read();
     } catch (error: any) {
       expect(error.type).toBe("loadData");
     }

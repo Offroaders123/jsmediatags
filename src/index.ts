@@ -13,8 +13,8 @@ import type { CallbackType, LoadCallbackType, TagReaderCallbackType, ByteRange }
 const mediaFileReaders: typeof MediaFileReader[] = [];
 const mediaTagReaders: typeof MediaTagReader[] = [];
 
-export function read(location: Object, callbacks: CallbackType) {
-  new Reader(location).read(callbacks);
+export async function read(location: Object): CallbackType {
+  return new Reader(location).read();
 }
 
 function isRangeValid(range: ByteRange, fileSize: number) {
@@ -52,24 +52,15 @@ export class Reader {
     return this;
   }
 
-  read(callbacks: CallbackType) {
+  async read(): CallbackType {
     const FileReader = this._getFileReader();
     const fileReader = new FileReader(this._file);
-
-    fileReader.init({
-      onSuccess: () => {
-        this._getTagReader(fileReader, {
-          onSuccess: TagReader => {
-            new TagReader(fileReader)
-              .setTagsToRead(this._tagsToRead)
-              .read(callbacks);
-          },
-          onError: callbacks.onError
-        });
-      },
-      onError: callbacks.onError
-    });
-  }
+    await fileReader.init();
+    const TagReader = await this._getTagReader(fileReader);
+    return new TagReader(fileReader)
+      .setTagsToRead(this._tagsToRead)
+      .read();
+}
 
   _getFileReader(): typeof MediaFileReader {
     if (this._fileReader) {
@@ -89,18 +80,17 @@ export class Reader {
     throw new Error("No suitable file reader found for " + this._file);
   }
 
-  _getTagReader(fileReader: MediaFileReader, callbacks: TagReaderCallbackType) {
+  async _getTagReader(fileReader: MediaFileReader): TagReaderCallbackType {
     if (this._tagReader) {
       const tagReader = this._tagReader;
-      setTimeout(() => {
-        callbacks.onSuccess(tagReader);
-      }, 1);
+      await new Promise(resolve => setTimeout(resolve, 1));
+      return tagReader;
     } else {
-      this._findTagReader(fileReader, callbacks);
+      return this._findTagReader(fileReader);
     }
   }
 
-  _findTagReader(fileReader: MediaFileReader, callbacks: TagReaderCallbackType) {
+  async _findTagReader(fileReader: MediaFileReader): TagReaderCallbackType {
     // We don't want to make multiple fetches per tag reader to get the tag
     // identifier. The strategy here is to combine all the tag identifier
     // ranges into one and make a single fetch. This is particularly important
@@ -132,62 +122,58 @@ export class Reader {
     }
 
     let tagsLoaded = false;
-    const loadTagIdentifiersCallbacks = {
-      onSuccess: () => {
-        if (!tagsLoaded) {
-          // We're expecting to load two sets of tag identifiers. This flag
-          // indicates when the first one has been loaded.
-          tagsLoaded = true;
-          return;
+    function checkTagsLoaded() {
+      if (!tagsLoaded) {
+        // We're expecting to load two sets of tag identifiers. This flag
+        // indicates when the first one has been loaded.
+        tagsLoaded = true;
+        return;
+      }
+
+      for (let i = 0; i < mediaTagReaders.length; i++) {
+        const range = mediaTagReaders[i].getTagIdentifierByteRange();
+        if (!isRangeValid(range, fileSize)) {
+          continue;
         }
 
-        for (let i = 0; i < mediaTagReaders.length; i++) {
-          const range = mediaTagReaders[i].getTagIdentifierByteRange();
-          if (!isRangeValid(range, fileSize)) {
-            continue;
-          }
-
-          let tagIndentifier: number[];
-          try {
-            tagIndentifier = fileReader.getBytesAt(
-              range.offset >= 0 ? range.offset : range.offset + fileSize,
-              range.length
-            );
-          } catch (ex: any) {
-            callbacks.onError?.({
-              type: "fileReader",
-              info: ex.message
-            });
-            return;
-          }
-
-          if (mediaTagReaders[i].canReadTagFormat(tagIndentifier)) {
-            callbacks.onSuccess(mediaTagReaders[i]);
-            return;
-          }
+        let tagIndentifier: number[];
+        try {
+          tagIndentifier = fileReader.getBytesAt(
+            range.offset >= 0 ? range.offset : range.offset + fileSize,
+            range.length
+          );
+        } catch (ex: any) {
+          throw new Error(`fileReader: ${ex.message}`);
         }
 
-        callbacks.onError?.({
-          type: "tagFormat",
-          info: "No suitable tag reader found"
-        });
-      },
-      onError: callbacks.onError
-    };
+        if (mediaTagReaders[i].canReadTagFormat(tagIndentifier)) {
+          return mediaTagReaders[i];
+        }
+      }
 
-    this._loadTagIdentifierRanges(fileReader, tagReadersAtFileStart, loadTagIdentifiersCallbacks);
-    this._loadTagIdentifierRanges(fileReader, tagReadersAtFileEnd, loadTagIdentifiersCallbacks);
+      throw new Error("tagFormat: No suitable tag reader found");
+    }
+
+    let tagReader: typeof MediaTagReader | undefined;
+
+    await this._loadTagIdentifierRanges(fileReader, tagReadersAtFileStart);
+    tagReader = checkTagsLoaded();
+    await this._loadTagIdentifierRanges(fileReader, tagReadersAtFileEnd);
+    tagReader = checkTagsLoaded();
+
+    if (tagReader === undefined){
+      throw new Error("tagFormat: No suitable tag reader found");
+    }
+    return tagReader;
   }
 
-  _loadTagIdentifierRanges(
+  async _loadTagIdentifierRanges(
     fileReader: MediaFileReader,
-    tagReaders: typeof MediaTagReader[],
-    callbacks: LoadCallbackType
-  ) {
+    tagReaders: typeof MediaTagReader[]
+  ): LoadCallbackType {
     if (tagReaders.length === 0) {
       // Force async
-      setTimeout(callbacks.onSuccess, 1);
-      return;
+      return new Promise(resolve => setTimeout(resolve, 1));
     }
 
     const tagIdentifierRange: [number,number] = [Number.MAX_VALUE, 0];
@@ -205,7 +191,7 @@ export class Reader {
       tagIdentifierRange[1] = Math.max(end, tagIdentifierRange[1]);
     }
 
-    fileReader.loadRange(tagIdentifierRange, callbacks);
+    await fileReader.loadRange(tagIdentifierRange);
   }
 }
 

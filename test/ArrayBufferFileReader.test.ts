@@ -7,15 +7,6 @@ jest
   .dontMock("../src/MediaFileReader.js")
   .dontMock("../src/ChunkedFileData.js");
 
-function throwOnError(onSuccess: () => void) {
-  return {
-    onSuccess,
-    onError: () => {
-      throw new Error();
-    }
-  }
-}
-
 function str2ab(str: string) {
   const buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
   const bufView = new Uint16Array(buf);
@@ -38,18 +29,14 @@ describe("ArrayBufferFileReader", () => {
   });
 
   it("should have the right size information", async () => {
-    await new Promise<void>(resolve => {
-      fileReader.init(throwOnError(resolve));
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    await fileReader.init();
     expect(fileReader.getSize()).toBe(8);
   });
 
   it("should read a byte", async () => {
-    await new Promise<void>(resolve => {
-      fileReader.loadRange([0, 4], throwOnError(resolve));
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 });

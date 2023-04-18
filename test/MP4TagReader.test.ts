@@ -60,37 +60,33 @@ describe("MP4TagReader", () => {
   });
 
   it("reads the type and version", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     expect(tag.type).toBe("MP4");
     expect(tag.ftyp).toBe("M4A ");
   });
 
   it("reads string tag", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     const { tags } = tag;
     expect(tags["©nam"].data).toBe("A Title");
   });
 
   it("reads uint8 tag", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     const { tags } = tag;
     expect(tags.cpil.data).toBeTruthy();
   });
 
   it("reads jpeg tag", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     const { tags } = tag;
     expect("covr" in tags).toBeTruthy();
     expect(tags.covr.data.format).toBe("image/jpeg");
@@ -98,10 +94,9 @@ describe("MP4TagReader", () => {
   });
 
   it("reads multiple int tags", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     const { tags } = tag;
     expect(tags.trkn.data.track).toBe(2);
     expect(tags.trkn.data.total).toBe(9);
@@ -110,10 +105,9 @@ describe("MP4TagReader", () => {
   });
 
   it("reads all tags", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     const { tags } = tag;
     expect("©nam" in tags).toBeTruthy();
     expect("©ART" in tags).toBeTruthy();
@@ -125,31 +119,26 @@ describe("MP4TagReader", () => {
   });
 
   it("creates shorcuts", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     const { tags } = tag;
     expect("artist" in tags).toBeTruthy();
     expect(tags.artist).toBe(tags["©ART"].data);
   });
 
   it("reads the specificed tag", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.setTagsToRead(["©cmt"])
-        .read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.setTagsToRead(["©cmt"])
+      .read();
     expect(Object.keys(tag.tags)).not.toContain("©nam");
     expect(Object.keys(tag.tags)).toContain("©cmt");
   });
 
   it("reads the specificed shortcut tag", async () => {
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.setTagsToRead(["title"])
-        .read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.setTagsToRead(["title"])
+      .read();
     expect(Object.keys(tag.tags)).toContain("title");
   });
 
@@ -160,10 +149,9 @@ describe("MP4TagReader", () => {
     const mediaFileReader = new ArrayFileReader(mp4FileContents.toArray());
     const tagReader = new MP4TagReader(mediaFileReader);
 
-    const tag = await new Promise<any>((onSuccess, onError) => {
-      tagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tag = await tagReader.read();
+
     const { tags } = tag;
     expect("covr" in tags).toBeTruthy();
     expect(tags.covr.data.format).toBe("image/jpeg");

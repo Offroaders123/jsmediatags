@@ -23,21 +23,16 @@ export default class MediaFileReader {
    * This function needs to be called before any other function.
    * Loads the necessary initial information from the file.
    */
-  init(callbacks: LoadCallbackType): void {
+  async init(): LoadCallbackType {
     if (this._isInitialized) {
-      setTimeout(callbacks.onSuccess, 1);
+      return new Promise(resolve => setTimeout(resolve, 1));
     } else {
-      return this._init({
-        onSuccess: () => {
-          this._isInitialized = true;
-          callbacks.onSuccess();
-        },
-        onError: callbacks.onError
-      });
+      await this._init();
+      this._isInitialized = true;
     }
   }
 
-  _init(callbacks: LoadCallbackType): void {
+  async _init(): LoadCallbackType {
     throw new Error("Must implement init function");
   }
 
@@ -45,7 +40,7 @@ export default class MediaFileReader {
    * @param range The start and end indexes of the range to load.
    *        Ex: [0, 7] load bytes 0 to 7 inclusive.
    */
-  loadRange(range: [number, number], callbacks: LoadCallbackType): void {
+  async loadRange(range: [number, number]): Promise<unknown> {
     throw new Error("Must implement loadRange function");
   }
 

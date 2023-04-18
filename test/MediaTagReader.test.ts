@@ -15,10 +15,8 @@ describe("MediaTagReader", () => {
   beforeEach(() => {
     mediaFileReader = new MediaFileReader();
     mediaFileReader.init =
-      jest.fn<typeof mediaFileReader.init>().mockImplementation(callbacks => {
-        setTimeout(() => {
-          callbacks.onSuccess();
-        }, 1);
+      jest.fn<typeof mediaFileReader.init>().mockImplementation(async () => {
+        return new Promise(resolve => setTimeout(resolve, 1));
       });
     mediaTagReader = new MediaTagReader(mediaFileReader);
   });
@@ -26,38 +24,31 @@ describe("MediaTagReader", () => {
   it("can read the data given by _parseData", async () => {
     const expectedTags = {} as TagType;
     mediaTagReader._loadData =
-      jest.fn<typeof mediaTagReader._loadData>().mockImplementation((_, callbacks) => {
-        setTimeout(() => {
-          callbacks.onSuccess();
-        }, 1);
+      jest.fn<typeof mediaTagReader._loadData>().mockImplementation(async _ => {
+        return new Promise(resolve => setTimeout(resolve, 1));
       });
     mediaTagReader._parseData =
       jest.fn<typeof mediaTagReader._parseData>().mockImplementation(() => {
         return expectedTags;
       });
 
-    const tags = await new Promise((onSuccess, onError) => {
-      mediaTagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    const tags = await mediaTagReader.read();
     expect(tags).toBe(expectedTags);
   });
 
   it("should _loadData when it needs to be read", async () => {
     mediaTagReader._loadData = jest.fn<typeof mediaTagReader._loadData>().mockImplementation(
-      (localMediaFileReader, callbacks) => {
+      async localMediaFileReader => {
         expect(localMediaFileReader).toBe(mediaFileReader);
-        setTimeout(() => {
-          callbacks.onSuccess();
-        }, 1);
+        return new Promise(resolve => setTimeout(resolve, 1));
       }
     );
     mediaTagReader._parseData = jest.fn<typeof mediaTagReader._parseData>();
 
-    await new Promise((onSuccess, onError) => {
-      mediaTagReader.read({ onSuccess, onError });
-      jest.runAllTimers();
-    });
+    jest.runAllTimers();
+    await mediaTagReader.read();
+
     expect(mediaTagReader._loadData).toBeCalled();
   });
 });

@@ -19,9 +19,9 @@ export default class ID3v1TagReader extends MediaTagReader {
     return id === "TAG";
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
     const fileSize = mediaFileReader.getSize();
-    mediaFileReader.loadRange([fileSize - 128, fileSize - 1], callbacks);
+    await mediaFileReader.loadRange([fileSize - 128, fileSize - 1]);
   }
 
   override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {

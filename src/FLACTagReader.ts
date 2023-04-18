@@ -113,12 +113,9 @@ export default class FLACTagReader extends MediaTagReader {
    * @param mediaFileReader - The MediaFileReader used to parse the file.
    * @param callbacks - The callback to call once _loadData is completed.
    */
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
-    mediaFileReader.loadRange([4, 7], {
-      onSuccess: () => {
-        this._loadBlock(mediaFileReader, 4, callbacks);
-      }
-    });
+  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
+    await mediaFileReader.loadRange([4, 7]);
+    await this._loadBlock(mediaFileReader, 4);
   }
 
   /**
@@ -140,13 +137,12 @@ export default class FLACTagReader extends MediaTagReader {
    * 
    * @param mediaFileReader - The MediaFileReader used to parse the file.
    * @param offset - The offset to start checking the header from.
-   * @param callbacks - The callback to call once the header has been found.
+   * @return - The callback to call once the header has been found.
    */
-  _loadBlock(
+  async _loadBlock(
     mediaFileReader: MediaFileReader,
-    offset: number,
-    callbacks: LoadCallbackType
-  ) {
+    offset: number
+  ): LoadCallbackType {
     /**
      * As mentioned above, this first byte is loaded to see what metadata type
      * this block represents.
@@ -177,22 +173,16 @@ export default class FLACTagReader extends MediaTagReader {
        * and offsetMetadata + blockSize (the end of the block) is loaded.
        */
       const offsetMetadata = offset + 4;
-      mediaFileReader.loadRange([offsetMetadata, offsetMetadata + blockSize], {
-        onSuccess: () => {
-          this._commentOffset = offsetMetadata;
-          this._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
-        }
-      });
+      await mediaFileReader.loadRange([offsetMetadata, offsetMetadata + blockSize]);
+      this._commentOffset = offsetMetadata;
+      await this._nextBlock(mediaFileReader, offset, blockHeader, blockSize);
     } else if (PICTURE_HEADERS.indexOf(blockHeader as PICTURE_HEADERS) !== -1) {
       const offsetMetadata = offset + 4;
-      mediaFileReader.loadRange([offsetMetadata, offsetMetadata + blockSize], {
-        onSuccess: () => {
-          this._pictureOffset = offsetMetadata;
-          this._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
-        }
-      });
+      await mediaFileReader.loadRange([offsetMetadata, offsetMetadata + blockSize]);
+      this._pictureOffset = offsetMetadata;
+      await this._nextBlock(mediaFileReader, offset, blockHeader, blockSize);
     } else {
-      this._nextBlock(mediaFileReader, offset, blockHeader, blockSize, callbacks);
+      await this._nextBlock(mediaFileReader, offset, blockHeader, blockSize);
     }
   }
 
@@ -211,30 +201,23 @@ export default class FLACTagReader extends MediaTagReader {
    * @param offset - The offset that the existing header was located at.
    * @param blockHeader - An integer reflecting the header type of the block.
    * @param blockSize - The size of the previously processed header.
-   * @param callbacks - The callback functions to be called.
+   * @return - The callback functions to be called.
    */
-  _nextBlock(
+  async _nextBlock(
     mediaFileReader: MediaFileReader,
     offset: number,
     blockHeader: number,
-    blockSize: number,
-    callbacks: LoadCallbackType
-  ) {
+    blockSize: number
+  ): LoadCallbackType {
     if (blockHeader > 127) {
       if (!this._commentOffset) {
-        callbacks.onError?.({
-          type: "loadData",
-          info: "Comment block could not be found."
-        });
+        throw new Error("loadData: Comment block could not be found.");
       } else {
-        callbacks.onSuccess();
+        return;
       }
     } else {
-      mediaFileReader.loadRange([offset + 4 + blockSize, offset + 4 + 4 + blockSize], {
-        onSuccess: () => {
-          this._loadBlock(mediaFileReader, offset + 4 + blockSize, callbacks);
-        }
-      });
+      await mediaFileReader.loadRange([offset + 4 + blockSize, offset + 4 + 4 + blockSize]);
+      await this._loadBlock(mediaFileReader, offset + 4 + blockSize);
     }
   }
 

@@ -27,20 +27,16 @@ export default class ReactNativeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  override async _init({ onSuccess, onError }: LoadCallbackType) {
+  override async _init(): LoadCallbackType {
     try {
       const statResult = await RNFS.stat(this._path);
       this._size = statResult.size;
-      onSuccess();
-    } catch (error){
-      onError?.({
-        type: "fs",
-        info: error as any
-      });
+    } catch (error: any){
+      throw new Error(`fs: ${error.message}`);
     }
   }
 
-  override async loadRange(range: [number, number], { onSuccess, onError }: LoadCallbackType) {
+  override async loadRange(range: [number, number]): LoadCallbackType {
     const fileData = this._fileData;
     const length = range[1] - range[0] + 1;
 
@@ -50,13 +46,8 @@ export default class ReactNativeFileReader extends MediaFileReader {
       const buffer = Buffer.from(readData, "base64");
       const data = Array.prototype.slice.call(buffer, 0, length);
       fileData.addData(range[0], data);
-
-      onSuccess();
-    } catch (err){
-      onError?.({
-        type: "fs",
-        info: err as any
-      });
+    } catch (err: any){
+      throw new Error(`fs: ${err.message}`);
     }
   }
 }

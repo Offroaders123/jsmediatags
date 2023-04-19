@@ -3,7 +3,7 @@ import MediaFileReader from "./MediaFileReader.js";
 // @ts-expect-error
 import { XMLHttpRequest } from "xhr2";
 
-import type { LoadCallbackType, XHRCallbackType } from "./FlowTypes.js";
+import type { XHRCallbackType } from "./FlowTypes.js";
 
 const CHUNK_SIZE = 1024;
 
@@ -48,7 +48,7 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
-  override async _init(): LoadCallbackType {
+  override async _init() {
     if (XhrFileReader._config.avoidHeadRequests) {
       await this._fetchSizeWithGetRequest();
     } else {
@@ -135,6 +135,7 @@ export default class XhrFileReader extends MediaFileReader {
     }
   }
 
+  // @ts-expect-error
   override async loadRange(range: [number, number]): XHRCallbackType {
     if (this._fileData.hasDataRange(range[0], Math.min(this._size, range[1]))) {
       return new Promise(resolve => setTimeout(resolve, 1));

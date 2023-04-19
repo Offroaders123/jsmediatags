@@ -37,15 +37,6 @@ const XMLHttpRequest = new XMLHttpRequestMock();
 // @ts-expect-error
 globalThis.XMLHttpRequest = () => XMLHttpRequest;
 
-function throwOnSuccess(onError: (error?: any) => void) {
-  return {
-    onSuccess: () => {
-      throw new Error();
-    },
-    onError
-  }
-}
-
 describe("XhrFileReader", () => {
   let fileReader: XhrFileReader;
 

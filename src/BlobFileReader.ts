@@ -1,8 +1,6 @@
 import ChunkedFileData from "./ChunkedFileData.js";
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType } from "./FlowTypes.js";
-
 export default class BlobFileReader extends MediaFileReader {
   declare _blob: Blob;
   declare _fileData: ChunkedFileData;
@@ -23,12 +21,12 @@ export default class BlobFileReader extends MediaFileReader {
     );
   }
 
-  override async _init(): LoadCallbackType {
+  override async _init() {
     this._size = this._blob.size;
     await new Promise(resolve => setTimeout(resolve, 1));
   }
 
-  override async loadRange(range: [number, number]): LoadCallbackType {
+  override async loadRange(range: [number, number]) {
     const blob = this._blob.slice(range[0], range[1] + 1);
     let buffer: ArrayBuffer;
 

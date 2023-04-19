@@ -3,8 +3,6 @@ import * as fs from "node:fs";
 import ChunkedFileData from "./ChunkedFileData.js";
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType } from "./FlowTypes.js";
-
 export default class NodeFileReader extends MediaFileReader {
   declare _path: string;
   declare _fileData: ChunkedFileData;
@@ -26,8 +24,8 @@ export default class NodeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  override async _init(): LoadCallbackType {
-    return new Promise((resolve, reject) => {
+  override async _init() {
+    return new Promise<void>((resolve, reject) => {
       fs.stat(this._path, (err, stats) => {
         if (err){
           reject(new Error(`fs: ${err.message}`));
@@ -39,14 +37,14 @@ export default class NodeFileReader extends MediaFileReader {
     });
   }
 
-  override async loadRange(range: [number, number]): LoadCallbackType {
+  override async loadRange(range: [number, number]) {
     let fd = -1;
     const fileData = this._fileData;
 
     const length = range[1] - range[0] + 1;
 
     if (fileData.hasDataRange(range[0], range[1])) {
-      return new Promise(resolve => process.nextTick(resolve));
+      return new Promise<void>(resolve => process.nextTick(resolve));
     }
 
     function readData(err: NodeJS.ErrnoException | null, _fd: number) {

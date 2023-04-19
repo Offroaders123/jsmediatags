@@ -1,6 +1,6 @@
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { CallbackType, LoadCallbackType, ByteRange, TagType } from "./FlowTypes.js";
+import type { ByteRange, TagType } from "./FlowTypes.js";
 
 export default class MediaTagReader {
   declare _mediaFileReader: MediaFileReader;
@@ -34,7 +34,7 @@ export default class MediaTagReader {
     return this;
   }
 
-  async read(): CallbackType {
+  async read() {
     await this._mediaFileReader.init();
     await this._loadData(this._mediaFileReader);
 
@@ -58,7 +58,7 @@ export default class MediaTagReader {
    */
   async _loadData(
     mediaFileReader: MediaFileReader
-  ): LoadCallbackType {
+  ) {
     throw new Error("Must implement _loadData function");
   }
 

@@ -8,12 +8,12 @@ import ID3v2TagReader from "./ID3v2TagReader.js";
 import MP4TagReader from "./MP4TagReader.js";
 import FLACTagReader from "./FLACTagReader.js";
 
-import type { CallbackType, LoadCallbackType, TagReaderCallbackType, ByteRange } from "./FlowTypes.js";
+import type { ByteRange } from "./FlowTypes.js";
 
 const mediaFileReaders: typeof MediaFileReader[] = [];
 const mediaTagReaders: typeof MediaTagReader[] = [];
 
-export async function read(location: Object): CallbackType {
+export async function read(location: Object) {
   return new Reader(location).read();
 }
 
@@ -52,7 +52,7 @@ export class Reader {
     return this;
   }
 
-  async read(): CallbackType {
+  async read() {
     const FileReader = this._getFileReader();
     const fileReader = new FileReader(this._file);
     await fileReader.init();
@@ -80,7 +80,7 @@ export class Reader {
     throw new Error("No suitable file reader found for " + this._file);
   }
 
-  async _getTagReader(fileReader: MediaFileReader): TagReaderCallbackType {
+  async _getTagReader(fileReader: MediaFileReader) {
     if (this._tagReader) {
       const tagReader = this._tagReader;
       await new Promise(resolve => setTimeout(resolve, 1));
@@ -90,7 +90,7 @@ export class Reader {
     }
   }
 
-  async _findTagReader(fileReader: MediaFileReader): TagReaderCallbackType {
+  async _findTagReader(fileReader: MediaFileReader) {
     // We don't want to make multiple fetches per tag reader to get the tag
     // identifier. The strategy here is to combine all the tag identifier
     // ranges into one and make a single fetch. This is particularly important
@@ -170,10 +170,10 @@ export class Reader {
   async _loadTagIdentifierRanges(
     fileReader: MediaFileReader,
     tagReaders: typeof MediaTagReader[]
-  ): LoadCallbackType {
+  ) {
     if (tagReaders.length === 0) {
       // Force async
-      return new Promise(resolve => setTimeout(resolve, 1));
+      return new Promise<void>(resolve => setTimeout(resolve, 1));
     }
 
     const tagIdentifierRange: [number,number] = [Number.MAX_VALUE, 0];
@@ -236,6 +236,7 @@ export class Config {
 }
 
 Config
+  // @ts-expect-error
   .addFileReader(XhrFileReader)
   .addFileReader(BlobFileReader)
   .addFileReader(ArrayFileReader)

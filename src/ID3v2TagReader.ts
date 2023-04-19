@@ -2,7 +2,7 @@ import MediaTagReader from "./MediaTagReader.js";
 import MediaFileReader from "./MediaFileReader.js";
 import ID3v2FrameReader from "./ID3v2FrameReader.js";
 
-import type { CallbackType, LoadCallbackType, TagFrames, TagFrame, TagHeader, TagFrameHeader, TagFrameFlags, CharsetType, ByteRange, TagType } from "./FlowTypes.js";
+import type { TagFrames, TagFrame, TagHeader, TagFrameHeader, TagFrameFlags, CharsetType, ByteRange, TagType } from "./FlowTypes.js";
 
 const ID3_HEADER_SIZE = 10;
 
@@ -20,7 +20,7 @@ export default class ID3v2TagReader extends MediaTagReader {
     return id === "ID3";
   }
 
-  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
+  override async _loadData(mediaFileReader: MediaFileReader) {
     await mediaFileReader.loadRange([6, 9]);
     await mediaFileReader.loadRange(
       // The tag size does not include the header size.

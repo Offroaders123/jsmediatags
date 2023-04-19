@@ -9,7 +9,7 @@
 import MediaTagReader from "./MediaTagReader.js";
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { CallbackType, LoadCallbackType, CharsetType, ByteRange, TagType, TagFrame } from "./FlowTypes.js";
+import type { CharsetType, ByteRange, TagType, TagFrame } from "./FlowTypes.js";
 
 export default class MP4TagReader extends MediaTagReader {
   static override getTagIdentifierByteRange(): ByteRange {
@@ -27,7 +27,7 @@ export default class MP4TagReader extends MediaTagReader {
     return id === "ftyp";
   }
 
-  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
+  override async _loadData(mediaFileReader: MediaFileReader) {
     // MP4 metadata isn't located in a specific location of the file. Roughly
     // speaking, it's composed of blocks chained together like a linked list.
     // These blocks are called atoms (or boxes).
@@ -49,7 +49,7 @@ export default class MP4TagReader extends MediaTagReader {
     mediaFileReader: MediaFileReader,
     offset: number,
     parentAtomFullName: string
-  ): LoadCallbackType {
+  ) {
     if (offset >= mediaFileReader.getSize()) {
       return;
     }

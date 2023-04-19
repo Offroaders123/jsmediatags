@@ -1,7 +1,7 @@
 import MediaTagReader from "./MediaTagReader.js";
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType, ByteRange, TagType } from "./FlowTypes.js";
+import type { ByteRange, TagType } from "./FlowTypes.js";
 
 export default class ID3v1TagReader extends MediaTagReader {
   static override getTagIdentifierByteRange(): ByteRange {
@@ -19,7 +19,7 @@ export default class ID3v1TagReader extends MediaTagReader {
     return id === "TAG";
   }
 
-  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
+  override async _loadData(mediaFileReader: MediaFileReader) {
     const fileSize = mediaFileReader.getSize();
     await mediaFileReader.loadRange([fileSize - 128, fileSize - 1]);
   }

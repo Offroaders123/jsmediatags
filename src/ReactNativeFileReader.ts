@@ -4,8 +4,6 @@ import { Buffer } from "buffer";
 import ChunkedFileData from "./ChunkedFileData.js";
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { LoadCallbackType } from "./FlowTypes.js";
-
 export default class ReactNativeFileReader extends MediaFileReader {
   declare _path: string;
   declare _fileData: ChunkedFileData;
@@ -27,7 +25,7 @@ export default class ReactNativeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  override async _init(): LoadCallbackType {
+  override async _init() {
     try {
       const statResult = await RNFS.stat(this._path);
       this._size = statResult.size;
@@ -36,7 +34,7 @@ export default class ReactNativeFileReader extends MediaFileReader {
     }
   }
 
-  override async loadRange(range: [number, number]): LoadCallbackType {
+  override async loadRange(range: [number, number]) {
     const fileData = this._fileData;
     const length = range[1] - range[0] + 1;
 

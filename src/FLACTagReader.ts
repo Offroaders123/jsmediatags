@@ -1,7 +1,7 @@
 import MediaFileReader from "./MediaFileReader.js";
 import MediaTagReader from "./MediaTagReader.js";
 
-import type { LoadCallbackType, ByteRange, TagType, PictureType } from "./FlowTypes.js";
+import type { ByteRange, TagType, PictureType } from "./FlowTypes.js";
 
 /*
  * The first 4 bytes of a FLAC file describes the header for the file. If these
@@ -113,7 +113,7 @@ export default class FLACTagReader extends MediaTagReader {
    * @param mediaFileReader - The MediaFileReader used to parse the file.
    * @param callbacks - The callback to call once _loadData is completed.
    */
-  override async _loadData(mediaFileReader: MediaFileReader): LoadCallbackType {
+  override async _loadData(mediaFileReader: MediaFileReader) {
     await mediaFileReader.loadRange([4, 7]);
     await this._loadBlock(mediaFileReader, 4);
   }
@@ -142,7 +142,7 @@ export default class FLACTagReader extends MediaTagReader {
   async _loadBlock(
     mediaFileReader: MediaFileReader,
     offset: number
-  ): LoadCallbackType {
+  ) {
     /**
      * As mentioned above, this first byte is loaded to see what metadata type
      * this block represents.
@@ -208,7 +208,7 @@ export default class FLACTagReader extends MediaTagReader {
     offset: number,
     blockHeader: number,
     blockSize: number
-  ): LoadCallbackType {
+  ) {
     if (blockHeader > 127) {
       if (!this._commentOffset) {
         throw new Error("loadData: Comment block could not be found.");

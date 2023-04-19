@@ -1,7 +1,7 @@
 import { readUTF8String, readUTF16String, readNullTerminatedString } from "./StringUtils.js";
 
 import type { DecodedString } from "./StringUtils.js";
-import type { LoadCallbackType, CharsetType } from "./FlowTypes.js";
+import type { CharsetType } from "./FlowTypes.js";
 
 export default class MediaFileReader {
   declare _isInitialized: boolean;
@@ -23,16 +23,16 @@ export default class MediaFileReader {
    * This function needs to be called before any other function.
    * Loads the necessary initial information from the file.
    */
-  async init(): LoadCallbackType {
+  async init() {
     if (this._isInitialized) {
-      return new Promise(resolve => setTimeout(resolve, 1));
+      return new Promise<void>(resolve => setTimeout(resolve, 1));
     } else {
       await this._init();
       this._isInitialized = true;
     }
   }
 
-  async _init(): LoadCallbackType {
+  async _init() {
     throw new Error("Must implement init function");
   }
 
@@ -40,7 +40,7 @@ export default class MediaFileReader {
    * @param range The start and end indexes of the range to load.
    *        Ex: [0, 7] load bytes 0 to 7 inclusive.
    */
-  async loadRange(range: [number, number]): Promise<unknown> {
+  async loadRange(range: [number, number]) {
     throw new Error("Must implement loadRange function");
   }
 

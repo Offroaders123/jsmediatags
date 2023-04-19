@@ -1,17 +1,4 @@
 import type MediaFileReader from "./MediaFileReader.js";
-import type MediaTagReader from "./MediaTagReader.js";
-
-export interface jsmediatagsError {
-  type: string;
-  info: string;
-  xhr?: XMLHttpRequest;
-}
-
-export type CallbackType = Promise<TagType>;
-
-export type LoadCallbackType = Promise<void>;
-
-export type TagReaderCallbackType = Promise<typeof MediaTagReader>;
 
 export type XHRCallbackType = Promise<XMLHttpRequest>;
 
@@ -48,9 +35,7 @@ export interface ChunkType {
   data: DataType;
 }
 
-export type Byte = number;
-
-export type ByteArray = Byte[];
+export type ByteArray = number[];
 
 export type FrameReaderSignature = (
   offset: number,
@@ -141,14 +126,3 @@ export interface FrameType {
   description: string;
   data: any;
 }
-
-export type ShortcutNameType =
-  | "title"
-  | "artist"
-  | "album"
-  | "year"
-  | "comment"
-  | "track"
-  | "genre"
-  | "picture"
-  | "lyrics";

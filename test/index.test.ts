@@ -1,23 +1,21 @@
 import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
-import { read, Config } from "../src/index.js";
-import NodeFileReader from "../src/NodeFileReader.js";
-import XhrFileReader from "../src/XhrFileReader.js";
-import ArrayFileReader from "../src/ArrayFileReader.js";
-import ID3v1TagReader from "../src/ID3v1TagReader.js";
-import ID3v2TagReader from "../src/ID3v2TagReader.js";
-import MP4TagReader from "../src/MP4TagReader.js";
-import FLACTagReader from "../src/FLACTagReader.js";
-
 import type MediaFileReader from "../src/MediaFileReader.js";
 import type MediaTagReader from "../src/MediaTagReader.js";
 import type { TagType } from "../src/FlowTypes.js";
 
 jest
   .enableAutomock()
-  .dontMock("../src/jsmediatags.js")
+  .dontMock("../src/index.js")
   .dontMock("../src/ByteArrayUtils.js")
   .useRealTimers();
+
+const { read, Config } = await import("../src/index.js");
+const { default: ArrayFileReader } = await import("../src/ArrayFileReader.js");
+const { default: ID3v1TagReader } = await import("../src/ID3v1TagReader.js");
+const { default: ID3v2TagReader } = await import("../src/ID3v2TagReader.js");
+const { default: MP4TagReader } = await import("../src/MP4TagReader.js");
+const { default: FLACTagReader } = await import("../src/FLACTagReader.js");
 
 describe("jsmediatags", () => {
   // const mockFileReader;
@@ -28,16 +26,6 @@ describe("jsmediatags", () => {
     Config.removeTagReader(MP4TagReader);
     Config.removeTagReader(FLACTagReader);
     // Reset auto mock to its original state.
-    NodeFileReader.canReadFile = jest.fn<typeof NodeFileReader.canReadFile>();
-    NodeFileReader.prototype.init = jest.fn<typeof NodeFileReader.prototype.init>()
-      .mockImplementation(async () => {
-        return new Promise(resolve => setTimeout(resolve, 1));
-      });
-    NodeFileReader.prototype.loadRange = jest.fn<typeof NodeFileReader.prototype.loadRange>()
-      .mockImplementation(async range => {
-        return new Promise(resolve => setTimeout(resolve, 1));
-      });
-
       // @ts-ignore
     ID3v2TagReader.getTagIdentifierByteRange.mockReturnValue(
       {offset: 0, length: 0}
@@ -70,17 +58,6 @@ describe("jsmediatags", () => {
       expect(fileReader).toBe(MockFileReader);
     });
 
-    it("should use the node file reader", () => {
-      // @ts-ignore
-      NodeFileReader.canReadFile.mockReturnValue(true);
-
-      // @ts-ignore
-      const reader = new Reader();
-      const FileReader = reader._getFileReader();
-
-      expect(FileReader).toBe(NodeFileReader);
-    });
-
     it("should use the Array file reader for Buffers", () => {
       // @ts-ignore
       ArrayFileReader.canReadFile.mockReturnValue(true);
@@ -90,17 +67,6 @@ describe("jsmediatags", () => {
       const FileReader = reader._getFileReader();
 
       expect(FileReader).toBe(ArrayFileReader);
-    });
-
-    it("should use the XHR file reader", () => {
-      // @ts-ignore
-      XhrFileReader.canReadFile.mockReturnValue(true);
-
-      // @ts-ignore
-      const reader = new Reader();
-      const FileReader = reader._getFileReader();
-
-      expect(FileReader).toBe(XhrFileReader);
     });
   });
 

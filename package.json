@@ -36,9 +36,6 @@
     "url": "https://github.com/aadsm/jsmediatags/issues"
   },
   "homepage": "https://github.com/aadsm/jsmediatags#readme",
-  "dependencies": {
-    "xhr2": "^0.2.1"
-  },
   "devDependencies": {
     "jest": "^29.5.0",
     "jest-ts-webcompat-resolver": "^1.0.0",

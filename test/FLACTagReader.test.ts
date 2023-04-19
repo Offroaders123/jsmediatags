@@ -4,7 +4,9 @@ import ArrayFileReader from "../src/ArrayFileReader.js";
 import FLACTagContents from "../src/FLACTagContents.js";
 import FLACTagReader from "../src/FLACTagReader.js";
 
-jest.autoMockOff();
+jest
+  .autoMockOff()
+  .useRealTimers();
 
 describe("FLACTagReader", () => {
   const flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(
@@ -23,28 +25,24 @@ describe("FLACTagReader", () => {
   });
 
   it("reads the tag type", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
     expect(tag.type).toBe("FLAC");
     expect(tag.version).toBe("1");
   });
 
   it("reads a string tag", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
     const { tags } = tag;
     expect(tags.title).toBe("A Title");
   });
 
   it("reads an image tag", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
     const { tags } = tag;
     expect(tags.picture!.description).toBe("A Picture");
   });
 
   it("reads all tags", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
     const { tags } = tag;
     expect(tags.title).toBeTruthy();
@@ -61,7 +59,6 @@ describe("FLACTagReader", () => {
     )]);
     mediaFileReader = new ArrayFileReader(flacFileContents.toArray());
     tagReader = new FLACTagReader(mediaFileReader);
-    jest.runAllTimers();
     const tag = await tagReader.read();
     const { tags } = tag;
     expect(tags.title).toBeTruthy();
@@ -73,10 +70,9 @@ describe("FLACTagReader", () => {
     const fileReaderEmpty = new ArrayFileReader(flacFileEmpty.toArray());
     const tagReaderEmpty = new FLACTagReader(fileReaderEmpty);
     try {
-      jest.runAllTimers();
       return await tagReaderEmpty.read();
     } catch (error: any) {
-      expect(error.type).toBe("loadData");
+      expect(error.message).not.toBeUndefined();
     }
   });
 });

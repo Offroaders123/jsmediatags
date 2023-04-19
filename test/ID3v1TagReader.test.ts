@@ -6,7 +6,9 @@ import ArrayFileReader from "../src/ArrayFileReader.js";
 import { bin } from "../src/ByteArrayUtils.js";
 import { pad } from "../src/ByteArrayUtils.js";
 
-jest.autoMockOff();
+jest
+  .autoMockOff()
+  .useRealTimers();
 
 describe("ID3v1TagReader", () => {
   it("reads 1.0 tags", async () => {
@@ -23,7 +25,6 @@ describe("ID3v1TagReader", () => {
     const mediaFileReader = new ArrayFileReader(id3ArrayFile);
     const tagReader = new ID3v1TagReader(mediaFileReader);
 
-    jest.runAllTimers();
     const tags = await tagReader.read();
 
     expect(tags).toEqual({
@@ -55,7 +56,6 @@ describe("ID3v1TagReader", () => {
     const mediaFileReader = new ArrayFileReader(id3ArrayFile);
     const tagReader = new ID3v1TagReader(mediaFileReader);
 
-    jest.runAllTimers();
     const tags = await tagReader.read();
 
     expect(tags).toEqual({

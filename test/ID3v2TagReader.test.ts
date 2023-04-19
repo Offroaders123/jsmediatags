@@ -6,7 +6,9 @@ import ArrayFileReader from "../src/ArrayFileReader.js";
 
 import { bin } from "../src/ByteArrayUtils";
 
-jest.autoMockOff();
+jest
+  .autoMockOff()
+  .useRealTimers();
 
 describe("ID3v2TagReader", () => {
   let tagReader: ID3v2TagReader;
@@ -32,7 +34,6 @@ describe("ID3v2TagReader", () => {
 
   describe("header", () => {
     it("reads an header", async () => {
-      jest.runAllTimers();
       const tags = await tagReader.read();
 
       // @ts-ignore
@@ -53,7 +54,6 @@ describe("ID3v2TagReader", () => {
     });
     
     it("reads an header with extended header", async () => {
-      jest.runAllTimers();
       const tags = await tagReader.read();
       const id3FileContents = new ID3v2TagContents(4, 3)
         .addFrame("TIT2", [].concat(
@@ -99,7 +99,6 @@ describe("ID3v2TagReader", () => {
       }
     );
 
-    jest.runAllTimers();
     await tagReader.read();
     // The first call is the initial load to figure out the tag ID.
     // @ts-ignore
@@ -108,7 +107,6 @@ describe("ID3v2TagReader", () => {
   });
 
   it("reads tags", async () => {
-    jest.runAllTimers();
     const tags = await tagReader.read();
     expect("TIT2" in tags.tags).toBeTruthy();
     expect(tags.tags.TIT2).toEqual({
@@ -120,20 +118,17 @@ describe("ID3v2TagReader", () => {
   });
 
   it("reads tags as shortcuts", async () => {
-    jest.runAllTimers();
     const tags = await tagReader.read();
     expect(tags.tags.title).toBe("The title");
   });
 
   it("reads all tags when none is specified", async () => {
-    jest.runAllTimers();
     const tags = await tagReader.read();
     expect(Object.keys(tags.tags)).toContain("TIT2");
     expect(Object.keys(tags.tags)).toContain("TCOM");
   });
 
   it("reads the specificed tag", async () => {
-    jest.runAllTimers();
     const tags = await tagReader.setTagsToRead(["TCOM"])
       .read();
     expect(Object.keys(tags.tags)).not.toContain("TIT2");
@@ -141,7 +136,6 @@ describe("ID3v2TagReader", () => {
   });
 
   it("should ignore empty tags", async () => {
-    jest.runAllTimers();
     const tags = await tagReader.read();
     expect(Object.keys(tags.tags)).not.toContain("\u0000\u0000\u0000\u0000");
   });
@@ -170,7 +164,6 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      jest.runAllTimers();
       const tags = await tagReader.read();
 
       expect(tags.tags.title).toBe("The title");
@@ -201,7 +194,6 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      jest.runAllTimers();
       const tags = await tagReader.read();
       expect(tags.tags.picture!.data).toEqual([1, 2, 255, 3, 4, 5]);
     });
@@ -231,7 +223,6 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      jest.runAllTimers();
       const tags = await tagReader.read();
       expect(tags.tags.title).toBe("The title");
       expect(tags.tags.picture!.data).toEqual([1, 2, 255, 3, 4, 5]);
@@ -265,7 +256,6 @@ describe("ID3v2TagReader", () => {
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
-      jest.runAllTimers();
       const tags = await tagReader.read();
       expect(tags.tags.picture!.data).toEqual([1, 2, 255, 0, 3, 4, 5]);
     });
@@ -284,7 +274,6 @@ describe("ID3v2TagReader", () => {
     mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
     tagReader = new ID3v2TagReader(mediaFileReader);
 
-    jest.runAllTimers();
     const tags = await tagReader.read();
     expect("TIT2" in tags.tags).toBeTruthy();
   });
@@ -305,7 +294,6 @@ describe("ID3v2TagReader", () => {
     mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
     tagReader = new ID3v2TagReader(mediaFileReader);
 
-    jest.runAllTimers();
     const tags = await tagReader.read();
     expect(tags.tags.title).toBe("The title");
   });

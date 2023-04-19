@@ -30,7 +30,7 @@ export default class NodeFileReader extends MediaFileReader {
     return new Promise((resolve, reject) => {
       fs.stat(this._path, (err, stats) => {
         if (err){
-          reject(`fs: ${err.message}`);
+          reject(new Error(`fs: ${err.message}`));
         } else {
           this._size = stats.size;
           resolve();

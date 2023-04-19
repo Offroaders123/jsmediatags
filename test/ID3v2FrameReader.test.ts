@@ -4,7 +4,9 @@ import ID3v2FrameReader from "../src/ID3v2FrameReader.js";
 import ArrayFileReader from "../src/ArrayFileReader.js";
 import { bin } from "../src/ByteArrayUtils.js";
 
-jest.autoMockOff();
+jest
+  .autoMockOff()
+  .useRealTimers();
 
 describe("ID3v2FrameReader", () => {
   it("should read APIC tag", () => {

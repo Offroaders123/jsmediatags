@@ -184,7 +184,7 @@ export default class XhrFileReader extends MediaFileReader {
         xhr.onload = resolve;
         xhr.onerror = () => {
           console.log(xhr);
-          reject("xhr: Generic XHR error, check xhr object.");
+          reject(new Error("xhr: Generic XHR error, check xhr object."));
         };
       });
       return onXHRLoad();

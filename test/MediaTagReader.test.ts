@@ -6,7 +6,8 @@ import MediaFileReader from "../src/MediaFileReader.js";
 import type { TagType } from "../src/FlowTypes.js";
 
 jest
-  .dontMock("../src/MediaTagReader.js");
+  .dontMock("../src/MediaTagReader.js")
+  .useRealTimers();
 
 describe("MediaTagReader", () => {
   let mediaTagReader: MediaTagReader;
@@ -32,7 +33,6 @@ describe("MediaTagReader", () => {
         return expectedTags;
       });
 
-    jest.runAllTimers();
     const tags = await mediaTagReader.read();
     expect(tags).toBe(expectedTags);
   });
@@ -46,7 +46,6 @@ describe("MediaTagReader", () => {
     );
     mediaTagReader._parseData = jest.fn<typeof mediaTagReader._parseData>();
 
-    jest.runAllTimers();
     await mediaTagReader.read();
 
     expect(mediaTagReader._loadData).toBeCalled();

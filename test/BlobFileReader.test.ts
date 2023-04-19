@@ -5,7 +5,8 @@ import BlobFileReader from "../src/BlobFileReader.js";
 jest
   .dontMock("../src/BlobFileReader.js")
   .dontMock("../src/MediaFileReader.js")
-  .dontMock("../src/ChunkedFileData.js");
+  .dontMock("../src/ChunkedFileData.js")
+  .useRealTimers();
 
 describe("BlobFileReader", () => {
   let fileReader: BlobFileReader;
@@ -21,13 +22,11 @@ describe("BlobFileReader", () => {
   });
 
   it("should have the right size information", async () => {
-    jest.runAllTimers();
     await fileReader.init();
     expect(fileReader.getSize()).toBe(21);
   });
 
   it("should read a byte", async () => {
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
@@ -39,7 +38,6 @@ describe("BlobFileReader", () => {
   });
 
   it("should not read a byte that hasn't been loaded yet", async () => {
-    jest.runAllTimers();
     await fileReader.init();
     expect(() => {
       fileReader.getByteAt(0);

@@ -6,7 +6,9 @@ import ArrayFileReader from "../src/ArrayFileReader.js";
 
 import { bin } from "../src/ByteArrayUtils.js";
 
-jest.autoMockOff();
+jest
+  .autoMockOff()
+  .useRealTimers();
 
 function createMP4FileContents(atoms: Atom[]) {
   return new MP4TagContents(
@@ -60,7 +62,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads the type and version", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     expect(tag.type).toBe("MP4");
@@ -68,7 +69,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads string tag", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     const { tags } = tag;
@@ -76,7 +76,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads uint8 tag", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     const { tags } = tag;
@@ -84,7 +83,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads jpeg tag", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     const { tags } = tag;
@@ -94,7 +92,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads multiple int tags", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     const { tags } = tag;
@@ -105,7 +102,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads all tags", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     const { tags } = tag;
@@ -119,7 +115,6 @@ describe("MP4TagReader", () => {
   });
 
   it("creates shorcuts", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     const { tags } = tag;
@@ -128,7 +123,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads the specificed tag", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.setTagsToRead(["©cmt"])
       .read();
     expect(Object.keys(tag.tags)).not.toContain("©nam");
@@ -136,7 +130,6 @@ describe("MP4TagReader", () => {
   });
 
   it("reads the specificed shortcut tag", async () => {
-    jest.runAllTimers();
     const tag = await tagReader.setTagsToRead(["title"])
       .read();
     expect(Object.keys(tag.tags)).toContain("title");
@@ -149,7 +142,6 @@ describe("MP4TagReader", () => {
     const mediaFileReader = new ArrayFileReader(mp4FileContents.toArray());
     const tagReader = new MP4TagReader(mediaFileReader);
 
-    jest.runAllTimers();
     const tag = await tagReader.read();
 
     const { tags } = tag;

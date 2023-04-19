@@ -5,7 +5,8 @@ import ArrayBufferFileReader from "../src/ArrayBufferFileReader.js";
 jest
   .dontMock("../src/ArrayBufferFileReader.js")
   .dontMock("../src/MediaFileReader.js")
-  .dontMock("../src/ChunkedFileData.js");
+  .dontMock("../src/ChunkedFileData.js")
+  .useRealTimers();
 
 function str2ab(str: string) {
   const buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
@@ -29,13 +30,11 @@ describe("ArrayBufferFileReader", () => {
   });
 
   it("should have the right size information", async () => {
-    jest.runAllTimers();
     await fileReader.init();
     expect(fileReader.getSize()).toBe(8);
   });
 
   it("should read a byte", async () => {
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });

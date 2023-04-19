@@ -3,7 +3,8 @@ import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 import ChunkedFileData from "../src/ChunkedFileData.js";
 
 jest
-  .dontMock("../src/ChunkedFileData.js");
+  .dontMock("../src/ChunkedFileData.js")
+  .useRealTimers();
 
 describe("ChunkedFileData", () => {
   let chunkedFileData: ChunkedFileData;

@@ -4,7 +4,8 @@ import ArrayFileReader from "../src/ArrayFileReader.js";
 
 jest
   .dontMock("../src/ArrayFileReader.js")
-  .dontMock("../src/MediaFileReader.js");
+  .dontMock("../src/MediaFileReader.js")
+  .useRealTimers();
 
 describe("ArrayFileReader", () => {
   let fileReader: ArrayFileReader;
@@ -22,13 +23,11 @@ describe("ArrayFileReader", () => {
   });
 
   it("should have the right size information", async () => {
-    jest.runAllTimers();
     await fileReader.init();
     expect(fileReader.getSize()).toBe(21);
   });
 
   it("should read a byte", async () => {
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });

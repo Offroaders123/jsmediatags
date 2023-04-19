@@ -21,7 +21,8 @@ jest
   }))
   .dontMock("../src/NodeFileReader.js")
   .dontMock("../src/MediaFileReader.js")
-  .dontMock("../src/ChunkedFileData.js");
+  .dontMock("../src/ChunkedFileData.js")
+  .useRealTimers();
 
 const fs = await import("node:fs");
 

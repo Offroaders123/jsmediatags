@@ -9,7 +9,8 @@ jest
   }))
   .dontMock("../src/XhrFileReader.js")
   .dontMock("../src/MediaFileReader.js")
-  .dontMock("../src/ChunkedFileData.js");
+  .dontMock("../src/ChunkedFileData.js")
+  .useRealTimers();
 
 // @ts-expect-error
 const { default: xhr2 } = await import("xhr2");
@@ -92,35 +93,30 @@ describe("XhrFileReader", () => {
       });
 
       it("should have the right size information", async () => {
-        jest.runAllTimers();
         await fileReader.init();
         expect(fileReader.getSize()).toBe(21);
       });
 
       it("should have the right size information for files bigger than the first range request", async () => {
         fileReader = new XhrFileReader("http://www.example.fakedomain/big-file.mp3");
-        jest.runAllTimers();
         await fileReader.init();
         expect(fileReader.getSize()).toBe(2079);
       });
 
       it("should have the right size information when range not supported", async () => {
         fileReader = new XhrFileReader("http://www.example.fakedomain/range-not-supported.mp3");
-        jest.runAllTimers();
         await fileReader.init();
         expect(fileReader.getSize()).toBe(2079);
       });
 
       it("should have the right size information when content length is unknown", async () => {
         fileReader = new XhrFileReader("http://www.example.fakedomain/unknown-length.mp3");
-        jest.runAllTimers();
         await fileReader.init();
         expect(fileReader.getSize()).toBe(2079);
       });
 
       it("should have the right size information when range is supported", async () => {
         fileReader = new XhrFileReader("http://www.example.fakedomain/range-supported.mp3");
-        jest.runAllTimers();
         await fileReader.init();
         expect(fileReader.getSize()).toBe(2079);
       });
@@ -131,27 +127,23 @@ describe("XhrFileReader", () => {
   describeFileSizeTests(false /*HEAD*/);
 
   it("should not fetch the same data twice", async () => {
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     await fileReader.loadRange([0, 4]);
     expect(xhr2.XMLHttpRequest.send.mock.calls.length).toBe(1);
   });
 
   it("should read a byte", async () => {
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 
   it("should read a byte after loading the same range twice", async () => {
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     await fileReader.loadRange([0, 4]);
     expect(fileReader.getByteAt(0)).toBe("T".charCodeAt(0));
   });
 
   it("should not read a byte that hasn't been loaded yet", async () => {
-    jest.runAllTimers();
     await fileReader.init();
     expect(() => {
       fileReader.getByteAt(2000);
@@ -161,7 +153,6 @@ describe("XhrFileReader", () => {
   it("should not read a file that does not exist", async () => {
     fileReader = new XhrFileReader("http://www.example.fakedomain/fail.mp3");
 
-    jest.runAllTimers();
     await fileReader.init().then(() => {
       // throwOnSuccess
       // expect(error.type).toBe("xhr");
@@ -174,14 +165,12 @@ describe("XhrFileReader", () => {
 
   it("should fetch in multples of 1K", async () => {
     fileReader._size = 2000;
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     expect(xhr2.XMLHttpRequest.setRequestHeader.mock.calls[0][1]).toBe("bytes=0-1023");
   });
 
   it("should not fetch more than max file size", async () => {
     fileReader._size = 10;
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     expect(xhr2.XMLHttpRequest.setRequestHeader.mock.calls[0][1]).toBe("bytes=0-10");
   });
@@ -190,7 +179,6 @@ describe("XhrFileReader", () => {
     XhrFileReader.setConfig({
       disallowedXhrHeaders: ["If-Modified-Since"]
     });
-    jest.runAllTimers();
     await fileReader.loadRange([0, 4]);
     const calls = xhr2.XMLHttpRequest.setRequestHeader.mock.calls;
     for (let i = 0; i < calls.length; i++) {
@@ -203,7 +191,6 @@ describe("XhrFileReader", () => {
       avoidHeadRequests: true
     });
     xhr2.XMLHttpRequest.getAllResponseHeaders = jest.fn().mockReturnValue("");
-    jest.runAllTimers();
     await fileReader.init();
     expect(fileReader.getSize()).toBe(21);
   });
@@ -214,7 +201,6 @@ describe("XhrFileReader", () => {
       timeoutInSec: 0.2
     });
 
-    jest.runAllTimers();
     await fileReader.init().then(() => {
       // throwOnSuccess
       // expect(error.type).toBe("xhr");

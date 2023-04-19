@@ -16,7 +16,8 @@ import type { TagType } from "../src/FlowTypes.js";
 jest
   .enableAutomock()
   .dontMock("../src/jsmediatags.js")
-  .dontMock("../src/ByteArrayUtils.js");
+  .dontMock("../src/ByteArrayUtils.js")
+  .useRealTimers();
 
 describe("jsmediatags", () => {
   // const mockFileReader;
@@ -52,7 +53,6 @@ describe("jsmediatags", () => {
     ID3v2TagReader.prototype.read = jest.fn<typeof ID3v2TagReader.prototype.read>()
       .mockImplementation(async () => mockTags);
 
-    jest.runAllTimers();
     const tags = await read("fakefile");
 
     expect(tags).toBe(mockTags);
@@ -114,7 +114,6 @@ describe("jsmediatags", () => {
         reader.setTagReader(MockTagReader);
         // @ts-ignore
         reader._getTagReader(null, { onSuccess, onError });
-        jest.runAllTimers();
       });
       expect(TagReader).toBe(MockTagReader);
     });
@@ -136,7 +135,6 @@ describe("jsmediatags", () => {
         const reader = new Reader();
         // @ts-ignore
         reader._getTagReader(new NodeFileReader(), { onSuccess, onError });
-        jest.runAllTimers();
       });
       Config.removeTagReader(MockTagReader);
       expect(TagReader).toBe(MockTagReader);
@@ -150,7 +148,6 @@ describe("jsmediatags", () => {
         const reader = new Reader();
         // @ts-ignore
         reader._getTagReader(new NodeFileReader(), throwOnSuccess(onSuccess));
-        jest.runAllTimers();
       });
     });
 
@@ -174,7 +171,6 @@ describe("jsmediatags", () => {
         const reader = new Reader();
         // @ts-ignore
         reader._findTagReader(new NodeFileReader(), { onSuccess, onError });
-        jest.runAllTimers();
       });
       Config.removeTagReader(MockTagReader);
       // @ts-ignore
@@ -206,7 +202,6 @@ describe("jsmediatags", () => {
         // @ts-ignore
         const reader = new Reader();
         reader._findTagReader(fileReader, { onSuccess, onError });
-        jest.runAllTimers();
       });
       Config.removeTagReader(MockTagReader);
       // @ts-ignore

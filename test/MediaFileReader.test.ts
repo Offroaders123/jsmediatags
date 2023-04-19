@@ -4,7 +4,8 @@ import MediaFileReader from "../src/MediaFileReader.js";
 
 jest
   .dontMock("../src/MediaFileReader.js")
-  .dontMock("../src/StringUtils.js");
+  .dontMock("../src/StringUtils.js")
+  .useRealTimers();
 
 describe("MediaFileReader", () => {
   let mediaFileReader: MediaFileReader;

@@ -12,7 +12,10 @@ const NOT_FOUND = -1;
  * to add and read data from the file.
  */
 export default class ChunkedFileData {
-  static get NOT_FOUND() { return NOT_FOUND; }
+  static get NOT_FOUND() {
+    return NOT_FOUND as typeof NOT_FOUND;
+  }
+
   declare _fileData: ChunkType[];
 
   constructor() {

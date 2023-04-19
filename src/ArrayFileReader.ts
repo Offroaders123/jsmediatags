@@ -4,8 +4,6 @@ import type { ByteArray } from "./FlowTypes.js";
 
 export default class ArrayFileReader extends MediaFileReader {
   declare _array: ByteArray;
-  declare _size: number;
-  declare _isInitialized: boolean;
 
   constructor(array: ByteArray) {
     super();

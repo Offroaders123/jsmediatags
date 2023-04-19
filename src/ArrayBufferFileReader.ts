@@ -4,7 +4,6 @@ import MediaFileReader from "./MediaFileReader.js";
 export default class ArrayBufferFileReader extends MediaFileReader {
   declare _buffer: ArrayBuffer;
   declare _fileData: ChunkedFileData;
-  declare _size: number;
 
   constructor(buffer: ArrayBuffer) {
     super();

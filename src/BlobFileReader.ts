@@ -4,7 +4,6 @@ import MediaFileReader from "./MediaFileReader.js";
 export default class BlobFileReader extends MediaFileReader {
   declare _blob: Blob;
   declare _fileData: ChunkedFileData;
-  declare _size: number;
 
   constructor(blob: Blob) {
     super();

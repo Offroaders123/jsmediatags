@@ -110,10 +110,7 @@ export default class ChunkedFileData {
    * should be inserted in the data list (startIx == NOT_FOUND and endIX ==
    * NOT_FOUND).
    */
-  _getChunkRange(
-    offsetStart: number,
-    offsetEnd: number
-  ): {startIx: number, endIx: number, insertIx?: number} {
+  _getChunkRange(offsetStart: number, offsetEnd: number): { startIx: number; endIx: number; insertIx?: number; } {
     let startChunkIx = NOT_FOUND;
     let endChunkIx = NOT_FOUND;
     let insertIx = 0;

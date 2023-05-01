@@ -37,13 +37,7 @@ export interface ChunkType {
 
 export type ByteArray = number[];
 
-export type FrameReaderSignature = (
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-) => any;
+export type FrameReaderSignature = (offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader) => any;
 
 export interface TagFrames {
   [key: string]: TagFrame;

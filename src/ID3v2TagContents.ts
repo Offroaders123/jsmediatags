@@ -183,13 +183,7 @@ export default class ID3v2TagContents {
    *   11  All images are exactly 64x64 pixels, unless required
    *       otherwise.
    */
-  setTagRestrictions(
-    size: number,
-    textEncoding: number,
-    textSize: number,
-    imageEncoding: number,
-    imageSize: number
-  ): ID3v2TagContents {
+  setTagRestrictions(size: number, textEncoding: number, textSize: number, imageEncoding: number, imageSize: number): ID3v2TagContents {
     if (!this._hasExtendedHeader) {
       this._initExtendedHeader();
     }
@@ -215,12 +209,7 @@ export default class ID3v2TagContents {
    *   for instance, the length before compression and unsynchronisation.
    *   This field is only needed when data_length_indicator flag is set.
    */
-  addFrame(
-    id: string,
-    data: ByteArray,
-    flags?: TagFrameFlags,
-    noFlagsDataLength?: number
-  ): ID3v2TagContents {
+  addFrame(id: string, data: ByteArray, flags?: TagFrameFlags, noFlagsDataLength?: number): ID3v2TagContents {
     let size: number | ByteArray = 0;
     const frameFlags = [0, 0];
     if (flags) {

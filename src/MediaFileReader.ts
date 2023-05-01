@@ -61,7 +61,7 @@ export default class MediaFileReader {
 
   getBytesAt(offset: number, length: number): number[] {
     const bytes = new Array(length);
-    for(let i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       bytes[i] = this.getByteAt(offset+i);
     }
     return bytes;
@@ -151,11 +151,7 @@ export default class MediaFileReader {
     return string.join("");
   }
 
-  getStringWithCharsetAt(
-    offset: number,
-    length: number,
-    charset?: CharsetType
-  ): DecodedString {
+  getStringWithCharsetAt(offset: number, length: number, charset?: CharsetType): DecodedString {
     const bytes = this.getBytesAt(offset, length);
     let string: DecodedString;
 

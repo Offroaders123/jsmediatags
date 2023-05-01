@@ -45,11 +45,7 @@ export default class MP4TagReader extends MediaTagReader {
     await this._loadAtom(mediaFileReader, 0, "");
   }
 
-  async _loadAtom(
-    mediaFileReader: MediaFileReader,
-    offset: number,
-    parentAtomFullName: string
-  ) {
+  async _loadAtom(mediaFileReader: MediaFileReader, offset: number, parentAtomFullName: string) {
     if (offset >= mediaFileReader.getSize()) {
       return;
     }
@@ -119,15 +115,7 @@ export default class MP4TagReader extends MediaTagReader {
     };
   }
 
-  _readAtom(
-    tags: Object,
-    data: MediaFileReader,
-    offset: number,
-    length: number,
-    tagsToRead?: string[] | null,
-    parentAtomFullName?: string,
-    indent?: string
-  ) {
+  _readAtom(tags: Object, data: MediaFileReader, offset: number, length: number, tagsToRead?: string[] | null, parentAtomFullName?: string, indent?: string) {
     indent = indent === undefined ? "" : indent + "  ";
 
     let seek = offset;

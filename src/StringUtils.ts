@@ -22,27 +22,27 @@ export function readUTF16String(bytes: number[], bigEndian: boolean, maxBytes?: 
 
   maxBytes = Math.min(maxBytes||bytes.length, bytes.length);
 
-  if( bytes[0] == 0xFE && bytes[1] == 0xFF ) {
+  if (bytes[0] == 0xFE && bytes[1] == 0xFF) {
     bigEndian = true;
     ix = 2;
-  } else if( bytes[0] == 0xFF && bytes[1] == 0xFE ) {
+  } else if (bytes[0] == 0xFF && bytes[1] == 0xFE) {
     bigEndian = false;
     ix = 2;
   }
-  if( bigEndian ) {
+  if (bigEndian) {
     offset1 = 0;
     offset2 = 1;
   }
 
   const arr = [];
-  for(let j = 0; ix < maxBytes; j++) {
+  for (let j = 0; ix < maxBytes; j++) {
       const byte1 = bytes[ix+offset1];
       const byte2 = bytes[ix+offset2];
       const word1 = (byte1<<8)+byte2;
       ix += 2;
-      if( word1 == 0x0000 ) {
+      if (word1 == 0x0000) {
           break;
-      } else if( byte1 < 0xD8 || byte1 >= 0xE0 ) {
+      } else if (byte1 < 0xD8 || byte1 >= 0xE0) {
           arr[j] = String.fromCharCode(word1);
       } else {
           const byte3 = bytes[ix+offset1];
@@ -59,25 +59,25 @@ export function readUTF8String(bytes: number[], maxBytes?: number): DecodedStrin
   let ix = 0;
   maxBytes = Math.min(maxBytes||bytes.length, bytes.length);
 
-  if( bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF ) {
+  if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
     ix = 3;
   }
 
   const arr = [];
-  for(let j = 0; ix < maxBytes; j++) {
+  for (let j = 0; ix < maxBytes; j++) {
     const byte1 = bytes[ix++];
-    if( byte1 == 0x00 ) {
+    if (byte1 == 0x00) {
       break;
-    } else if( byte1 < 0x80 ) {
+    } else if (byte1 < 0x80) {
       arr[j] = String.fromCharCode(byte1);
-    } else if( byte1 >= 0xC2 && byte1 < 0xE0 ) {
+    } else if (byte1 >= 0xC2 && byte1 < 0xE0) {
       const byte2 = bytes[ix++];
       arr[j] = String.fromCharCode(((byte1&0x1F)<<6) + (byte2&0x3F));
-    } else if( byte1 >= 0xE0 && byte1 < 0xF0 ) {
+    } else if (byte1 >= 0xE0 && byte1 < 0xF0) {
       const byte2 = bytes[ix++];
       const byte3 = bytes[ix++];
       arr[j] = String.fromCharCode(((byte1&0xFF)<<12) + ((byte2&0x3F)<<6) + (byte3&0x3F));
-    } else if( byte1 >= 0xF0 && byte1 < 0xF5) {
+    } else if (byte1 >= 0xF0 && byte1 < 0xF5) {
       const byte2 = bytes[ix++];
       const byte3 = bytes[ix++];
       const byte4 = bytes[ix++];

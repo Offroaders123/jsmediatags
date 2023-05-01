@@ -139,10 +139,7 @@ export default class FLACTagReader extends MediaTagReader {
    * @param offset - The offset to start checking the header from.
    * @return - The callback to call once the header has been found.
    */
-  async _loadBlock(
-    mediaFileReader: MediaFileReader,
-    offset: number
-  ) {
+  async _loadBlock(mediaFileReader: MediaFileReader, offset: number) {
     /**
      * As mentioned above, this first byte is loaded to see what metadata type
      * this block represents.
@@ -203,12 +200,7 @@ export default class FLACTagReader extends MediaTagReader {
    * @param blockSize - The size of the previously processed header.
    * @return - The callback functions to be called.
    */
-  async _nextBlock(
-    mediaFileReader: MediaFileReader,
-    offset: number,
-    blockHeader: number,
-    blockSize: number
-  ) {
+  async _nextBlock(mediaFileReader: MediaFileReader, offset: number, blockHeader: number, blockSize: number) {
     if (blockHeader > 127) {
       if (!this._commentOffset) {
         throw new Error("loadData: Comment block could not be found.");

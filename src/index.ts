@@ -166,10 +166,7 @@ export class Reader {
     return tagReader;
   }
 
-  async _loadTagIdentifierRanges(
-    fileReader: MediaFileReader,
-    tagReaders: typeof MediaTagReader[]
-  ) {
+  async _loadTagIdentifierRanges(fileReader: MediaFileReader, tagReaders: typeof MediaTagReader[]) {
     if (tagReaders.length === 0) {
       // Force async
       return new Promise<void>(resolve => setTimeout(resolve, 1));

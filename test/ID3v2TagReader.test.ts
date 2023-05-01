@@ -36,7 +36,7 @@ describe("ID3v2TagReader", () => {
     it("reads an header", async () => {
       const tags = await tagReader.read();
 
-      // @ts-ignore
+      // @ts-expect-error
       delete tags.tags;
       expect(tags).toEqual({
         type: "ID3",
@@ -73,7 +73,7 @@ describe("ID3v2TagReader", () => {
 
       expect("TIT2" in tags.tags).toBeTruthy();
       expect("TCOM" in tags.tags).toBeTruthy();
-      // @ts-ignore
+      // @ts-expect-error
       delete tags.tags;
       expect(tags).toEqual({
         type: "ID3",
@@ -101,7 +101,7 @@ describe("ID3v2TagReader", () => {
 
     await tagReader.read();
     // The first call is the initial load to figure out the tag ID.
-    // @ts-ignore
+    // @ts-expect-error
     let callArguments = mediaFileReader.loadRange.mock.calls[1];
     expect(callArguments[0]).toEqual([0, mediaFileReader._array.length - 1]);
   });
@@ -144,7 +144,7 @@ describe("ID3v2TagReader", () => {
     it("reads global unsynchronised content", async () => {
       const id3FileContents =
         new ID3v2TagContents(4, 3)
-        // @ts-ignore
+          // @ts-expect-error
           .setFlags({
             unsynchronisation: true
           })
@@ -186,7 +186,7 @@ describe("ID3v2TagReader", () => {
             bin("front cover image"), [0x00],
             [0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05] // image data
           ), {
-            // @ts-ignore
+            // @ts-expect-error
             format: {
               unsynchronisation: true
             }
@@ -214,7 +214,7 @@ describe("ID3v2TagReader", () => {
             bin("front cover image"), [0x00],
             [0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05] // image data
           ), {
-            // @ts-ignore
+            // @ts-expect-error
             format: {
               unsynchronisation: true,
               data_length_indicator: true,
@@ -231,7 +231,7 @@ describe("ID3v2TagReader", () => {
     it("doesn't unsynchronise frames twice", async () => {
       const id3FileContents =
         new ID3v2TagContents(4, 3)
-        // @ts-ignore
+          // @ts-expect-error
           .setFlags({
             unsynchronisation: true
           })
@@ -248,7 +248,7 @@ describe("ID3v2TagReader", () => {
             bin("front cover image"), [0x00],
             [0x01, 0x02, 0xff, 0x00, 0x00, 0x03, 0x04, 0x05] // image data
           ), {
-            // @ts-ignore
+            // @ts-expect-error
             format: {
               unsynchronisation: true
             }
@@ -264,7 +264,7 @@ describe("ID3v2TagReader", () => {
   it("should process frames with no content", async () => {
     const id3FileContents =
       new ID3v2TagContents(4, 3)
-      // @ts-ignore
+        // @ts-expect-error
         .addFrame("WOAF") // empty frame contents
         .addFrame("TIT2", [].concat(
           // @ts-expect-error

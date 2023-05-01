@@ -47,18 +47,14 @@ export default class MediaTagReader {
     return tags;
   }
 
-  getShortcuts(): {
-    [key: string]: string | string[];
-  } {
+  getShortcuts(): { [key: string]: string | string[]; } {
     return {};
   }
 
   /**
    * Load the necessary bytes from the media file.
    */
-  async _loadData(
-    mediaFileReader: MediaFileReader
-  ) {
+  async _loadData(mediaFileReader: MediaFileReader) {
     throw new Error("Must implement _loadData function");
   }
 

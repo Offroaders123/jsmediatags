@@ -2,7 +2,7 @@ import MediaFileReader from "./MediaFileReader.js";
 import * as StringUtils from "./StringUtils.js";
 import ArrayFileReader from "./ArrayFileReader.js";
 
-import type { CharsetType, FrameReaderSignature, TagHeader, TagFrames, TagFrameHeader, TagFrameFlags } from "./FlowTypes.js";
+import type { CharsetType, FrameReaderSignature, TagHeader, TagFrame, TagFrames, TagFrameHeader, TagFrameFlags } from "./FlowTypes.js";
 import type { DecodedString } from "./StringUtils.js";
 
 const FRAME_DESCRIPTIONS = {
@@ -191,13 +191,8 @@ export default class ID3v2FrameReader {
    * of ten bytes in every frame. The size is calculated as frame size excluding
    * frame header (frame size - 10).
    */
-  static readFrames(
-    offset: number,
-    end: number,
-    data: MediaFileReader,
-    id3header: TagHeader,
-    tags?: string[] | null
-  ): TagFrames {
+  static readFrames(offset: number, end: number, data: MediaFileReader, id3header: TagHeader, tags?: string[] | null): TagFrames {
+    // : TagFrames?
     const frames = {};
     const frameHeaderSize = this._getFrameHeaderSize(id3header);
     // console.log("header", id3header);
@@ -257,16 +252,16 @@ export default class ID3v2FrameReader {
       const parsedData = readFrameFunc ? readFrameFunc.apply(this, [frameDataOffset, frameSize, frameData, flags, id3header]) : null;
       const desc = this._getFrameDescription(frameId);
 
-      const frame = {
+      const frame: TagFrame = {
         id: frameId,
         size: frameSize,
         description: desc,
         data: parsedData
       };
 
-      if( frameId in frames ) {
+      if (frameId in frames){
         // @ts-expect-error
-        if( frames[frameId].id ) {
+        if (frames[frameId].id){
           // @ts-expect-error
           frames[frameId] = [frames[frameId]];
         }
@@ -282,7 +277,7 @@ export default class ID3v2FrameReader {
   }
 
   static _getFrameHeaderSize(id3header: TagHeader): number {
-    const major = id3header.major;
+    const { major } = id3header;
 
     if (major == 2) {
       return 6;
@@ -293,12 +288,8 @@ export default class ID3v2FrameReader {
     }
   }
 
-  static _readFrameHeader(
-    data: MediaFileReader,
-    offset: number,
-    id3header: TagHeader
-  ): TagFrameHeader {
-    const major = id3header.major;
+  static _readFrameHeader(data: MediaFileReader, offset: number, id3header: TagHeader): TagFrameHeader {
+    const { major } = id3header;
     let flags: TagFrameFlags | null = null;
     const frameHeaderSize = this._getFrameHeaderSize(id3header);
     let frameId!: string;
@@ -370,11 +361,7 @@ export default class ID3v2FrameReader {
     }
   }
 
-  static getUnsyncFileReader(
-    data: MediaFileReader,
-    offset: number,
-    size: number
-  ): MediaFileReader {
+  static getUnsyncFileReader(data: MediaFileReader, offset: number, size: number): MediaFileReader {
     const frameData = data.getBytesAt(offset, size);
     for (let i = 0; i < frameData.length - 1; i++) {
       if (frameData[i] === 0xff && frameData[i+1] === 0x00) {
@@ -414,13 +401,7 @@ const frameReaderFunctions = {} as {
   [K in FrameType]: FrameReaderSignature | null | void;
 } & Record<string,FrameReaderSignature | null | void>;
 
-frameReaderFunctions["APIC"] = function readPictureFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any {
+frameReaderFunctions["APIC"] = function readPictureFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any {
   let format: string | DecodedString;
   const start = offset;
   const charset = getTextEncoding(data.getByteAt(offset));
@@ -454,13 +435,7 @@ frameReaderFunctions["APIC"] = function readPictureFrame(
 };
 
 // ID3v2 chapters according to http://id3.org/id3v2-chapters-1.0
-frameReaderFunctions["CHAP"] = function readChapterFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any {
+frameReaderFunctions["CHAP"] = function readChapterFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any {
   const originalOffset = offset;
   const result = {} as {
     id: string,
@@ -488,13 +463,7 @@ frameReaderFunctions["CHAP"] = function readChapterFrame(
 };
 
 // ID3v2 table of contents according to http://id3.org/id3v2-chapters-1.0
-frameReaderFunctions["CTOC"] = function readTableOfContentsFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-) {
+frameReaderFunctions["CTOC"] = function readTableOfContentsFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader) {
   interface TableOfContentsResult {
     childElementIds: string[];
     id: string;
@@ -533,13 +502,7 @@ frameReaderFunctions["CTOC"] = function readTableOfContentsFrame(
   return result;
 }
 
-frameReaderFunctions["COMM"] = function readCommentsFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any {
+frameReaderFunctions["COMM"] = function readCommentsFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any {
   const start = offset;
   const charset = getTextEncoding(data.getByteAt(offset));
   const language = data.getStringAt(offset + 1, 3);
@@ -557,60 +520,30 @@ frameReaderFunctions["COMM"] = function readCommentsFrame(
 
 frameReaderFunctions["COM"] = frameReaderFunctions["COMM"];
 
-frameReaderFunctions["PIC"] = (
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any => {
+frameReaderFunctions["PIC"] = (offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any => {
   return frameReaderFunctions["APIC"]!(offset, length, data, flags, id3header);
 };
 
-frameReaderFunctions["PCNT"] = function readCounterFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any {
+frameReaderFunctions["PCNT"] = function readCounterFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any {
   // FIXME: implement the rest of the spec
   return data.getLongAt(offset, false);
 };
 
 frameReaderFunctions["CNT"] = frameReaderFunctions["PCNT"];
 
-frameReaderFunctions["T*"] = function readTextFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any {
+frameReaderFunctions["T*"] = function readTextFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any {
   const charset = getTextEncoding(data.getByteAt(offset));
 
   return data.getStringWithCharsetAt(offset+1, length-1, charset).toString();
 };
 
-frameReaderFunctions["TXXX"] = function readTextFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): Object {
+frameReaderFunctions["TXXX"] = function readTextFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): Object {
   const charset = getTextEncoding(data.getByteAt(offset));
 
   return getUserDefinedFields(offset, length, data, charset);
 };
 
-frameReaderFunctions["WXXX"] = function readUrlFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): Object | null | void {
+frameReaderFunctions["WXXX"] = function readUrlFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): Object | null | void {
   if (length === 0) {
     return null;
   }
@@ -618,39 +551,24 @@ frameReaderFunctions["WXXX"] = function readUrlFrame(
   return getUserDefinedFields(offset, length, data, charset);
 };
 
-frameReaderFunctions["W*"] = function readUrlFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): string | null | void {
+frameReaderFunctions["W*"] = function readUrlFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): string | null | void {
   if (length === 0) {
     return null;
   }
   return data.getStringWithCharsetAt(offset, length, "iso-8859-1").toString();
 };
 
-frameReaderFunctions["TCON"] = function readGenreFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null
-): any {
-  // @ts-ignore
-  const text = frameReaderFunctions["T*"]!.apply(this, arguments) as string;
+frameReaderFunctions["TCON"] = function readGenreFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null): any {
+  const text = frameReaderFunctions["T*"]!.apply(this,
+    // @ts-expect-error
+    arguments
+  ) as string;
   return text.replace(/^\(\d+\)/, "");
 };
 
 frameReaderFunctions["TCO"] = frameReaderFunctions["TCON"];
 
-frameReaderFunctions["USLT"] = function readLyricsFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any {
+frameReaderFunctions["USLT"] = function readLyricsFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any {
   const start = offset;
   const charset = getTextEncoding(data.getByteAt(offset));
   const language = data.getStringAt(offset+1, 3);
@@ -668,13 +586,7 @@ frameReaderFunctions["USLT"] = function readLyricsFrame(
 
 frameReaderFunctions["ULT"] = frameReaderFunctions["USLT"];
 
-frameReaderFunctions["UFID"] = function readLyricsFrame(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
-): any {
+frameReaderFunctions["UFID"] = function readLyricsFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): any {
   const ownerIdentifier =
     StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));
   offset += ownerIdentifier.bytesReadCount;
@@ -718,12 +630,7 @@ function getTextEncoding(bite: number): CharsetType {
 
 // Handles reading description/data from either http://id3.org/id3v2.3.0#User_defined_text_information_frame
 // and http://id3.org/id3v2.3.0#User_defined_URL_link_frame
-function getUserDefinedFields(
-  offset: number,
-  length: number,
-  data: MediaFileReader,
-  charset: CharsetType
-): Object {
+function getUserDefinedFields(offset: number, length: number, data: MediaFileReader, charset: CharsetType): Object {
   const userDesc = data.getStringWithCharsetAt(offset + 1, length - 1, charset);
   const userDefinedData = data.getStringWithCharsetAt(offset + 1 + userDesc.bytesReadCount, length - 1 - userDesc.bytesReadCount, charset);
 

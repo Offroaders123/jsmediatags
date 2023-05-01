@@ -45,7 +45,7 @@ export default class ID3v2TagReader extends MediaTagReader {
     const size = data.getSynchsafeInteger32At(offset+6);
     offset += 10;
 
-    if( xheader ) {
+    if (xheader) {
       // We skip the extended header and don't offer support for it right now.
       if (major === 4) {
         const xheadersize = data.getSynchsafeInteger32At(offset);

@@ -4,8 +4,8 @@ import type { DecodedString } from "./StringUtils.js";
 import type { CharsetType } from "./FlowTypes.js";
 
 export default class MediaFileReader {
-  declare _isInitialized: boolean;
-  declare _size: number;
+  declare protected _isInitialized: boolean;
+  declare protected _size: number;
 
   constructor(path?: any) {
     this._isInitialized = false;
@@ -32,7 +32,7 @@ export default class MediaFileReader {
     }
   }
 
-  async _init() {
+  protected async _init() {
     throw new Error("Must implement init function");
   }
 

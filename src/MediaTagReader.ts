@@ -3,8 +3,8 @@ import MediaFileReader from "./MediaFileReader.js";
 import type { ByteRange, TagType } from "./FlowTypes.js";
 
 export default class MediaTagReader {
-  declare _mediaFileReader: MediaFileReader;
-  declare _tags?: string[] | null;
+  declare private _mediaFileReader: MediaFileReader;
+  declare private _tags?: string[] | null;
 
   constructor(mediaFileReader: MediaFileReader) {
     this._mediaFileReader = mediaFileReader;
@@ -54,18 +54,18 @@ export default class MediaTagReader {
   /**
    * Load the necessary bytes from the media file.
    */
-  async _loadData(mediaFileReader: MediaFileReader) {
+  public async _loadData(mediaFileReader: MediaFileReader) {
     throw new Error("Must implement _loadData function");
   }
 
   /**
    * Parse the loaded data to read the media tags.
    */
-  _parseData(mediaFileReader: MediaFileReader, tags?: string[] | null): TagType {
+  public _parseData(mediaFileReader: MediaFileReader, tags?: string[] | null): TagType {
     throw new Error("Must implement _parseData function");
   }
 
-  _expandShortcutTags(tagsWithShortcuts?: string[] | null): string[] | null | undefined {
+  protected _expandShortcutTags(tagsWithShortcuts?: string[] | null): string[] | null | undefined {
     if (!tagsWithShortcuts) {
       return null;
     }

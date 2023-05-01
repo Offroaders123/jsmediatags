@@ -69,8 +69,8 @@ const IMAGE_TYPES = [
  * Class representing a MediaTagReader that parses FLAC tags.
  */
 export default class FLACTagReader extends MediaTagReader {
-  declare _commentOffset: number;
-  declare _pictureOffset: number;
+  declare private _commentOffset: number;
+  declare private _pictureOffset: number;
 
   /**
    * Gets the byte range for the tag identifier.
@@ -113,7 +113,7 @@ export default class FLACTagReader extends MediaTagReader {
    * @param mediaFileReader - The MediaFileReader used to parse the file.
    * @param callbacks - The callback to call once _loadData is completed.
    */
-  override async _loadData(mediaFileReader: MediaFileReader) {
+  public override async _loadData(mediaFileReader: MediaFileReader) {
     await mediaFileReader.loadRange([4, 7]);
     await this._loadBlock(mediaFileReader, 4);
   }
@@ -139,7 +139,7 @@ export default class FLACTagReader extends MediaTagReader {
    * @param offset - The offset to start checking the header from.
    * @return - The callback to call once the header has been found.
    */
-  async _loadBlock(mediaFileReader: MediaFileReader, offset: number) {
+  private async _loadBlock(mediaFileReader: MediaFileReader, offset: number) {
     /**
      * As mentioned above, this first byte is loaded to see what metadata type
      * this block represents.
@@ -200,7 +200,7 @@ export default class FLACTagReader extends MediaTagReader {
    * @param blockSize - The size of the previously processed header.
    * @return - The callback functions to be called.
    */
-  async _nextBlock(mediaFileReader: MediaFileReader, offset: number, blockHeader: number, blockSize: number) {
+  private async _nextBlock(mediaFileReader: MediaFileReader, offset: number, blockHeader: number, blockSize: number) {
     if (blockHeader > 127) {
       if (!this._commentOffset) {
         throw new Error("loadData: Comment block could not be found.");
@@ -234,7 +234,7 @@ export default class FLACTagReader extends MediaTagReader {
    * @param tags - Optional tags to also be retrieved from the file.
    * @return - An object containing the tag information for the file.
    */
-  override _parseData(data: MediaFileReader, tags?: string[]): TagType {
+  public override _parseData(data: MediaFileReader, tags?: string[]): TagType {
     const vendorLength = data.getLongAt(this._commentOffset, false);
     const offsetVendor = this._commentOffset + 4;
     /* This line is able to retrieve the vendor string that the VorbisComment block

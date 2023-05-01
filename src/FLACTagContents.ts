@@ -5,7 +5,7 @@ import { getInteger32 } from "./ByteArrayUtils.js";
 import type { ByteArray } from "./FlowTypes.js";
 
 export default class FLACTagContents {
-  declare _blocks: MetadataBlock[];
+  declare private _blocks: MetadataBlock[];
 
   constructor(blocks?: MetadataBlock[]) {
     this._blocks = [];
@@ -54,9 +54,9 @@ export default class FLACTagContents {
 }
 
 class MetadataBlock {
-  declare _data: number[];
-  declare _final: boolean;
-  declare _type: number;
+  declare private _data: number[];
+  declare private _final: boolean;
+  declare private _type: number;
 
   constructor(type: number, data: ByteArray) {
     this._type = type;

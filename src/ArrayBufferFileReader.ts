@@ -2,8 +2,8 @@ import ChunkedFileData from "./ChunkedFileData.js";
 import MediaFileReader from "./MediaFileReader.js";
 
 export default class ArrayBufferFileReader extends MediaFileReader {
-  declare _buffer: ArrayBuffer;
-  declare _fileData: ChunkedFileData;
+  declare private _buffer: ArrayBuffer;
+  declare private _fileData: ChunkedFileData;
 
   constructor(buffer: ArrayBuffer) {
     super();
@@ -15,7 +15,7 @@ export default class ArrayBufferFileReader extends MediaFileReader {
     return file instanceof ArrayBuffer
   }
 
-  override async _init() {
+  protected override async _init() {
     this._size = this._buffer.byteLength;
     await new Promise(resolve => setTimeout(resolve, 1));
   }

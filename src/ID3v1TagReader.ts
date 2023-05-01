@@ -19,12 +19,12 @@ export default class ID3v1TagReader extends MediaTagReader {
     return id === "TAG";
   }
 
-  override async _loadData(mediaFileReader: MediaFileReader) {
+  public override async _loadData(mediaFileReader: MediaFileReader) {
     const fileSize = mediaFileReader.getSize();
     await mediaFileReader.loadRange([fileSize - 128, fileSize - 1]);
   }
 
-  override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
+  public override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
     const offset = data.getSize() - 128;
 
     const title = data.getStringWithCharsetAt(offset + 3, 30).toString();

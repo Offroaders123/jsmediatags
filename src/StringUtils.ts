@@ -1,7 +1,7 @@
 export type DecodedString = InternalDecodedString;
 
 class InternalDecodedString {
-  declare _value: string;
+  declare private _value: string;
   declare bytesReadCount: number;
   declare length: number;
 

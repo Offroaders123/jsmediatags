@@ -3,7 +3,7 @@ import MediaFileReader from "./MediaFileReader.js";
 import type { ByteArray } from "./FlowTypes.js";
 
 export default class ArrayFileReader extends MediaFileReader {
-  declare _array: ByteArray;
+  declare public _array: ByteArray;
 
   constructor(array: ByteArray) {
     super();

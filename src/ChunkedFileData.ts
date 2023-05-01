@@ -16,11 +16,7 @@ export default class ChunkedFileData {
     return NOT_FOUND as typeof NOT_FOUND;
   }
 
-  declare _fileData: ChunkType[];
-
-  constructor() {
-    this._fileData = [];
-  }
+  public _fileData: ChunkType[] = [];
 
   /**
    * Adds data to the file storage at a specific offset.
@@ -75,7 +71,7 @@ export default class ChunkedFileData {
     }
   }
 
-  _concatData(dataA: DataType, dataB: DataType): DataType {
+  private _concatData(dataA: DataType, dataB: DataType): DataType {
     // TypedArrays don't support concat.
     if (
       typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView &&
@@ -92,7 +88,7 @@ export default class ChunkedFileData {
     }
   }
 
-  _sliceData(data: DataType, begin: number, end: number): DataType {
+  private _sliceData(data: DataType, begin: number, end: number): DataType {
     // Some TypeArray implementations do not support slice yet.
     if (data.slice) {
       return data.slice(begin, end);
@@ -110,7 +106,7 @@ export default class ChunkedFileData {
    * should be inserted in the data list (startIx == NOT_FOUND and endIX ==
    * NOT_FOUND).
    */
-  _getChunkRange(offsetStart: number, offsetEnd: number): { startIx: number; endIx: number; insertIx?: number; } {
+  public _getChunkRange(offsetStart: number, offsetEnd: number): { startIx: number; endIx: number; insertIx?: number; } {
     let startChunkIx = NOT_FOUND;
     let endChunkIx = NOT_FOUND;
     let insertIx = 0;

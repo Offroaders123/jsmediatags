@@ -10,7 +10,7 @@ import { bin, pad, getInteger32 } from "./ByteArrayUtils.js";
 import type { ByteArray } from "./FlowTypes.js";
 
 export default class MP4TagContents {
-  declare _atoms: Atom[];
+  declare private _atoms: Atom[];
 
   constructor(ftyp: string, atoms?: Atom | Atom[]) {
     this._atoms = [
@@ -54,9 +54,9 @@ export default class MP4TagContents {
 }
 
 class Atom {
-  declare _name: string;
-  declare _data: number[];
-  declare _atoms: Atom[];
+  declare private _name: string;
+  declare private _data: number[];
+  declare private _atoms: Atom[];
 
   constructor(name: string, data?: ByteArray | null, atoms?: Atom[] | null) {
     this._name = name;

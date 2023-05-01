@@ -276,7 +276,7 @@ export default class ID3v2FrameReader {
     return frames;
   }
 
-  static _getFrameHeaderSize(id3header: TagHeader): number {
+  private static _getFrameHeaderSize(id3header: TagHeader): number {
     const { major } = id3header;
 
     if (major == 2) {
@@ -288,7 +288,7 @@ export default class ID3v2FrameReader {
     }
   }
 
-  static _readFrameHeader(data: MediaFileReader, offset: number, id3header: TagHeader): TagFrameHeader {
+  private static _readFrameHeader(data: MediaFileReader, offset: number, id3header: TagHeader): TagFrameHeader {
     const { major } = id3header;
     let flags: TagFrameFlags | null = null;
     const frameHeaderSize = this._getFrameHeaderSize(id3header);
@@ -335,7 +335,7 @@ export default class ID3v2FrameReader {
     };
   }
 
-  static _readFrameFlags(data: MediaFileReader, offset: number): TagFrameFlags {
+  private static _readFrameFlags(data: MediaFileReader, offset: number): TagFrameFlags {
     return {
       message: {
         tag_alter_preservation  : data.isBitSetAt(offset, 6),
@@ -352,7 +352,7 @@ export default class ID3v2FrameReader {
     };
   }
 
-  static _getFrameDescription(frameId: string): string {
+  private static _getFrameDescription(frameId: string): string {
     if (frameId in FRAME_DESCRIPTIONS) {
       // @ts-expect-error
       return FRAME_DESCRIPTIONS[frameId];

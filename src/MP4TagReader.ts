@@ -27,7 +27,7 @@ export default class MP4TagReader extends MediaTagReader {
     return id === "ftyp";
   }
 
-  override async _loadData(mediaFileReader: MediaFileReader) {
+  public override async _loadData(mediaFileReader: MediaFileReader) {
     // MP4 metadata isn't located in a specific location of the file. Roughly
     // speaking, it's composed of blocks chained together like a linked list.
     // These blocks are called atoms (or boxes).
@@ -45,7 +45,7 @@ export default class MP4TagReader extends MediaTagReader {
     await this._loadAtom(mediaFileReader, 0, "");
   }
 
-  async _loadAtom(mediaFileReader: MediaFileReader, offset: number, parentAtomFullName: string) {
+  private async _loadAtom(mediaFileReader: MediaFileReader, offset: number, parentAtomFullName: string) {
     if (offset >= mediaFileReader.getSize()) {
       return;
     }
@@ -78,15 +78,15 @@ export default class MP4TagReader extends MediaTagReader {
     }
   }
 
-  _isContainerAtom(atomName: string): boolean {
+  private _isContainerAtom(atomName: string): boolean {
     return ["moov", "udta", "meta", "ilst"].indexOf(atomName) >= 0;
   }
 
-  _canReadAtom(atomName: string): boolean {
+  private _canReadAtom(atomName: string): boolean {
     return atomName !== "----";
   }
 
-  override _parseData(data: MediaFileReader, tagsToRead?: string[] | null): TagType {
+  public override _parseData(data: MediaFileReader, tagsToRead?: string[] | null): TagType {
     const tags = {};
 
     tagsToRead = this._expandShortcutTags(tagsToRead);
@@ -115,7 +115,7 @@ export default class MP4TagReader extends MediaTagReader {
     };
   }
 
-  _readAtom(tags: Object, data: MediaFileReader, offset: number, length: number, tagsToRead?: string[] | null, parentAtomFullName?: string, indent?: string) {
+  private _readAtom(tags: Object, data: MediaFileReader, offset: number, length: number, tagsToRead?: string[] | null, parentAtomFullName?: string, indent?: string) {
     indent = indent === undefined ? "" : indent + "  ";
 
     let seek = offset;
@@ -150,7 +150,7 @@ export default class MP4TagReader extends MediaTagReader {
     }
   }
 
-  _readMetadataAtom(data: MediaFileReader, offset: number): TagFrame {
+  private _readMetadataAtom(data: MediaFileReader, offset: number): TagFrame {
     // 16: size + name + size + "data" (4 bytes each)
     // 8: 1 byte atom version & 3 bytes atom flags + 4 bytes NULL space
     // 8: 4 bytes track + 4 bytes total

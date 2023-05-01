@@ -20,15 +20,15 @@ export default class ID3v2TagReader extends MediaTagReader {
     return id === "ID3";
   }
 
-  override async _loadData(mediaFileReader: MediaFileReader) {
+  public override async _loadData(mediaFileReader: MediaFileReader) {
     await mediaFileReader.loadRange([6, 9]);
     await mediaFileReader.loadRange(
       // The tag size does not include the header size.
       [0, ID3_HEADER_SIZE + mediaFileReader.getSynchsafeInteger32At(6) - 1]
     );
-}
+  }
 
-  override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
+  public override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
     let offset = 0;
     const major = data.getByteAt(offset+3);
     if (major > 4) {
@@ -108,7 +108,7 @@ export default class ID3v2TagReader extends MediaTagReader {
     return id3;
   }
 
-  _getFrameData(frames: TagFrames, ids: string[]): Object | null | void {
+  private _getFrameData(frames: TagFrames, ids: string[]): Object | null | void {
     let frame: TagFrame;
     for (let i = 0, id; id = ids[i]; i++) {
       if (id in frames) {

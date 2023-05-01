@@ -27,10 +27,10 @@ function isRangeValid(range: ByteRange, fileSize: number) {
 }
 
 export class Reader {
-  declare _file: any;
-  declare _tagsToRead: string[];
-  declare _fileReader: typeof MediaFileReader;
-  declare _tagReader: typeof MediaTagReader;
+  declare private _file: any;
+  declare private _tagsToRead: string[];
+  declare private _fileReader: typeof MediaFileReader;
+  declare private _tagReader: typeof MediaTagReader;
 
   constructor(file: any) {
     this._file = file;
@@ -59,9 +59,9 @@ export class Reader {
     return new TagReader(fileReader)
       .setTagsToRead(this._tagsToRead)
       .read();
-}
+  }
 
-  _getFileReader(): typeof MediaFileReader {
+  public _getFileReader(): typeof MediaFileReader {
     if (this._fileReader) {
       return this._fileReader;
     } else {
@@ -69,7 +69,7 @@ export class Reader {
     }
   }
 
-  _findFileReader(): typeof MediaFileReader {
+  private _findFileReader(): typeof MediaFileReader {
     for (let i = 0; i < mediaFileReaders.length; i++) {
       if (mediaFileReaders[i].canReadFile(this._file)) {
         return mediaFileReaders[i];
@@ -79,7 +79,7 @@ export class Reader {
     throw new Error("No suitable file reader found for " + this._file);
   }
 
-  async _getTagReader(fileReader: MediaFileReader) {
+  public async _getTagReader(fileReader: MediaFileReader) {
     if (this._tagReader) {
       const tagReader = this._tagReader;
       await new Promise(resolve => setTimeout(resolve, 1));
@@ -89,7 +89,7 @@ export class Reader {
     }
   }
 
-  async _findTagReader(fileReader: MediaFileReader) {
+  public async _findTagReader(fileReader: MediaFileReader) {
     // We don't want to make multiple fetches per tag reader to get the tag
     // identifier. The strategy here is to combine all the tag identifier
     // ranges into one and make a single fetch. This is particularly important
@@ -166,7 +166,7 @@ export class Reader {
     return tagReader;
   }
 
-  async _loadTagIdentifierRanges(fileReader: MediaFileReader, tagReaders: typeof MediaTagReader[]) {
+  private async _loadTagIdentifierRanges(fileReader: MediaFileReader, tagReaders: typeof MediaTagReader[]) {
     if (tagReaders.length === 0) {
       // Force async
       return new Promise<void>(resolve => setTimeout(resolve, 1));

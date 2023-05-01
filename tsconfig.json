@@ -1,21 +1,12 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
     "module": "ESNext",
     "moduleResolution": "NodeNext",
     "target": "ESNext",
-    "declaration": true,
-    "sourceMap": true,
+    "noEmit": true,
     "strict": true,
     "noImplicitOverride": true
   },
-  "include": [
-    "./src/**/*.ts"
-  ],
-  "exclude": [
-    "./test"
-  ],
   "ts-node": {
     "esm": true
   }

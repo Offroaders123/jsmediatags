@@ -4,6 +4,8 @@ import ID3v2FrameReader from "../src/ID3v2FrameReader.js";
 import ArrayFileReader from "../src/ArrayFileReader.js";
 import { bin } from "../src/ByteArrayUtils.js";
 
+import type { TagHeader } from "../src/FlowTypes.js";
+
 jest
   .autoMockOff()
   .useRealTimers();
@@ -23,8 +25,10 @@ describe("ID3v2FrameReader", () => {
       [0x01, 0x02, 0x03, 0x04, 0x05] // image data
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
-    const data = frameReader!(0, fileData.length, fileReader, {}, {major: 3});
+    const data = frameReader!(0, fileData.length, fileReader, {},
+      // @ts-expect-error
+      { major: 3 }
+    );
 
     expect(data).toEqual({
       format: "image/jpeg",
@@ -47,8 +51,10 @@ describe("ID3v2FrameReader", () => {
       bin("The entire comment that can include new lines\n.")
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
-    const data = frameReader!(0, fileData.length, fileReader, {}, {major: 3});
+    const data = frameReader!(0, fileData.length, fileReader, {},
+      // @ts-expect-error
+      { major: 3 }
+    );
 
     expect(data).toEqual({
       language: "ENG",
@@ -71,8 +77,10 @@ describe("ID3v2FrameReader", () => {
       [0x01, 0x02, 0x03, 0x04, 0x05] // image data
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
-    const data = frameReader!(0, fileData.length, fileReader, {}, {major: 2});
+    const data = frameReader!(0, fileData.length, fileReader, {},
+      // @ts-expect-error
+      { major: 2 }
+    );
 
     expect(data).toEqual({
       format: "JPG",
@@ -92,7 +100,6 @@ describe("ID3v2FrameReader", () => {
       [0xaf, 0x19, 0x00, 0x00]
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
     const data = frameReader!(0, fileData.length, fileReader);
 
     expect(data).toEqual(6575);
@@ -113,7 +120,6 @@ describe("ID3v2FrameReader", () => {
           0xe3
         ];
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -125,7 +131,6 @@ describe("ID3v2FrameReader", () => {
           0xfe, 0xff, 0x00, 0xe3
         ];
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -137,7 +142,6 @@ describe("ID3v2FrameReader", () => {
           0xff, 0xfe, 0xe3, 0x00
         ];
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -149,7 +153,6 @@ describe("ID3v2FrameReader", () => {
           0xc3, 0xa3
         ];
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -179,7 +182,6 @@ describe("ID3v2FrameReader", () => {
           0xe3
         ];
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -193,7 +195,6 @@ describe("ID3v2FrameReader", () => {
           [0xfe, 0xff, 0x00, 0xe3, 0x00, 0x00]
         );
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -207,7 +208,6 @@ describe("ID3v2FrameReader", () => {
           [0xff, 0xfe, 0xe3, 0x00, 0x00, 0x00]
         );
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -221,7 +221,6 @@ describe("ID3v2FrameReader", () => {
           [0xc3, 0xe3, 0x00]
         );
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -240,7 +239,6 @@ describe("ID3v2FrameReader", () => {
       it("should read urls with iso-8859-1 charset", () => {
         const fileData = [0xe3];
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual("ã");
@@ -270,7 +268,6 @@ describe("ID3v2FrameReader", () => {
           0xe3
         ];
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -284,7 +281,6 @@ describe("ID3v2FrameReader", () => {
           [0xfe, 0xff, 0x00, 0xe3, 0x00, 0x00]
         );
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -298,7 +294,6 @@ describe("ID3v2FrameReader", () => {
           [0xff, 0xfe, 0xe3, 0x00, 0x00, 0x00]
         );
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -312,7 +307,6 @@ describe("ID3v2FrameReader", () => {
           [0xc3, 0xe3, 0x00]
         );
         const fileReader = new ArrayFileReader(fileData);
-        // @ts-ignore
         const data = frameReader!(0, fileData.length, fileReader);
 
         expect(data).toEqual(expected);
@@ -331,7 +325,6 @@ describe("ID3v2FrameReader", () => {
       bin("(10)Eurodisc")
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
     const data = frameReader!(0, fileData.length, fileReader);
 
     expect(data).toEqual("Eurodisc");
@@ -350,7 +343,6 @@ describe("ID3v2FrameReader", () => {
       bin("Se eu soubesse tinha ido com a Sofia")
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
     const data = frameReader!(0, fileData.length, fileReader);
 
     expect(data).toEqual({
@@ -361,7 +353,7 @@ describe("ID3v2FrameReader", () => {
   });
 
   it("should read CTOC tag", () => {
-    const frameReader = ID3v2FrameReader.getFrameReaderFunction("CTOC")!.bind(ID3v2FrameReader);
+    const frameReader = ID3v2FrameReader.getFrameReaderFunction("CTOC");
 
     expect(frameReader).toBeDefined();
 
@@ -383,8 +375,10 @@ describe("ID3v2FrameReader", () => {
         [0x00, 0x00] // text encoding + null terminated string
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
-    const data = frameReader!(0, fileData.length, fileReader, null, {major: 3});
+    const data = frameReader!(0, fileData.length, fileReader, null,
+      // @ts-expect-error
+      { major: 3 }
+    );
 
     expect(data).toEqual({
       id: "ID1",
@@ -410,7 +404,7 @@ describe("ID3v2FrameReader", () => {
   });
 
   it("should read CHAP tag", () => {
-    const frameReader = ID3v2FrameReader.getFrameReaderFunction("CHAP")!.bind(ID3v2FrameReader);
+    const frameReader = ID3v2FrameReader.getFrameReaderFunction("CHAP");
 
     expect(frameReader).toBeDefined();
 
@@ -424,8 +418,10 @@ describe("ID3v2FrameReader", () => {
       [0x00, 0x00, 0x03, 0xff] // end offset
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
-    const data = frameReader!(0, fileData.length, fileReader, null, {major: 3});
+    const data = frameReader!(0, fileData.length, fileReader, null,
+      // @ts-expect-error
+      { major: 3 }
+    );
 
     expect(data).toEqual({
       id: "ID1",
@@ -452,10 +448,10 @@ describe("ID3v2FrameReader", () => {
       mp3extPadding
     );
     const fileReader = new ArrayFileReader(fileData);
-    const id3header = {major: 4};
+    // @ts-expect-error
+    const id3header: TagHeader = { major: 4 };
 
     const tags = ID3v2FrameReader.readFrames(
-      // @ts-ignore
       0, fileData.length, fileReader, id3header
     );
     expect(tags.MP3e).not.toBeDefined();
@@ -476,13 +472,13 @@ describe("ID3v2FrameReader", () => {
       [0x00, 0x00]
     );
     const fileReader = new ArrayFileReader(fileData);
-    const id3header = {major: 4};
+    // @ts-expect-error
+    const id3header: TagHeader = { major: 4 };
 
     ID3v2FrameReader.readFrames(
       0,
       fileData.length,
       fileReader,
-      // @ts-ignore
       id3header
     );
   });
@@ -498,7 +494,6 @@ describe("ID3v2FrameReader", () => {
       [0x01, 0x02, 0x03] // identifier
     );
     const fileReader = new ArrayFileReader(fileData);
-    // @ts-ignore
     const data = frameReader!(0, fileData.length, fileReader);
 
     expect(data).toEqual({

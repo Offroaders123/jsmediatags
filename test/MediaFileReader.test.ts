@@ -140,8 +140,10 @@ describe("MediaFileReader", () => {
   describe("getStringWithCharsetAt", () => {
     it("should a null terminated string", () => {
       mediaFileBytes = [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x00];
-      // @ts-expect-error
-      const string = mediaFileReader.getStringWithCharsetAt(0, 6, "ascii");
+      const string = mediaFileReader.getStringWithCharsetAt(0, 6,
+        // @ts-expect-error
+        "ascii"
+      );
 
       expect(string.length).toBe(5);
 

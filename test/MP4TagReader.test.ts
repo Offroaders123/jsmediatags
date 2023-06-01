@@ -33,16 +33,14 @@ describe("MP4TagReader", () => {
     MP4TagContents.createMetadataAtom("©nam", "text", bin("A Title")),
     MP4TagContents.createMetadataAtom("©ART", "text", bin("A Artist")),
     MP4TagContents.createMetadataAtom("©alb", "text", bin("A Album")),
-    // @ts-expect-error
-    MP4TagContents.createMetadataAtom("trkn", "uint8", [].concat(
-      [0x00, 0x00, 0x00, 0x02], // track
-      [0x00, 0x00, 0x00, 0x09] // total track count
-    )),
-    // @ts-expect-error
-    MP4TagContents.createMetadataAtom("disk", "uint8", [].concat(
-      [0x00, 0x00, 0x00, 0x02], // disk
-      [0x00, 0x00, 0x00, 0x03] // total disk count
-    )),
+    MP4TagContents.createMetadataAtom("trkn", "uint8", [
+      0x00, 0x00, 0x00, 0x02, // track
+      0x00, 0x00, 0x00, 0x09 // total track count
+    ]),
+    MP4TagContents.createMetadataAtom("disk", "uint8", [
+      0x00, 0x00, 0x00, 0x02, // disk
+      0x00, 0x00, 0x00, 0x03 // total disk count
+    ]),
     MP4TagContents.createMetadataAtom("©cmt", "text", bin("A Comment")),
     MP4TagContents.createMetadataAtom("cpil", "uint8", [0x01]),
     MP4TagContents.createMetadataAtom("covr", "jpeg", [0x01, 0x02, 0x03])

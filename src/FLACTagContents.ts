@@ -38,17 +38,27 @@ export default class FLACTagContents {
       let entry = data[i][0] + "=" + data[i][1];
       byteArray = byteArray.concat(bin(entry));
     }
-    // @ts-expect-error
-    let array: ByteArray = [].concat(getInteger24(length), [0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      getInteger32(data.length).reverse(), byteArray);
+    let array: ByteArray = [
+      ...getInteger24(length),
+      0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      ...getInteger32(data.length).reverse(),
+      ...byteArray
+    ];
     return this.createBlock(4, array);
   }
 
   static createPictureBlock() {
-    // @ts-expect-error
-    let data: ByteArray = [].concat(getInteger24(45), getInteger32(3), getInteger32(10),
-      bin("image/jpeg"), getInteger32(9), bin("A Picture"), Array(16).fill(0x00),
-      getInteger32(4), bin("data"));
+    let data: ByteArray = [
+      ...getInteger24(45),
+      ...getInteger32(3),
+      ...getInteger32(10),
+      ...bin("image/jpeg"),
+      ...getInteger32(9),
+      ...bin("A Picture"),
+      ...Array(16).fill(0x00),
+      ...getInteger32(4),
+      ...bin("data")
+    ];
     return this.createBlock(6, data);
   }
 }

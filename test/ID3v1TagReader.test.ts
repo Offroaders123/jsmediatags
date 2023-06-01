@@ -12,16 +12,15 @@ jest
 
 describe("ID3v1TagReader", () => {
   it("reads 1.0 tags", async () => {
-    const id3ArrayFile = [].concat(
-      // @ts-expect-error
-      bin("TAG"),
-      pad(bin("Song Title"), 30),
-      pad(bin("The Artist"), 30),
-      pad(bin("The Album"), 30),
-      bin("1995"),
-      pad(bin("A Comment"), 30),
+    const id3ArrayFile = [
+      ...bin("TAG"),
+      ...pad(bin("Song Title"), 30) as number[],
+      ...pad(bin("The Artist"), 30) as number[],
+      ...pad(bin("The Album"), 30) as number[],
+      ...bin("1995"),
+      ...pad(bin("A Comment"), 30) as number[],
       30
-    );
+    ];
     const mediaFileReader = new ArrayFileReader(id3ArrayFile);
     const tagReader = new ID3v1TagReader(mediaFileReader);
 
@@ -42,17 +41,16 @@ describe("ID3v1TagReader", () => {
   });
 
   it("reads 1.1 tags", async () => {
-    const id3ArrayFile = [].concat(
-      // @ts-expect-error
-      bin("TAG"),
-      pad(bin("Song Title"), 30),
-      pad(bin("The Artist"), 30),
-      pad(bin("The Album"), 30),
-      bin("1995"),
-      pad(bin("A Comment"), 29),
+    const id3ArrayFile = [
+      ...bin("TAG"),
+      ...pad(bin("Song Title"), 30) as number[],
+      ...pad(bin("The Artist"), 30) as number[],
+      ...pad(bin("The Album"), 30) as number[],
+      ...bin("1995"),
+      ...pad(bin("A Comment"), 29) as number[],
       3,
       30
-    );
+    ];
     const mediaFileReader = new ArrayFileReader(id3ArrayFile);
     const tagReader = new ID3v1TagReader(mediaFileReader);
 

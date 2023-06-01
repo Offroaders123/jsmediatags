@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import type MediaFileReader from "../src/MediaFileReader.js";

@@ -47,13 +47,12 @@ export default class ID3v2TagContents {
 
     this._major = major;
     this._revision = revision;
-    this._contents = [].concat(
-      // @ts-expect-error
-      bin("ID3"),
-      [major, revision],
-      [0], // flags
-      [0, 0, 0, 0] // size
-    );
+    this._contents = [
+      ...bin("ID3"),
+      major, revision,
+      0, // flags
+      0, 0, 0, 0 // size
+    ];
     this._frames = {};
     this._updateSize();
     this._extendedHeader = {
@@ -262,16 +261,15 @@ export default class ID3v2TagContents {
       throw Error("Major version not supported");
     }
 
-    const frame = [].concat(
-      // @ts-expect-error
-      bin(id),
-      size,
-      frameFlags,
-      flags && flags.format.data_length_indicator && noFlagsDataLength
+    const frame = [
+      ...bin(id),
+      ...size,
+      ...frameFlags,
+      ...(flags && flags.format.data_length_indicator && noFlagsDataLength
         ? getSynchsafeInteger32(noFlagsDataLength)
-        : [],
-      data
-    );
+        : []),
+      ...data
+    ];
     if (!this._frames[id]) {
       this._frames[id] = [];
     }
@@ -320,12 +318,11 @@ export default class ID3v2TagContents {
         0, 0, 0, 0 // padding
       ]);
     } else if (this._major === 4) {
-      this._addData(EXTENDED_HEADER, [].concat(
-        // @ts-expect-error
-        getSynchsafeInteger32(6), // size
-        [1], // number of flag bytes
-        [0] // extended flags
-      ));
+      this._addData(EXTENDED_HEADER, [
+        ...getSynchsafeInteger32(6), // size
+        1, // number of flag bytes
+        0 // extended flags
+      ]);
     } else {
       throw new Error("Version doesn't support extended header.");
     }
@@ -372,18 +369,18 @@ export default class ID3v2TagContents {
   }
 
   private _setData(offset: number, data: ByteArray): void {
-    // @ts-expect-error
     this._contents.splice.apply(this._contents, [
       offset,
       data.length,
-    ].concat(data));
+      ...data
+    ]);
   }
 
   private _addData(offset: number, data: ByteArray): void {
-    // @ts-expect-error
     this._contents.splice.apply(this._contents, [
       offset,
       0,
-    ].concat(data));
+      ...data
+    ]);
   }
 }

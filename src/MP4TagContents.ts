@@ -43,12 +43,12 @@ export default class MP4TagContents {
     }[type];
 
     return this.createContainerAtom(atomName, [
-      // @ts-expect-error
-      new Atom("data", [].concat(
-        [0x00, 0x00, 0x00, klass], // 1 byte atom version + 3 byte atom flags
-        [0x00, 0x00, 0x00, 0x00], // NULL space
-        data
-      ))
+      new Atom("data", [
+        // @ts-expect-error
+        0x00, 0x00, 0x00, klass, // 1 byte atom version + 3 byte atom flags
+        0x00, 0x00, 0x00, 0x00, // NULL space
+        ...data
+      ])
     ]);
   }
 }
@@ -65,19 +65,18 @@ class Atom {
   }
 
   toArray(): ByteArray {
-    const atomsArray = this._atoms.reduce((array, atom) => {
+    const atomsArray: ByteArray = this._atoms.reduce((array, atom) => {
       // @ts-expect-error
       return array.concat(atom.toArray());
     }, []);
     const length = 4 + this._name.length + this._data.length + atomsArray.length;
 
-    return [].concat(
-      // @ts-expect-error
-      getInteger32(length),
-      bin(this._name),
-      this._data,
-      atomsArray
-    );
+    return [
+      ...getInteger32(length),
+      ...bin(this._name),
+      ...this._data,
+      ...atomsArray
+    ];
   }
 }
 

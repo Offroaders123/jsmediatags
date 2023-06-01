@@ -15,16 +15,14 @@ describe("ID3v2TagReader", () => {
   let mediaFileReader: ArrayFileReader;
   const id3FileContents =
     new ID3v2TagContents(4, 3)
-      .addFrame("TIT2", [].concat(
-        // @ts-expect-error
-        [0x00], // encoding
-        bin("The title"), [0x00]
-      ))
-      .addFrame("TCOM", [].concat(
-        // @ts-expect-error
-        [0x00], // encoding
-        bin("The Composer"), [0x00]
-      ))
+      .addFrame("TIT2", [
+        0x00, // encoding
+        ...bin("The title"), 0x00
+      ])
+      .addFrame("TCOM", [
+        0x00, // encoding
+        ...bin("The Composer"), 0x00
+      ])
       .addFrame("\u0000\u0000\u0000\u0000", []); // Padding frame
 
   beforeEach(() => {
@@ -56,16 +54,14 @@ describe("ID3v2TagReader", () => {
     it("reads an header with extended header", async () => {
       const tags = await tagReader.read();
       const id3FileContents = new ID3v2TagContents(4, 3)
-        .addFrame("TIT2", [].concat(
-          // @ts-expect-error
-          [0],
-          bin("The title"), [0]
-        ))
-        .addFrame("TCOM", [].concat(
-          // @ts-expect-error
-          [0],
-          bin("The Composer"), [0]
-        ))
+        .addFrame("TIT2", [
+          0,
+          ...bin("The title"), 0
+        ])
+        .addFrame("TCOM", [
+          0,
+          ...bin("The Composer"), 0
+        ])
         .setTagIsUpdate();
 
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
@@ -148,19 +144,17 @@ describe("ID3v2TagReader", () => {
           .setFlags({
             unsynchronisation: true
           })
-          .addFrame("TIT2", [].concat(
-            // @ts-expect-error
-            [0x00], // encoding
-            bin("The title"), [0x00]
-          ))
-          .addFrame("APIC", [].concat(
-            // @ts-expect-error
-            [0x00], // text encoding
-            bin("image/jpeg"), [0x00],
-            [0x03], // picture type - cover front
-            bin("front cover image"), [0x00],
-            [0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05] // image data
-          ));
+          .addFrame("TIT2", [
+            0x00, // encoding
+            ...bin("The title"), 0x00
+          ])
+          .addFrame("APIC", [
+            0x00, // text encoding
+            ...bin("image/jpeg"), 0x00,
+            0x03, // picture type - cover front
+            ...bin("front cover image"), 0x00,
+            0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05 // image data
+          ]);
       mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
       tagReader = new ID3v2TagReader(mediaFileReader);
 
@@ -173,19 +167,17 @@ describe("ID3v2TagReader", () => {
     it("reads local unsynchronised content", async () => {
       const id3FileContents =
         new ID3v2TagContents(4, 3)
-          .addFrame("TIT2", [].concat(
-            // @ts-expect-error
-            [0x00], // encoding
-            bin("The title"), [0x00]
-          ))
-          .addFrame("APIC", [].concat(
-            // @ts-expect-error
-            [0x00], // text encoding
-            bin("image/jpeg"), [0x00],
-            [0x03], // picture type - cover front
-            bin("front cover image"), [0x00],
-            [0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05] // image data
-          ), {
+          .addFrame("TIT2", [
+            0x00, // encoding
+            ...bin("The title"), 0x00
+          ])
+          .addFrame("APIC", [
+            0x00, // text encoding
+            ...bin("image/jpeg"), 0x00,
+            0x03, // picture type - cover front
+            ...bin("front cover image"), 0x00,
+            0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05 // image data
+          ], {
             // @ts-expect-error
             format: {
               unsynchronisation: true
@@ -201,19 +193,17 @@ describe("ID3v2TagReader", () => {
     it("reads unsynchronised content with data length indicator", async () => {
       const id3FileContents =
         new ID3v2TagContents(4, 3)
-          .addFrame("TIT2", [].concat(
-            // @ts-expect-error
-            [0x00], // encoding
-            bin("The title"), [0x00]
-          ))
-          .addFrame("APIC", [].concat(
-            // @ts-expect-error
-            [0x00], // text encoding
-            bin("image/jpeg"), [0x00],
-            [0x03], // picture type - cover front
-            bin("front cover image"), [0x00],
-            [0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05] // image data
-          ), {
+          .addFrame("TIT2", [
+            0x00, // encoding
+            ...bin("The title"), 0x00
+          ])
+          .addFrame("APIC", [
+            0x00, // text encoding
+            ...bin("image/jpeg"), 0x00,
+            0x03, // picture type - cover front
+            ...bin("front cover image"), 0x00,
+            0x01, 0x02, 0xff, 0x00, 0x03, 0x04, 0x05 // image data
+          ], {
             // @ts-expect-error
             format: {
               unsynchronisation: true,
@@ -235,19 +225,17 @@ describe("ID3v2TagReader", () => {
           .setFlags({
             unsynchronisation: true
           })
-          .addFrame("TIT2", [].concat(
-            // @ts-expect-error
-            [0x00], // encoding
-            bin("The title"), [0x00]
-          ))
-          .addFrame("APIC", [].concat(
-            // @ts-expect-error
-            [0x00], // text encoding
-            bin("image/jpeg"), [0x00],
-            [0x03], // picture type - cover front
-            bin("front cover image"), [0x00],
-            [0x01, 0x02, 0xff, 0x00, 0x00, 0x03, 0x04, 0x05] // image data
-          ), {
+          .addFrame("TIT2", [
+            0x00, // encoding
+            ...bin("The title"), 0x00
+          ])
+          .addFrame("APIC", [
+            0x00, // text encoding
+            ...bin("image/jpeg"), 0x00,
+            0x03, // picture type - cover front
+            ...bin("front cover image"), 0x00,
+            0x01, 0x02, 0xff, 0x00, 0x00, 0x03, 0x04, 0x05 // image data
+          ], {
             // @ts-expect-error
             format: {
               unsynchronisation: true
@@ -266,11 +254,10 @@ describe("ID3v2TagReader", () => {
       new ID3v2TagContents(4, 3)
         // @ts-expect-error
         .addFrame("WOAF") // empty frame contents
-        .addFrame("TIT2", [].concat(
-          // @ts-expect-error
-          [0x00], // encoding
-          bin("The title"), [0x00]
-        ));
+        .addFrame("TIT2", [
+          0x00, // encoding
+          ...bin("The title"), 0x00
+        ]);
     mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
     tagReader = new ID3v2TagReader(mediaFileReader);
 
@@ -281,16 +268,14 @@ describe("ID3v2TagReader", () => {
   it("should correctly assign shortcuts to when there are multiple instances of the same frame", async () => {
     const id3FileContents =
       new ID3v2TagContents(4, 3)
-        .addFrame("TIT2", [].concat(
-          // @ts-expect-error
-          [0x00], // encoding
-          bin("The title"), [0x00]
-        ))
-        .addFrame("TIT2", [].concat(
-          // @ts-expect-error
-          [0x00], // text encoding
-          bin("Another title"), [0x00]
-        ));
+        .addFrame("TIT2", [
+          0x00, // encoding
+          ...bin("The title"), 0x00
+        ])
+        .addFrame("TIT2", [
+          0x00, // text encoding
+          ...bin("Another title"), 0x00
+        ]);
     mediaFileReader = new ArrayFileReader(id3FileContents.toArray());
     tagReader = new ID3v2TagReader(mediaFileReader);
 

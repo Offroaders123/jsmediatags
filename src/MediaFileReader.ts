@@ -1,7 +1,7 @@
 import { readUTF8String, readUTF16String, readNullTerminatedString } from "./StringUtils.js";
 
 import type { DecodedString } from "./StringUtils.js";
-import type { CharsetType } from "./FlowTypes.js";
+import type { ByteArray, CharsetType } from "./FlowTypes.js";
 
 export default class MediaFileReader {
   declare protected _isInitialized: boolean;
@@ -59,7 +59,7 @@ export default class MediaFileReader {
     throw new Error("Must implement getByteAt function");
   }
 
-  getBytesAt(offset: number, length: number): number[] {
+  getBytesAt(offset: number, length: number): ByteArray {
     const bytes = new Array(length);
     for (let i = 0; i < length; i++) {
       bytes[i] = this.getByteAt(offset+i);

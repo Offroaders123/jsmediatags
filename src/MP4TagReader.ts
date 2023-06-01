@@ -9,7 +9,7 @@
 import MediaTagReader from "./MediaTagReader.js";
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { CharsetType, ByteRange, TagType, TagFrame } from "./FlowTypes.js";
+import type { ByteArray, CharsetType, ByteRange, TagType, TagFrame } from "./FlowTypes.js";
 
 export default class MP4TagReader extends MediaTagReader {
   static override getTagIdentifierByteRange(): ByteRange {
@@ -22,7 +22,7 @@ export default class MP4TagReader extends MediaTagReader {
     };
   }
 
-  static override canReadTagFormat(tagIdentifier: number[]): boolean {
+  static override canReadTagFormat(tagIdentifier: ByteArray): boolean {
     const id = String.fromCharCode.apply(String, tagIdentifier.slice(4, 8));
     return id === "ftyp";
   }
@@ -162,7 +162,7 @@ export default class MP4TagReader extends MediaTagReader {
     const klass = data.getInteger24At(offset + METADATA_HEADER + 1, true);
     // @ts-expect-error
     let type = TYPES[klass];
-    let atomData: string | number | Record<string,string | number | number[]> | undefined;
+    let atomData: string | number | Record<string,string | number | ByteArray> | undefined;
     const bigEndian = true;
     if (atomName == "trkn") {
       atomData = {

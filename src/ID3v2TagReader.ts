@@ -2,7 +2,7 @@ import MediaTagReader from "./MediaTagReader.js";
 import MediaFileReader from "./MediaFileReader.js";
 import ID3v2FrameReader from "./ID3v2FrameReader.js";
 
-import type { TagFrames, TagFrame, TagHeader, TagFrameHeader, TagFrameFlags, CharsetType, ByteRange, TagType } from "./FlowTypes.js";
+import type { ByteArray, TagFrames, TagFrame, TagHeader, TagFrameHeader, TagFrameFlags, CharsetType, ByteRange, TagType } from "./FlowTypes.js";
 
 const ID3_HEADER_SIZE = 10;
 
@@ -15,7 +15,7 @@ export default class ID3v2TagReader extends MediaTagReader {
     };
   }
 
-  static override canReadTagFormat(tagIdentifier: number[]): boolean {
+  static override canReadTagFormat(tagIdentifier: ByteArray): boolean {
     const id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
     return id === "ID3";
   }

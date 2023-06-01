@@ -55,7 +55,7 @@ export default class MP4TagContents {
 
 class Atom {
   declare private _name: string;
-  declare private _data: number[];
+  declare private _data: ByteArray;
   declare private _atoms: Atom[];
 
   constructor(name: string, data?: ByteArray | null, atoms?: Atom[] | null) {

@@ -1,7 +1,7 @@
 import MediaFileReader from "./MediaFileReader.js";
 import MediaTagReader from "./MediaTagReader.js";
 
-import type { ByteRange, TagType, PictureType } from "./FlowTypes.js";
+import type { ByteArray, ByteRange, TagType, PictureType } from "./FlowTypes.js";
 
 /*
  * The first 4 bytes of a FLAC file describes the header for the file. If these
@@ -97,7 +97,7 @@ export default class FLACTagReader extends MediaTagReader {
    *
    * @return True if the header is fLaC, false otherwise.
    */
-  static override canReadTagFormat(tagIdentifier: number[]): boolean {
+  static override canReadTagFormat(tagIdentifier: ByteArray): boolean {
     const id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 4));
     return id === "fLaC";
   }

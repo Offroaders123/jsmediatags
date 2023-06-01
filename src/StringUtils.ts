@@ -1,3 +1,5 @@
+import type { ByteArray } from "./FlowTypes.js";
+
 export type DecodedString = InternalDecodedString;
 
 class InternalDecodedString {
@@ -16,7 +18,7 @@ class InternalDecodedString {
   }
 }
 
-export function readUTF16String(bytes: number[], bigEndian: boolean, maxBytes?: number): DecodedString {
+export function readUTF16String(bytes: ByteArray, bigEndian: boolean, maxBytes?: number): DecodedString {
   let ix = 0;
   let offset1 = 1, offset2 = 0;
 
@@ -55,7 +57,7 @@ export function readUTF16String(bytes: number[], bigEndian: boolean, maxBytes?: 
   return new InternalDecodedString(arr.join(""), ix);
 }
 
-export function readUTF8String(bytes: number[], maxBytes?: number): DecodedString {
+export function readUTF8String(bytes: ByteArray, maxBytes?: number): DecodedString {
   let ix = 0;
   maxBytes = Math.min(maxBytes||bytes.length, bytes.length);
 
@@ -91,7 +93,7 @@ export function readUTF8String(bytes: number[], maxBytes?: number): DecodedStrin
   return new InternalDecodedString(arr.join(""), ix);
 }
 
-export function readNullTerminatedString(bytes: number[], maxBytes?: number): DecodedString {
+export function readNullTerminatedString(bytes: ByteArray, maxBytes?: number): DecodedString {
   const arr = [];
   maxBytes = maxBytes || bytes.length;
   let i = 0;

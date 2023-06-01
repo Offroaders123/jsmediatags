@@ -64,7 +64,7 @@ export default class FLACTagContents {
 }
 
 class MetadataBlock {
-  declare private _data: number[];
+  declare private _data: ByteArray;
   declare private _final: boolean;
   declare private _type: number;
 
@@ -78,7 +78,7 @@ class MetadataBlock {
     this._final = true;
   }
 
-  toArray(): number[] {
+  toArray(): ByteArray {
     return [ this._type + (this._final ? 128 : 0) ].concat(this._data);
   }
 }

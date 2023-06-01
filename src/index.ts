@@ -7,7 +7,7 @@ import ID3v2TagReader from "./ID3v2TagReader.js";
 import MP4TagReader from "./MP4TagReader.js";
 import FLACTagReader from "./FLACTagReader.js";
 
-import type { ByteRange, TagType } from "./FlowTypes.js";
+import type { ByteArray, ByteRange, TagType } from "./FlowTypes.js";
 
 const mediaFileReaders: typeof MediaFileReader[] = [];
 const mediaTagReaders: typeof MediaTagReader[] = [];
@@ -135,7 +135,7 @@ export class Reader {
           continue;
         }
 
-        let tagIndentifier: number[];
+        let tagIndentifier: ByteArray;
         try {
           tagIndentifier = fileReader.getBytesAt(
             range.offset >= 0 ? range.offset : range.offset + fileSize,

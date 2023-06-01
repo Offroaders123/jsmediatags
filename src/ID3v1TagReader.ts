@@ -1,7 +1,7 @@
 import MediaTagReader from "./MediaTagReader.js";
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { ByteRange, TagType } from "./FlowTypes.js";
+import type { ByteArray, ByteRange, TagType } from "./FlowTypes.js";
 
 export default class ID3v1TagReader extends MediaTagReader {
   static override getTagIdentifierByteRange(): ByteRange {
@@ -14,7 +14,7 @@ export default class ID3v1TagReader extends MediaTagReader {
     };
   }
 
-  static override canReadTagFormat(tagIdentifier: number[]): boolean {
+  static override canReadTagFormat(tagIdentifier: ByteArray): boolean {
     const id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
     return id === "TAG";
   }

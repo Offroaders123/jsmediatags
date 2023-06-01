@@ -1,6 +1,6 @@
 import MediaFileReader from "./MediaFileReader.js";
 
-import type { ByteRange, TagType } from "./FlowTypes.js";
+import type { ByteArray, ByteRange, TagType } from "./FlowTypes.js";
 
 export default class MediaTagReader {
   declare private _mediaFileReader: MediaFileReader;
@@ -25,7 +25,7 @@ export default class MediaTagReader {
    * getTagIdentifierByteRange) this function checks if it can read the tag
    * format or not.
    */
-  static canReadTagFormat(tagIdentifier: number[]): boolean {
+  static canReadTagFormat(tagIdentifier: ByteArray): boolean {
     throw new Error("Must implement");
   }
 

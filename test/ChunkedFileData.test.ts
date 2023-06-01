@@ -8,7 +8,7 @@ jest
 
 describe("ChunkedFileData", () => {
   let chunkedFileData: ChunkedFileData;
-  let someData = new Array<number>(400);
+  let someData = new Uint8Array(400);
 
   for (let i = 0; i < someData.length; i++) {
     someData[i] = i;
@@ -304,29 +304,29 @@ describe("ChunkedFileData", () => {
   });
 
   it("should read data when offsets match", () => {
-    chunkedFileData.addData(0, [0x01, 0x02, 0x03, 0x04, 0x05]);
+    chunkedFileData.addData(0, new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]));
     const iByte = chunkedFileData.getByteAt(2);
 
     expect(iByte).toBe(0x03);
   });
 
   it("should read data when offsets are mapped", () => {
-    chunkedFileData.addData(100, [0x01, 0x02, 0x03, 0x04, 0x05]);
+    chunkedFileData.addData(100, new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]));
     const iByte = chunkedFileData.getByteAt(102);
 
     expect(iByte).toBe(0x03);
   });
 
   it("should read data from the right range", () => {
-    chunkedFileData.addData(100, [0x01, 0x02, 0x03, 0x04, 0x05]);
-    chunkedFileData.addData(200, [0x11, 0x12, 0x13, 0x14, 0x15]);
+    chunkedFileData.addData(100, new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]));
+    chunkedFileData.addData(200, new Uint8Array([0x11, 0x12, 0x13, 0x14, 0x15]));
     const iByte = chunkedFileData.getByteAt(202);
 
     expect(iByte).toBe(0x13);
   });
 
   it("should fail to read when data is not loaded before any chunks", () => {
-    chunkedFileData.addData(100, [0x01, 0x02, 0x03, 0x04, 0x05]);
+    chunkedFileData.addData(100, new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]));
 
     expect(() => {
       chunkedFileData.getByteAt(0);
@@ -334,8 +334,8 @@ describe("ChunkedFileData", () => {
   });
 
   it("should fail to read when data is not loaded between chunks", () => {
-    chunkedFileData.addData(0, [0x01, 0x02, 0x03, 0x04, 0x05]);
-    chunkedFileData.addData(100, [0x01, 0x02, 0x03, 0x04, 0x05]);
+    chunkedFileData.addData(0, new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]));
+    chunkedFileData.addData(100, new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]));
 
     expect(() => {
       chunkedFileData.getByteAt(50);
@@ -343,7 +343,7 @@ describe("ChunkedFileData", () => {
   });
 
   it("should fail to read when data is not loaded after all chunks", () => {
-    chunkedFileData.addData(0, [0x01, 0x02, 0x03, 0x04, 0x05]);
+    chunkedFileData.addData(0, new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]));
 
     expect(() => {
       chunkedFileData.getByteAt(100);
@@ -351,7 +351,7 @@ describe("ChunkedFileData", () => {
   });
 
   it("should add TypedArrays", () => {
-    const intArray = new Uint8Array(Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05]));
+    const intArray = new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]);
     chunkedFileData.addData(5, intArray);
 
     expect(() => {

@@ -1,4 +1,4 @@
-import type { ChunkType, DataType, TypedArray } from "./FlowTypes.js";
+import type { ChunkType, DataType } from "./FlowTypes.js";
 
 const NOT_FOUND = -1;
 
@@ -72,30 +72,30 @@ export default class ChunkedFileData {
   }
 
   private _concatData(dataA: DataType, dataB: DataType): DataType {
-    // TypedArrays don't support concat.
-    if (
-      typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView &&
-      ArrayBuffer.isView(dataA)
-    ) {
-      // @ts-expect-error - flow thinks dataAandB is a string but it's not
-      const dataAandB = new (dataA.constructor as TypedArray)(dataA.length + dataB.length);
+    // // TypedArrays don't support concat.
+    // if (
+    //   typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView &&
+    //   ArrayBuffer.isView(dataA)
+    // ) {
+    //   // @ts-expect-error - flow thinks dataAandB is a string but it's not
+      const dataAandB = new Uint8Array(dataA.length + dataB.length);
       dataAandB.set(dataA, 0);
       dataAandB.set(dataB, dataA.length);
       return dataAandB;
-    } else {
-      // @ts-expect-error - flow thinks dataAandB is a TypedArray but it's not
-      return dataA.concat(dataB);
-    }
+    // } else {
+    //   // @ts-expect-error - flow thinks dataAandB is a TypedArray but it's not
+    //   return dataA.concat(dataB);
+    // }
   }
 
   private _sliceData(data: DataType, begin: number, end: number): DataType {
     // Some TypeArray implementations do not support slice yet.
-    if (data.slice) {
+    // if (data.slice) {
       return data.slice(begin, end);
-    } else {
-      // $FlowIssue - flow thinks data is a string but it's not
-      return (data as TypedArray).subarray(begin, end);
-    }
+    // } else {
+    //   // $FlowIssue - flow thinks data is a string but it's not
+    //   return (data as TypedArray).subarray(begin, end);
+    // }
   }
 
   /**

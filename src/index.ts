@@ -100,8 +100,8 @@ export class Reader {
     // To get around this we divide the tag readers into two categories, the
     // ones that read their tag identifiers from the start of the file and the
     // ones that read from the end of the file.
-    const tagReadersAtFileStart = [];
-    const tagReadersAtFileEnd = [];
+    const tagReadersAtFileStart: typeof MediaTagReader[] = [];
+    const tagReadersAtFileEnd: typeof MediaTagReader[] = [];
     const fileSize = fileReader.getSize();
 
     for (let i = 0; i < mediaTagReaders.length; i++) {

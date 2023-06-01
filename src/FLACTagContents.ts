@@ -25,7 +25,7 @@ export default class FLACTagContents {
   }
 
   static createStreamBlock(): MetadataBlock {
-    let data = [0x00, 0x00, 0x22].concat(Array(34).fill(0x00));
+    let data: ByteArray = [0x00, 0x00, 0x22].concat(Array(34).fill(0x00));
     return this.createBlock(0, data);
   }
 

@@ -6,19 +6,21 @@ import ArrayFileReader from "../src/ArrayFileReader.js";
 import { bin } from "../src/ByteArrayUtils.js";
 import { pad } from "../src/ByteArrayUtils.js";
 
+import type { ByteArray } from "../src/FlowTypes.js";
+
 jest
   .autoMockOff()
   .useRealTimers();
 
 describe("ID3v1TagReader", () => {
   it("reads 1.0 tags", async () => {
-    const id3ArrayFile = [
+    const id3ArrayFile: ByteArray = [
       ...bin("TAG"),
-      ...pad(bin("Song Title"), 30) as number[],
-      ...pad(bin("The Artist"), 30) as number[],
-      ...pad(bin("The Album"), 30) as number[],
+      ...pad(bin("Song Title"), 30) as ByteArray,
+      ...pad(bin("The Artist"), 30) as ByteArray,
+      ...pad(bin("The Album"), 30) as ByteArray,
       ...bin("1995"),
-      ...pad(bin("A Comment"), 30) as number[],
+      ...pad(bin("A Comment"), 30) as ByteArray,
       30
     ];
     const mediaFileReader = new ArrayFileReader(id3ArrayFile);
@@ -41,13 +43,13 @@ describe("ID3v1TagReader", () => {
   });
 
   it("reads 1.1 tags", async () => {
-    const id3ArrayFile = [
+    const id3ArrayFile: ByteArray = [
       ...bin("TAG"),
-      ...pad(bin("Song Title"), 30) as number[],
-      ...pad(bin("The Artist"), 30) as number[],
-      ...pad(bin("The Album"), 30) as number[],
+      ...pad(bin("Song Title"), 30) as ByteArray,
+      ...pad(bin("The Artist"), 30) as ByteArray,
+      ...pad(bin("The Album"), 30) as ByteArray,
       ...bin("1995"),
-      ...pad(bin("A Comment"), 29) as number[],
+      ...pad(bin("A Comment"), 29) as ByteArray,
       3,
       30
     ];

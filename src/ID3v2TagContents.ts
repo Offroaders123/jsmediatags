@@ -210,7 +210,7 @@ export default class ID3v2TagContents {
    */
   addFrame(id: string, data: ByteArray, flags?: TagFrameFlags, noFlagsDataLength?: number): ID3v2TagContents {
     let size: number | ByteArray = 0;
-    const frameFlags = [0, 0];
+    const frameFlags: [number,number] = [0, 0];
     if (flags) {
       flags.message = flags.message || {};
       flags.format = flags.format || {};
@@ -261,7 +261,7 @@ export default class ID3v2TagContents {
       throw Error("Major version not supported");
     }
 
-    const frame = [
+    const frame: ByteArray = [
       ...bin(id),
       ...size,
       ...frameFlags,
@@ -301,7 +301,7 @@ export default class ID3v2TagContents {
       }
     }
 
-    const data = [tagData.length].concat(tagData);
+    const data: ByteArray = [tagData.length].concat(tagData);
     // @ts-expect-error
     this._extendedHeader[tagKey] = data.length;
     this._addData(offset, data);

@@ -144,7 +144,7 @@ export default class MediaFileReader {
   }
 
   getStringAt(offset: number, length: number): string {
-    const string = [];
+    const string: string[] = [];
     for (let i = offset, j = 0; i < offset+length; i++, j++) {
       string[j] = String.fromCharCode(this.getByteAt(i));
     }

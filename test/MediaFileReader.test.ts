@@ -2,6 +2,8 @@ import { jest, describe, beforeEach, it, expect } from "@jest/globals";
 
 import MediaFileReader from "../src/MediaFileReader.js";
 
+import type { ByteArray } from "../src/FlowTypes.js";
+
 jest
   .dontMock("../src/MediaFileReader.js")
   .dontMock("../src/StringUtils.js")
@@ -9,7 +11,7 @@ jest
 
 describe("MediaFileReader", () => {
   let mediaFileReader: MediaFileReader;
-  let mediaFileBytes: number[] = [];
+  let mediaFileBytes: ByteArray = [];
 
   beforeEach(() => {
     mediaFileReader = new MediaFileReader();

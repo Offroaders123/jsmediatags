@@ -4,7 +4,7 @@ import ID3v2FrameReader from "../src/ID3v2FrameReader.js";
 import ArrayFileReader from "../src/ArrayFileReader.js";
 import { bin } from "../src/ByteArrayUtils.js";
 
-import type { TagHeader } from "../src/FlowTypes.js";
+import type { ByteArray, TagHeader } from "../src/FlowTypes.js";
 
 jest
   .autoMockOff()
@@ -16,7 +16,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       0x00, // text encoding
       ...bin("image/jpeg"), 0x00,
       0x03, // picture type - cover front
@@ -42,7 +42,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       0x00, // text encoding
       ...bin("ENG"), // language
       ...bin("tl;dr"), 0x00, // short text description
@@ -66,7 +66,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       0x00, // text encoding
       ...bin("JPG"), // image format
       0x03, // picture type - cover front
@@ -92,7 +92,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       0xaf, 0x19, 0x00, 0x00
     ];
     const fileReader = new ArrayFileReader(fileData);
@@ -111,7 +111,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("should read text with iso-8859-1 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x00, // encoding
           0xe3
         ];
@@ -122,7 +122,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("should read text with utf-16 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x01, // encoding
           0xfe, 0xff, 0x00, 0xe3
         ];
@@ -133,7 +133,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("should read text with utf-16be charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x02, // encoding
           0xff, 0xfe, 0xe3, 0x00
         ];
@@ -144,7 +144,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("should read text with utf-8 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x03, // encoding
           0xc3, 0xa3
         ];
@@ -167,7 +167,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads the description and value with iso-8859-1 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           // encoding
           0x00,
           // "ã" for description field
@@ -184,7 +184,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads the description and value with utf-16 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x01, // encoding
           0xfe, 0xff, 0x00, 0xe3, 0x00, 0x00,
           0xfe, 0xff, 0x00, 0xe3, 0x00, 0x00
@@ -196,7 +196,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads the description and value with utf-16be charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x02, // encoding
           0xff, 0xfe, 0xe3, 0x00, 0x00, 0x00,
           0xff, 0xfe, 0xe3, 0x00, 0x00, 0x00
@@ -208,7 +208,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads the description and value with utf-8 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x03, // encoding
           0xc3, 0xa3, 0x00,
           0xc3, 0xe3, 0x00
@@ -230,7 +230,7 @@ describe("ID3v2FrameReader", () => {
 
     describe("W000 - WZZZ, excluding WXXX", () => {
       it("should read urls with iso-8859-1 charset", () => {
-        const fileData = [0xe3];
+        const fileData: ByteArray = [0xe3];
         const fileReader = new ArrayFileReader(fileData);
         const data = frameReader!(0, fileData.length, fileReader);
 
@@ -250,7 +250,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads both description and url with iso-8859-1 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           // encoding
           0x00,
           // "ã" for description field
@@ -267,7 +267,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads the description and url with utf-16 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x01, // encoding
           0xfe, 0xff, 0x00, 0xe3, 0x00, 0x00,
           0xfe, 0xff, 0x00, 0xe3, 0x00, 0x00
@@ -279,7 +279,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads the description and url with utf-16be charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x02, // encoding
           0xff, 0xfe, 0xe3, 0x00, 0x00, 0x00,
           0xff, 0xfe, 0xe3, 0x00, 0x00, 0x00
@@ -291,7 +291,7 @@ describe("ID3v2FrameReader", () => {
       });
 
       it("reads the description and url with utf-8 charset", () => {
-        const fileData = [
+        const fileData: ByteArray = [
           0x03, // encoding
           0xc3, 0xa3, 0x00,
           0xc3, 0xe3, 0x00
@@ -309,7 +309,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       0x00, // encoding
       ...bin("(10)Eurodisc")
     ];
@@ -324,7 +324,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       0x00, // encoding
       ...bin("POR"), // language
       0x00, // content descriptor
@@ -345,7 +345,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       ...bin("ID1"), // ID
       0x00, // null terminated
       0b00000011, // toplevel/ordered bit
@@ -395,7 +395,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       ...bin("ID1"), // ID
       0x00, // null terminated
       0x00, 0x00, 0x00, 0xff, // start time
@@ -422,7 +422,7 @@ describe("ID3v2FrameReader", () => {
   it("should ignore faulty MP3ext padding", () => {
     const artistName = bin("Lead Artist");
     const mp3extPadding = bin("MP3ext V3.3.19(ansi) MP3ext V3.3.19(ansi)");
-    const fileData = [
+    const fileData: ByteArray = [
       // Good tag
       ...bin("TPE1"),
       0x00, 0x00, 0x00, 1 + artistName.length, // size
@@ -446,7 +446,7 @@ describe("ID3v2FrameReader", () => {
   // padding size (https://github.com/aadsm/jsmediatags/issues/69).
   it("should ignore undeclared padding", () => {
     const artistName = bin("Lead Artist");
-    const fileData = [
+    const fileData: ByteArray = [
       ...bin("TPE1"),
       0x00, 0x00, 0x00, 1 + artistName.length, // size
       0x00, 0x00, // flags
@@ -472,7 +472,7 @@ describe("ID3v2FrameReader", () => {
 
     expect(frameReader).toBeDefined();
 
-    const fileData = [
+    const fileData: ByteArray = [
       ...bin("http://www.id3.org/dummy/ufid.html"), 0x00, // owner identifier
       0x01, 0x02, 0x03 // identifier
     ];

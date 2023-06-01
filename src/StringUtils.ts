@@ -36,7 +36,7 @@ export function readUTF16String(bytes: ByteArray, bigEndian: boolean, maxBytes?:
     offset2 = 1;
   }
 
-  const arr = [];
+  const arr: string[] = [];
   for (let j = 0; ix < maxBytes; j++) {
       const byte1 = bytes[ix+offset1];
       const byte2 = bytes[ix+offset2];
@@ -65,7 +65,7 @@ export function readUTF8String(bytes: ByteArray, maxBytes?: number): DecodedStri
     ix = 3;
   }
 
-  const arr = [];
+  const arr: string[] = [];
   for (let j = 0; ix < maxBytes; j++) {
     const byte1 = bytes[ix++];
     if (byte1 == 0x00) {
@@ -94,7 +94,7 @@ export function readUTF8String(bytes: ByteArray, maxBytes?: number): DecodedStri
 }
 
 export function readNullTerminatedString(bytes: ByteArray, maxBytes?: number): DecodedString {
-  const arr = [];
+  const arr: string[] = [];
   maxBytes = maxBytes || bytes.length;
   let i = 0;
   while (i < maxBytes) {

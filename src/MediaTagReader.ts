@@ -34,7 +34,7 @@ export default class MediaTagReader {
     return this;
   }
 
-  async read() {
+  async read(): Promise<TagType> {
     await this._mediaFileReader.init();
     await this._loadData(this._mediaFileReader);
 
@@ -54,7 +54,7 @@ export default class MediaTagReader {
   /**
    * Load the necessary bytes from the media file.
    */
-  public async _loadData(mediaFileReader: MediaFileReader) {
+  public async _loadData(mediaFileReader: MediaFileReader): Promise<void> {
     throw new Error("Must implement _loadData function");
   }
 

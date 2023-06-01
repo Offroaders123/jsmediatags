@@ -23,7 +23,7 @@ export default class MediaFileReader {
    * This function needs to be called before any other function.
    * Loads the necessary initial information from the file.
    */
-  async init() {
+  async init(): Promise<void> {
     if (this._isInitialized) {
       return new Promise<void>(resolve => setTimeout(resolve, 1));
     } else {
@@ -32,7 +32,7 @@ export default class MediaFileReader {
     }
   }
 
-  protected async _init() {
+  protected async _init(): Promise<void> {
     throw new Error("Must implement init function");
   }
 
@@ -40,7 +40,7 @@ export default class MediaFileReader {
    * @param range The start and end indexes of the range to load.
    *        Ex: [0, 7] load bytes 0 to 7 inclusive.
    */
-  async loadRange(range: [number, number]) {
+  async loadRange(range: [number, number]): Promise<void> {
     throw new Error("Must implement loadRange function");
   }
 

@@ -20,12 +20,12 @@ export default class BlobFileReader extends MediaFileReader {
     );
   }
 
-  protected override async _init() {
+  protected override async _init(): Promise<void> {
     this._size = this._blob.size;
     await new Promise(resolve => setTimeout(resolve, 1));
   }
 
-  override async loadRange(range: [number, number]) {
+  override async loadRange(range: [number, number]): Promise<void> {
     const blob = this._blob.slice(range[0], range[1] + 1);
     let buffer: ArrayBuffer;
 

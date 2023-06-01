@@ -27,7 +27,7 @@ export default class MP4TagReader extends MediaTagReader {
     return id === "ftyp";
   }
 
-  public override async _loadData(mediaFileReader: MediaFileReader) {
+  public override async _loadData(mediaFileReader: MediaFileReader): Promise<void> {
     // MP4 metadata isn't located in a specific location of the file. Roughly
     // speaking, it's composed of blocks chained together like a linked list.
     // These blocks are called atoms (or boxes).
@@ -45,7 +45,7 @@ export default class MP4TagReader extends MediaTagReader {
     await this._loadAtom(mediaFileReader, 0, "");
   }
 
-  private async _loadAtom(mediaFileReader: MediaFileReader, offset: number, parentAtomFullName: string) {
+  private async _loadAtom(mediaFileReader: MediaFileReader, offset: number, parentAtomFullName: string): Promise<void> {
     if (offset >= mediaFileReader.getSize()) {
       return;
     }
@@ -115,7 +115,7 @@ export default class MP4TagReader extends MediaTagReader {
     };
   }
 
-  private _readAtom(tags: Object, data: MediaFileReader, offset: number, length: number, tagsToRead?: string[] | null, parentAtomFullName?: string, indent?: string) {
+  private _readAtom(tags: Object, data: MediaFileReader, offset: number, length: number, tagsToRead?: string[] | null, parentAtomFullName?: string, indent?: string): void {
     indent = indent === undefined ? "" : indent + "  ";
 
     let seek = offset;

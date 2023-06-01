@@ -14,7 +14,7 @@ describe("ChunkedFileData", () => {
     someData[i] = i;
   }
 
-  function sliceData(offset: number, length: number) {
+  function sliceData(offset: number, length: number): Uint8Array {
     return someData.slice(offset, offset + length);
   }
 

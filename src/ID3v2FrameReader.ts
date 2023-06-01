@@ -462,17 +462,18 @@ frameReaderFunctions["CHAP"] = function readChapterFrame(offset: number, length:
   return result;
 };
 
-// ID3v2 table of contents according to http://id3.org/id3v2-chapters-1.0
-frameReaderFunctions["CTOC"] = function readTableOfContentsFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader) {
-  interface TableOfContentsResult {
-    childElementIds: string[];
-    id: string;
-    topLevel: boolean;
-    ordered: boolean;
-    entryCount: number;
-    subFrames?: string;
-  }
+interface TableOfContentsResult {
+  childElementIds: string[];
+  id: string;
+  topLevel: boolean;
+  ordered: boolean;
+  entryCount: number;
+  subFrames?: string;
+}
 
+
+// ID3v2 table of contents according to http://id3.org/id3v2-chapters-1.0
+frameReaderFunctions["CTOC"] = function readTableOfContentsFrame(offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader): TableOfContentsResult {
   const originalOffset = offset;
   const ID = StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));
   const id = ID.toString();

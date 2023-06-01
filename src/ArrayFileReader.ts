@@ -19,15 +19,15 @@ export default class ArrayFileReader extends MediaFileReader {
     );
   }
 
-  override async init() {
+  override async init(): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 0));
   }
 
-  override async loadRange(range: [number, number]) {
+  override async loadRange(range: [number, number]): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 0));
   }
 
-  override getByteAt(offset: number) {
+  override getByteAt(offset: number): number {
     if (offset >= this._array.length) {
       throw new Error(`Offset ${offset} hasn't been loaded yet.`);
     }

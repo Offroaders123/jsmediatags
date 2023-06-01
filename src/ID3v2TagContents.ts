@@ -282,7 +282,7 @@ export default class ID3v2TagContents {
     return this;
   }
 
-  private _addExtendedHeaderData(tagKey: string, tagData: ByteArray) {
+  private _addExtendedHeaderData(tagKey: string, tagData: ByteArray): void {
     const offset = START_EXTENDED_DATA_V4;
 
     // Each flag that is set in the extended header has data attached, which
@@ -309,7 +309,7 @@ export default class ID3v2TagContents {
     this._addData(offset, data);
   }
 
-  private _initExtendedHeader() {
+  private _initExtendedHeader(): void {
     this._hasExtendedHeader = true;
     this._updateFlags({extended_header: true});
 
@@ -331,7 +331,7 @@ export default class ID3v2TagContents {
     }
   }
 
-  private _updateSize() {
+  private _updateSize(): void {
     // Header (10 bytes) is not included in the size.
     let size = 0;
 
@@ -361,7 +361,7 @@ export default class ID3v2TagContents {
     this._setData(SIZE, getSynchsafeInteger32(size));
   }
 
-  private _setBitAtOffset(offset: number, bit: number) {
+  private _setBitAtOffset(offset: number, bit: number): void {
     const data = this._getData(offset, 1);
     data[0] |= 1<<bit;
     this._setData(offset, data);
@@ -371,7 +371,7 @@ export default class ID3v2TagContents {
     return this._contents.slice(offset, offset+length);
   }
 
-  private _setData(offset: number, data: ByteArray) {
+  private _setData(offset: number, data: ByteArray): void {
     // @ts-expect-error
     this._contents.splice.apply(this._contents, [
       offset,
@@ -379,7 +379,7 @@ export default class ID3v2TagContents {
     ].concat(data));
   }
 
-  private _addData(offset: number, data: ByteArray) {
+  private _addData(offset: number, data: ByteArray): void {
     // @ts-expect-error
     this._contents.splice.apply(this._contents, [
       offset,

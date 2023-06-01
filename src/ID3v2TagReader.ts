@@ -20,7 +20,7 @@ export default class ID3v2TagReader extends MediaTagReader {
     return id === "ID3";
   }
 
-  public override async _loadData(mediaFileReader: MediaFileReader) {
+  public override async _loadData(mediaFileReader: MediaFileReader): Promise<void> {
     await mediaFileReader.loadRange([6, 9]);
     await mediaFileReader.loadRange(
       // The tag size does not include the header size.

@@ -64,11 +64,11 @@ class MetadataBlock {
     this._final = false;
   }
 
-  setFinal() {
+  setFinal(): void {
     this._final = true;
   }
 
-  toArray() {
+  toArray(): number[] {
     return [ this._type + (this._final ? 128 : 0) ].concat(this._data);
   }
 }

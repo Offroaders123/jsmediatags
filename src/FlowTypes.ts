@@ -17,11 +17,9 @@ export interface ByteRange {
   length: number;
 }
 
-export type DataType = Uint8Array;
-
 export interface ChunkType {
   offset: number;
-  data: DataType;
+  data: Uint8Array;
 }
 
 export type ByteArray = number[];

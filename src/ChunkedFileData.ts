@@ -1,4 +1,4 @@
-import type { ChunkType, DataType } from "./FlowTypes.js";
+import type { ChunkType } from "./FlowTypes.js";
 
 const NOT_FOUND = -1;
 
@@ -21,7 +21,7 @@ export default class ChunkedFileData {
   /**
    * Adds data to the file storage at a specific offset.
    */
-  addData(offset: number, data: DataType): void {
+  addData(offset: number, data: Uint8Array): void {
     const offsetEnd = offset+data.length-1;
     const chunkRange = this._getChunkRange(offset, offsetEnd);
 
@@ -71,14 +71,14 @@ export default class ChunkedFileData {
     }
   }
 
-  private _concatData(dataA: DataType, dataB: DataType): DataType {
+  private _concatData(dataA: Uint8Array, dataB: Uint8Array): Uint8Array {
       const dataAandB = new Uint8Array(dataA.length + dataB.length);
       dataAandB.set(dataA, 0);
       dataAandB.set(dataB, dataA.length);
       return dataAandB;
   }
 
-  private _sliceData(data: DataType, begin: number, end: number): DataType {
+  private _sliceData(data: Uint8Array, begin: number, end: number): Uint8Array {
     return data.slice(begin, end);
     //   return (data as TypedArray).subarray(begin, end);
   }

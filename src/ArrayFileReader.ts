@@ -13,7 +13,6 @@ import type {
 
 class ArrayFileReader extends MediaFileReader {
   _array: ByteArray;
-  _size: number;
 
   constructor(array: ByteArray) {
     super();

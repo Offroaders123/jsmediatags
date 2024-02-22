@@ -85,7 +85,7 @@ class ID3v2TagContents {
       binaryFlags = this._contents[FLAGS] || 0;
     }
 
-    function setOrUnsetBit(shouldSet, bitmap, bit) {
+    function setOrUnsetBit(shouldSet: boolean, bitmap: number, bit: number) {
       if (shouldSet) {
         return bitmap |= 1<<bit;
       } else {

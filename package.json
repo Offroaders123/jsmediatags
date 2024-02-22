@@ -65,6 +65,7 @@
     "jest-cli": "^26.6.3",
     "react": "^16.2.0",
     "react-native": "^0.64.0",
+    "typescript": "^5.3.3",
     "watchify": "^4.0.0"
   },
   "scripts": {

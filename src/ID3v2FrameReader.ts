@@ -639,7 +639,7 @@ frameReaderFunctions['UFID'] = function readLyricsFrame(
   };
 };
 
-function getTextEncoding(bite): CharsetType {
+function getTextEncoding(bite: number): CharsetType {
   var charset: ?CharsetType;
 
   switch (bite)

@@ -63,7 +63,7 @@ class NodeFileReader extends MediaFileReader {
       return;
     }
 
-    var readData = function(err, _fd) {
+    var readData = function(err: Error, _fd: number) {
       if (err) {
         onError({"type": "fs", "info": err});
         return;
@@ -76,7 +76,7 @@ class NodeFileReader extends MediaFileReader {
       fs.read(_fd, buffer, 0, length, range[0], processData);
     };
 
-    var processData = function(err, bytesRead, buffer) {
+    var processData = function(err: Error, bytesRead: number, buffer: Buffer) {
       fs.close(fd, function(err) {
         if (err) {
           console.error(err);
@@ -92,7 +92,7 @@ class NodeFileReader extends MediaFileReader {
       onSuccess();
     };
 
-    var storeBuffer = function(buffer) {
+    var storeBuffer = function(buffer: Buffer) {
       var data = Array.prototype.slice.call(buffer, 0, length);
       fileData.addData(range[0], data);
     }

@@ -56,6 +56,7 @@ import type {
   ByteRange,
   TagType
 } from './FlowTypes';
+import type MediaFileReader = require('./MediaFileReader.js');
 
 /**
  * Class representing a MediaTagReader that parses FLAC tags.

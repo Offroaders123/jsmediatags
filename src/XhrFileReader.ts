@@ -14,9 +14,9 @@ import type {
 } from './FlowTypes';
 
 type ContentRangeType = {
-  firstBytePosition: ?number,
-  lastBytePosition: ?number,
-  instanceLength: ?number,
+  firstBytePosition: number,
+  lastBytePosition: number,
+  instanceLength: number | null,
 };
 
 class XhrFileReader extends MediaFileReader {
@@ -48,7 +48,7 @@ class XhrFileReader extends MediaFileReader {
 
     var disallowedXhrHeaders = this._config.disallowedXhrHeaders;
     for (var i = 0; i < disallowedXhrHeaders.length; i++) {
-      disallowedXhrHeaders[i] = disallowedXhrHeaders[i].toLowerCase();
+      disallowedXhrHeaders[i] = disallowedXhrHeaders[i]!.toLowerCase();
     }
   }
 
@@ -125,7 +125,7 @@ class XhrFileReader extends MediaFileReader {
     return xhr.responseBody || xhr.responseText || "";
   }
 
-  _parseContentLength(xhr: XMLHttpRequest): ?number {
+  _parseContentLength(xhr: XMLHttpRequest): number | null {
     var contentLength = this._getResponseHeader(xhr, "Content-Length");
 
     if (contentLength == null) {
@@ -135,7 +135,7 @@ class XhrFileReader extends MediaFileReader {
     }
   }
 
-  _parseContentRange(xhr: XMLHttpRequest): ?ContentRangeType {
+  _parseContentRange(xhr: XMLHttpRequest): ContentRangeType | null {
     var contentRange = this._getResponseHeader(xhr, "Content-Range");
 
     if (contentRange) {
@@ -147,8 +147,8 @@ class XhrFileReader extends MediaFileReader {
       }
 
       return {
-        firstBytePosition: parseInt(parsedContentRange[1], 10),
-        lastBytePosition: parseInt(parsedContentRange[2], 10),
+        firstBytePosition: parseInt(parsedContentRange[1]!, 10),
+        lastBytePosition: parseInt(parsedContentRange[2]!, 10),
         instanceLength: parsedContentRange[3] ? parseInt(parsedContentRange[3], 10) : null
       };
     } else {
@@ -191,7 +191,7 @@ class XhrFileReader extends MediaFileReader {
 
   _makeXHRRequest(
     method: string,
-    range: ?[number, number],
+    range: [number, number] | null,
     callbacks: CallbackType
   ) {
     var xhr = this._createXHRObject();
@@ -271,13 +271,13 @@ class XhrFileReader extends MediaFileReader {
     var headers = allResponseHeaders.split("\r\n");
     var headerNames = [];
     for (var i = 0; i < headers.length; i++) {
-      headerNames[i] = headers[i].split(":")[0].toLowerCase();
+      headerNames[i] = headers[i]!.split(":")[0]!.toLowerCase();
     }
 
     return headerNames.indexOf(headerName.toLowerCase()) >= 0;
   }
 
-  _getResponseHeader(xhr: XMLHttpRequest, headerName: string): ?string {
+  _getResponseHeader(xhr: XMLHttpRequest, headerName: string): string | null {
     if (!this._hasResponseHeader(xhr, headerName)) {
       return null;
     }

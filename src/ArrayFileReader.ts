@@ -40,7 +40,7 @@ class ArrayFileReader extends MediaFileReader {
     if (offset >= this._array.length) {
       throw new Error("Offset " + offset + " hasn't been loaded yet.");
     }
-    return this._array[offset];
+    return this._array[offset]!;
   }
 }
 

@@ -116,7 +116,7 @@ class MP4TagReader extends MediaTagReader {
     return atomName !== "----";
   }
 
-  override _parseData(data: MediaFileReader, tagsToRead: ?Array<string>): TagType {
+  override _parseData(data: MediaFileReader, tagsToRead: Array<string> | null): TagType {
     var tags = {};
 
     tagsToRead = this._expandShortcutTags(tagsToRead);
@@ -147,7 +147,7 @@ class MP4TagReader extends MediaTagReader {
     data: MediaFileReader,
     offset: number,
     length: number,
-    tagsToRead: ?Array<string>,
+    tagsToRead: Array<string> | null,
     parentAtomFullName?: string,
     indent?: string
   ) {

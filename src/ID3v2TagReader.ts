@@ -48,7 +48,7 @@ class ID3v2TagReader extends MediaTagReader {
     });
   }
 
-  override _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
     var offset = 0;
     var major = data.getByteAt(offset+3);
     if (major > 4) { return {"type": "ID3", "version": ">2.4", "tags": {}}; }
@@ -87,8 +87,9 @@ class ID3v2TagReader extends MediaTagReader {
       "tags": {},
     };
 
+    var expandedTags: string[] | null = null;
     if (tags) {
-      var expandedTags = this._expandShortcutTags(tags);
+      expandedTags = this._expandShortcutTags(tags);
     }
 
     var offsetEnd = size + 10/*header size*/;
@@ -105,7 +106,7 @@ class ID3v2TagReader extends MediaTagReader {
     var frames = ID3v2FrameReader.readFrames(offset, offsetEnd, data, id3, expandedTags);
     // create shortcuts for most common data.
     for (var name in SHORTCUTS) if (SHORTCUTS.hasOwnProperty(name)) {
-      var frameData = this._getFrameData(frames, SHORTCUTS[name]);
+      var frameData = this._getFrameData(frames, SHORTCUTS[name as keyof typeof SHORTCUTS]);
       if (frameData) {
         id3.tags[name] = frameData;
       }
@@ -118,7 +119,7 @@ class ID3v2TagReader extends MediaTagReader {
     return id3;
   }
 
-  _getFrameData(frames: TagFrames, ids: Array<string>): ?Object {
+  _getFrameData(frames: TagFrames, ids: Array<string>): Object | null {
     var frame;
     for (var i = 0, id; id = ids[i]; i++) {
       if (id in frames) {

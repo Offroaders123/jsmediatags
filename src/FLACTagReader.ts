@@ -62,8 +62,8 @@ import type MediaFileReader = require('./MediaFileReader.js');
  * Class representing a MediaTagReader that parses FLAC tags.
  */
 class FLACTagReader extends MediaTagReader {
-  _commentOffset: number;
-  _pictureOffset: number;
+  _commentOffset!: number;
+  _pictureOffset!: number;
 
   /**
    * Gets the byte range for the tag identifier.
@@ -248,7 +248,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {Array<string>} [tags] - Optional tags to also be retrieved from the file.
    * @return {TagType} - An object containing the tag information for the file.
    */
-  override _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
     var vendorLength = data.getLongAt(this._commentOffset, false);
     var offsetVendor = this._commentOffset + 4;
     /* This line is able to retrieve the vendor string that the VorbisComment block
@@ -276,7 +276,7 @@ class FLACTagReader extends MediaTagReader {
       let s = data.getStringWithCharsetAt(dataOffset + 4, dataLength, "utf-8").toString();
       let d = s.indexOf("=");
       let split = [s.slice(0, d), s.slice(d + 1)];
-      switch (split[0].toUpperCase()) {
+      switch (split[0]!.toUpperCase()) {
         case "TITLE":
           title = split[1];
           break;

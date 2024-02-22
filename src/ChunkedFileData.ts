@@ -43,8 +43,8 @@ class ChunkedFileData {
       // If the data to add collides with existing chunks we prepend and
       // append data from the half colliding chunks to make the collision at
       // 100%. The new data can then replace all the colliding chunkes.
-      var firstChunk = this._fileData[chunkRange.startIx];
-      var lastChunk = this._fileData[chunkRange.endIx];
+      var firstChunk = this._fileData[chunkRange.startIx]!;
+      var lastChunk = this._fileData[chunkRange.endIx]!;
       var needsPrepend = offset > firstChunk.offset;
       var needsAppend = offsetEnd < lastChunk.offset + lastChunk.data.length - 1;
 
@@ -127,8 +127,8 @@ class ChunkedFileData {
 
     // Could use binary search but not expecting that many blocks to exist.
     for (var i = 0; i < this._fileData.length; i++, insertIx = i) {
-      var chunkOffsetStart = this._fileData[i].offset;
-      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
+      var chunkOffsetStart = this._fileData[i]!.offset;
+      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i]!.data.length;
 
       if (offsetEnd < chunkOffsetStart-1) {
         // This offset range doesn't overlap with any chunks.
@@ -155,8 +155,8 @@ class ChunkedFileData {
 
     // Find the ending chunk.
     for (var i = startChunkIx; i < this._fileData.length; i++) {
-      var chunkOffsetStart = this._fileData[i].offset;
-      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
+      var chunkOffsetStart = this._fileData[i]!.offset;
+      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i]!.data.length;
 
       if (offsetEnd >= chunkOffsetStart-1) {
         // Candidate for the end chunk, it doesn't mean it is yet.
@@ -179,7 +179,7 @@ class ChunkedFileData {
 
   hasDataRange(offsetStart: number, offsetEnd: number): boolean {
     for (var i = 0; i < this._fileData.length; i++) {
-      var chunk = this._fileData[i];
+      var chunk = this._fileData[i]!;
       if (offsetEnd < chunk.offset) {
         return false;
       }
@@ -197,8 +197,8 @@ class ChunkedFileData {
     var dataChunk;
 
     for (var i = 0; i < this._fileData.length; i++) {
-      var dataChunkStart = this._fileData[i].offset;
-      var dataChunkEnd = dataChunkStart + this._fileData[i].data.length - 1;
+      var dataChunkStart = this._fileData[i]!.offset;
+      var dataChunkEnd = dataChunkStart + this._fileData[i]!.data.length - 1;
 
       if (offset >= dataChunkStart && offset <= dataChunkEnd) {
         dataChunk = this._fileData[i];

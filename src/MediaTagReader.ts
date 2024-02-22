@@ -14,7 +14,7 @@ import type {
 
 class MediaTagReader {
   _mediaFileReader: MediaFileReader;
-  _tags: ?Array<string>;
+  _tags: Array<string> | null;
 
   constructor(mediaFileReader: MediaFileReader) {
     this._mediaFileReader = mediaFileReader;
@@ -57,14 +57,14 @@ class MediaTagReader {
               if (callbacks.onError) {
                 callbacks.onError({
                   "type": "parseData",
-                  "info": ex.message
+                  "info": (ex as Error).message
                 });
                 return;
               }
             }
 
             // TODO: destroy mediaFileReader
-            callbacks.onSuccess(tags);
+            callbacks.onSuccess(tags!);
           },
           onError: callbacks.onError
         });
@@ -90,18 +90,18 @@ class MediaTagReader {
   /**
    * Parse the loaded data to read the media tags.
    */
-  _parseData(mediaFileReader: MediaFileReader, tags: ?Array<string>): TagType {
+  _parseData(mediaFileReader: MediaFileReader, tags: Array<string> | null): TagType {
     throw new Error("Must implement _parseData function");
   }
 
-  _expandShortcutTags(tagsWithShortcuts: ?Array<string>): ?Array<string> {
+  _expandShortcutTags(tagsWithShortcuts: Array<string> | null): Array<string> | null {
     if (!tagsWithShortcuts) {
       return null;
     }
 
-    var tags = [];
+    var tags: string[] = [];
     var shortcuts = this.getShortcuts();
-    for (var i = 0, tagOrShortcut; tagOrShortcut = tagsWithShortcuts[i]; i++ ) {
+    for (var i = 0, tagOrShortcut: string | undefined; tagOrShortcut = tagsWithShortcuts[i]; i++ ) {
       tags = tags.concat(shortcuts[tagOrShortcut]||[tagOrShortcut]);
     }
 

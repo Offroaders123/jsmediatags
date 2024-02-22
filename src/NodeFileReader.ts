@@ -63,20 +63,20 @@ class NodeFileReader extends MediaFileReader {
       return;
     }
 
-    var readData = function(err: Error, _fd: number) {
+    var readData = function(err: Error | null, _fd: number | null) {
       if (err) {
         onError({"type": "fs", "info": err});
         return;
       }
 
-      fd = _fd;
+      fd = _fd!;
       // TODO: Should create a pool of Buffer objects across all instances of
       //       NodeFileReader. This is fine for now.
       var buffer = new Buffer(length);
-      fs.read(_fd, buffer, 0, length, range[0], processData);
+      fs.read(_fd!, buffer, 0, length, range[0], processData);
     };
 
-    var processData = function(err: Error, bytesRead: number, buffer: Buffer) {
+    var processData = function(err: Error | null, bytesRead: number, buffer: Buffer) {
       fs.close(fd, function(err) {
         if (err) {
           console.error(err);

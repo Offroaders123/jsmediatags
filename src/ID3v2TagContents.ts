@@ -36,7 +36,7 @@ import type {
 } from './FlowTypes';
 
 class ID3v2TagContents {
-  _size: number;
+  _size!: number;
   _major: number;
   _revision: number;
   _contents: ByteArray;
@@ -46,8 +46,8 @@ class ID3v2TagContents {
     CRC: number,
     RESTRICTIONS: number
   };
-  _hasExtendedHeader: boolean;
-  _nextFrameOffset: number;
+  _hasExtendedHeader?: boolean;
+  _nextFrameOffset!: number;
 
   constructor(major: number, revision: number) {
     if (major < 2 || major > 4) {
@@ -56,7 +56,7 @@ class ID3v2TagContents {
 
     this._major = major;
     this._revision = revision;
-    this._contents = [].concat(
+    this._contents = ([] as ByteArray).concat(
       bin("ID3"),
       [major, revision],
       [0], // flags
@@ -229,7 +229,7 @@ class ID3v2TagContents {
     flags?: TagFrameFlags,
     noFlagsDataLength?: number
   ): ID3v2TagContents {
-    var size = 0;
+    var size: number | ByteArray = 0;
     var frameFlags = [0, 0];
     if (flags) {
       flags.message = flags.message || {};
@@ -238,7 +238,7 @@ class ID3v2TagContents {
     data = data || [];
 
     var dataLength = data.length;
-    var isTagUnsynchronised = this._contents[FLAGS] & (1<<7);
+    var isTagUnsynchronised = this._contents[FLAGS]! & (1<<7);
     if (isTagUnsynchronised) {
       var unsynchronisedByteCount = 0;
 
@@ -260,14 +260,14 @@ class ID3v2TagContents {
         frameFlags[0] |= (flags.message.read_only ? 1 : 0) << 5;
         frameFlags[1] |= (flags.format.compression ? 1 : 0) << 7;
         frameFlags[1] |= (flags.format.encryption ? 1 : 0) << 6;
-        frameFlags[1] |= (flags.format.grouping_identify ? 1 : 0) << 5;
+        frameFlags[1] |= (flags.format.grouping_identity ? 1 : 0) << 5;
       }
     } else if (this._major === 4) {
       if (flags) {
         frameFlags[0] |= (flags.message.tag_alter_preservation ? 1 : 0) << 6;
         frameFlags[0] |= (flags.message.file_alter_preservation ? 1 : 0) << 5;
         frameFlags[0] |= (flags.message.read_only ? 1 : 0) << 4;
-        frameFlags[1] |= (flags.format.grouping_identify ? 1 : 0) << 6;
+        frameFlags[1] |= (flags.format.grouping_identity ? 1 : 0) << 6;
         frameFlags[1] |= (flags.format.compression ? 1 : 0) << 3;
         frameFlags[1] |= (flags.format.encryption ? 1 : 0) << 2;
         frameFlags[1] |= (flags.format.unsynchronisation ? 1 : 0) << 1;
@@ -281,7 +281,7 @@ class ID3v2TagContents {
       throw Error("Major version not supported");
     }
 
-    var frame = [].concat(
+    var frame = ([] as ByteArray).concat(
       bin(id),
       size,
       frameFlags,
@@ -293,14 +293,14 @@ class ID3v2TagContents {
     if (!this._frames[id]) {
       this._frames[id] = [];
     }
-    this._frames[id].push(frame);
+    this._frames[id]!.push(frame);
     this._addData(this._nextFrameOffset, frame);
 
     this._updateSize();
     return this;
   }
 
-  _addExtendedHeaderData(tagKey: string, tagData: ByteArray) {
+  _addExtendedHeaderData(tagKey: keyof typeof this._extendedHeader, tagData: ByteArray) {
     var offset = START_EXTENDED_DATA_V4;
 
     // Each flag that is set in the extended header has data attached, which
@@ -315,7 +315,7 @@ class ID3v2TagContents {
         if (key === tagKey) {
           break;
         } else {
-          offset += this._extendedHeader[key];
+          offset += this._extendedHeader[key as keyof typeof this._extendedHeader];
         }
       }
     }
@@ -336,7 +336,7 @@ class ID3v2TagContents {
         0, 0, 0, 0 // padding
       ]);
     } else if (this._major === 4) {
-      this._addData(EXTENDED_HEADER, [].concat(
+      this._addData(EXTENDED_HEADER, ([] as ByteArray).concat(
         getSynchsafeInteger32(6), // size
         [1], // number of flag bytes
         [0] // extended flags
@@ -356,14 +356,14 @@ class ID3v2TagContents {
       // Extended header data size
       for (var key in this._extendedHeader) {
         if (this._extendedHeader.hasOwnProperty(key)) {
-          size += this._extendedHeader[key];
+          size += this._extendedHeader[key as keyof typeof this._extendedHeader];
         }
       }
     }
 
     for (var frameId in this._frames) {
       if (this._frames.hasOwnProperty(frameId)) {
-        for (var i = 0, frame; frame = this._frames[frameId][i]; i++) {
+        for (var i = 0, frame; frame = this._frames[frameId]![i]; i++) {
           size += frame.length;
         }
       }

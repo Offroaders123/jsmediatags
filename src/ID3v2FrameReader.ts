@@ -176,7 +176,7 @@ const FRAME_DESCRIPTIONS = {
 };
 
 class ID3v2FrameReader {
-  static getFrameReaderFunction(frameId: string): ?FrameReaderSignature {
+  static getFrameReaderFunction(frameId: string): FrameReaderSignature | null {
     if (frameId in frameReaderFunctions) {
       return frameReaderFunctions[frameId];
     } else if (frameId[0] === "T") {
@@ -206,7 +206,7 @@ class ID3v2FrameReader {
     end: number,
     data: MediaFileReader,
     id3header: TagHeader,
-    tags: ?Array<string>
+    tags: Array<string> | null
   ): TagFrames {
     var frames = {};
     var frameHeaderSize = this._getFrameHeaderSize(id3header);
@@ -395,7 +395,7 @@ frameReaderFunctions['APIC'] = function readPictureFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   var start = offset;
@@ -434,7 +434,7 @@ frameReaderFunctions['CHAP'] = function readChapterFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   var originalOffset = offset;
@@ -461,7 +461,7 @@ frameReaderFunctions['CTOC'] = function readTableOfContentsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   var originalOffset = offset;
@@ -489,7 +489,7 @@ frameReaderFunctions['COMM'] = function readCommentsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   var start = offset;
@@ -513,7 +513,7 @@ frameReaderFunctions['PIC'] = function(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   return frameReaderFunctions['APIC'](offset, length, data, flags, id3header);
@@ -523,7 +523,7 @@ frameReaderFunctions['PCNT'] = function readCounterFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   // FIXME: implement the rest of the spec
@@ -536,7 +536,7 @@ frameReaderFunctions['T*'] = function readTextFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   var charset = getTextEncoding(data.getByteAt(offset));
@@ -548,7 +548,7 @@ frameReaderFunctions['TXXX'] = function readTextFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): Object {
   var charset = getTextEncoding(data.getByteAt(offset));
@@ -560,9 +560,9 @@ frameReaderFunctions['WXXX'] = function readUrlFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
-): ?Object {
+): Object | null {
   if (length === 0) {
     return null;
   }
@@ -574,9 +574,9 @@ frameReaderFunctions['W*'] = function readUrlFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
-): ?string {
+): string | null {
   if (length === 0) {
     return null;
   }
@@ -587,7 +587,7 @@ frameReaderFunctions['TCON'] = function readGenreFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object
+  flags?: Object | null
 ): any {
   var text = frameReaderFunctions['T*'].apply(this, arguments);
   return (text as string).replace(/^\(\d+\)/, '');
@@ -599,7 +599,7 @@ frameReaderFunctions['USLT'] = function readLyricsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   var start = offset;
@@ -623,7 +623,7 @@ frameReaderFunctions['UFID'] = function readLyricsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: ?Object,
+  flags?: Object | null,
   id3header?: TagHeader
 ): any {
   var ownerIdentifier =
@@ -640,7 +640,7 @@ frameReaderFunctions['UFID'] = function readLyricsFrame(
 };
 
 function getTextEncoding(bite: number): CharsetType {
-  var charset: ?CharsetType;
+  var charset: CharsetType;
 
   switch (bite)
   {

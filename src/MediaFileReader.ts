@@ -172,7 +172,7 @@ class MediaFileReader {
   getStringWithCharsetAt(
     offset: number,
     length: number,
-    charset: ?CharsetType
+    charset?: CharsetType
   ): DecodedString {
     var bytes = this.getBytesAt(offset, length);
     var string;

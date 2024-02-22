@@ -33,7 +33,7 @@ class ID3v1TagReader extends MediaTagReader {
     mediaFileReader.loadRange([fileSize - 128, fileSize - 1], callbacks);
   }
 
-  override _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
     var offset = data.getSize() - 128;
 
     var title = data.getStringWithCharsetAt(offset + 3, 30).toString();
@@ -56,7 +56,7 @@ class ID3v1TagReader extends MediaTagReader {
     if (genreIdx < 255) {
       var genre = GENRES[genreIdx];
     } else {
-      var genre = "";
+      var genre: string | undefined = "";
     }
 
     var tag = {

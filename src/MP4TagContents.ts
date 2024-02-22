@@ -30,7 +30,7 @@ class MP4TagContents {
   toArray(): ByteArray {
     return this._atoms.reduce(function(array, atom) {
       return array.concat(atom.toArray());
-    }, []);
+    }, [] as ByteArray);
   }
 
   static createAtom(atomName: string): Atom {
@@ -42,16 +42,16 @@ class MP4TagContents {
   }
 
   static createMetadataAtom(atomName: string, type: string, data: ByteArray): Atom {
-    var klass = {
+    var klass: number = {
       "uint8": 0,
       "uint8b": 21, // Apple changed from 21 to 0 in latest versions
       "text": 1,
       "jpeg": 13,
       "png": 14,
-    }[type];
+    }[type]!;
 
     return this.createContainerAtom(atomName, [
-      new Atom("data", [].concat(
+      new Atom("data", ([] as ByteArray).concat(
         [0x00, 0x00, 0x00, klass], // 1 byte atom version + 3 byte atom flags
         [0x00, 0x00, 0x00, 0x00], // NULL space
         data
@@ -65,7 +65,7 @@ class Atom {
   _data: Array<number>;
   _atoms: Array<Atom>;
 
-  constructor(name: string, data: ?ByteArray, atoms: ?Array<Atom>) {
+  constructor(name: string, data?: ByteArray, atoms?: Array<Atom>) {
     this._name = name;
     this._data = data || [];
     this._atoms = atoms || [];
@@ -74,10 +74,10 @@ class Atom {
   toArray(): ByteArray {
     var atomsArray = this._atoms.reduce(function(array, atom) {
       return array.concat(atom.toArray());
-    }, []);
+    }, [] as ByteArray);
     var length = 4 + this._name.length + this._data.length + atomsArray.length;
 
-    return [].concat(
+    return ([] as ByteArray).concat(
       getInteger32(length),
       bin(this._name),
       this._data,

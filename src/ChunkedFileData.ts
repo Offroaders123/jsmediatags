@@ -87,15 +87,15 @@ class ChunkedFileData {
       ArrayBuffer.isView(dataA)
     ) {
       // $FlowIssue - flow thinks dataAandB is a string but it's not
-      var dataAandB = new dataA.constructor(dataA.length + dataB.length);
+      var dataAandB = new (dataA.constructor as typeof Uint8Array)(dataA.length + dataB.length);
       // $FlowIssue - flow thinks dataAandB is a string but it's not
       dataAandB.set(dataA, 0);
       // $FlowIssue - flow thinks dataAandB is a string but it's not
-      dataAandB.set(dataB, dataA.length);
+      dataAandB.set(dataB as Exclude<DataType, string>, dataA.length);
       return dataAandB;
     } else {
       // $FlowIssue - flow thinks dataAandB is a TypedArray but it's not
-      return dataA.concat(dataB);
+      return (dataA as string).concat(dataB as Exclude<DataType, number[] | Uint8Array>);
     }
   }
 
@@ -105,7 +105,7 @@ class ChunkedFileData {
       return data.slice(begin, end);
     } else {
       // $FlowIssue - flow thinks data is a string but it's not
-      return data.subarray(begin, end);
+      return (data as Exclude<DataType, string | number[]>).subarray(begin, end);
     }
   }
 

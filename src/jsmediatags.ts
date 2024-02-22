@@ -19,8 +19,8 @@ import type {
   ByteRange
 } from './FlowTypes';
 
-var mediaFileReaders: Array<Class<MediaFileReader>> = [];
-var mediaTagReaders: Array<Class<MediaTagReader>> = [];
+var mediaFileReaders: Array<typeof MediaFileReader> = [];
+var mediaTagReaders: Array<typeof MediaTagReader> = [];
 
 function read(location: Object, callbacks: CallbackType) {
   new Reader(location).read(callbacks);
@@ -38,9 +38,9 @@ function isRangeValid(range: ByteRange, fileSize: number) {
 
 class Reader {
   _file: any;
-  _tagsToRead: Array<string>;
-  _fileReader: Class<MediaFileReader>;
-  _tagReader: Class<MediaTagReader>;
+  _tagsToRead?: Array<string>;
+  _fileReader?: typeof MediaFileReader;
+  _tagReader?: typeof MediaTagReader;
 
   constructor(file: any) {
     this._file = file;
@@ -51,12 +51,12 @@ class Reader {
     return this;
   }
 
-  setFileReader(fileReader: Class<MediaFileReader>): Reader {
+  setFileReader(fileReader: typeof MediaFileReader): Reader {
     this._fileReader = fileReader;
     return this;
   }
 
-  setTagReader(tagReader: Class<MediaTagReader>): Reader {
+  setTagReader(tagReader: typeof MediaTagReader): Reader {
     this._tagReader = tagReader;
     return this;
   }
@@ -69,7 +69,7 @@ class Reader {
     fileReader.init({
       onSuccess: function() {
         self._getTagReader(fileReader, {
-          onSuccess: function(TagReader: Class<MediaTagReader>) {
+          onSuccess: function(TagReader: typeof MediaTagReader) {
             new TagReader(fileReader)
               .setTagsToRead(self._tagsToRead)
               .read(callbacks);
@@ -81,7 +81,7 @@ class Reader {
     });
   }
 
-  _getFileReader(): Class<MediaFileReader> {
+  _getFileReader(): typeof MediaFileReader {
     if (this._fileReader) {
       return this._fileReader;
     } else {
@@ -89,10 +89,10 @@ class Reader {
     }
   }
 
-  _findFileReader(): Class<MediaFileReader> {
+  _findFileReader(): typeof MediaFileReader {
     for (var i = 0; i < mediaFileReaders.length; i++) {
-      if (mediaFileReaders[i].canReadFile(this._file)) {
-        return mediaFileReaders[i];
+      if (mediaFileReaders[i]!.canReadFile(this._file)) {
+        return mediaFileReaders[i]!;
       }
     }
 
@@ -121,12 +121,12 @@ class Reader {
     // To get around this we divide the tag readers into two categories, the
     // ones that read their tag identifiers from the start of the file and the
     // ones that read from the end of the file.
-    var tagReadersAtFileStart = [];
-    var tagReadersAtFileEnd = [];
+    var tagReadersAtFileStart: (typeof MediaTagReader)[] = [];
+    var tagReadersAtFileEnd: (typeof MediaTagReader)[] = [];
     var fileSize = fileReader.getSize();
 
     for (var i = 0; i < mediaTagReaders.length; i++) {
-      var range = mediaTagReaders[i].getTagIdentifierByteRange();
+      var range = mediaTagReaders[i]!.getTagIdentifierByteRange();
       if (!isRangeValid(range, fileSize)) {
         continue;
       }
@@ -135,9 +135,9 @@ class Reader {
         (range.offset >= 0 && range.offset < fileSize / 2) ||
         (range.offset < 0 && range.offset < -fileSize / 2)
       ) {
-        tagReadersAtFileStart.push(mediaTagReaders[i]);
+        tagReadersAtFileStart.push(mediaTagReaders[i]!);
       } else {
-        tagReadersAtFileEnd.push(mediaTagReaders[i]);
+        tagReadersAtFileEnd.push(mediaTagReaders[i]!);
       }
     }
 
@@ -152,7 +152,7 @@ class Reader {
         }
 
         for (var i = 0; i < mediaTagReaders.length; i++) {
-          var range = mediaTagReaders[i].getTagIdentifierByteRange();
+          var range = mediaTagReaders[i]!.getTagIdentifierByteRange();
           if (!isRangeValid(range, fileSize)) {
             continue;
           }
@@ -172,7 +172,7 @@ class Reader {
             return;
           }
 
-          if (mediaTagReaders[i].canReadTagFormat(tagIndentifier)) {
+          if (mediaTagReaders[i]!.canReadTagFormat(tagIndentifier)) {
             callbacks.onSuccess(mediaTagReaders[i]);
             return;
           }
@@ -194,7 +194,7 @@ class Reader {
 
   _loadTagIdentifierRanges(
     fileReader: MediaFileReader,
-    tagReaders: Array<Class<MediaTagReader>>,
+    tagReaders: Array<typeof MediaTagReader>,
     callbacks: LoadCallbackType
   ) {
     if (tagReaders.length === 0) {
@@ -203,14 +203,14 @@ class Reader {
       return;
     }
 
-    var tagIdentifierRange = [Number.MAX_VALUE, 0];
+    var tagIdentifierRange: [number, number] = [Number.MAX_VALUE, 0];
     var fileSize = fileReader.getSize();
 
     // Create a super set of all ranges so we can load them all at once.
     // Might need to rethink this approach if there are tag ranges too far
     // a part from each other. We're good for now though.
     for (var i = 0; i < tagReaders.length; i++) {
-      var range = tagReaders[i].getTagIdentifierByteRange();
+      var range = tagReaders[i]!.getTagIdentifierByteRange();
       var start = range.offset >= 0 ? range.offset : range.offset + fileSize;
       var end = start + range.length - 1;
 
@@ -223,17 +223,17 @@ class Reader {
 }
 
 class Config {
-  static addFileReader(fileReader: Class<MediaFileReader>): Class<Config> {
+  static addFileReader(fileReader: typeof MediaFileReader): typeof Config {
     mediaFileReaders.push(fileReader);
     return Config;
   }
 
-  static addTagReader(tagReader: Class<MediaTagReader>): Class<Config> {
+  static addTagReader(tagReader: typeof MediaTagReader): typeof Config {
     mediaTagReaders.push(tagReader);
     return Config;
   }
 
-  static removeTagReader(tagReader: Class<MediaTagReader>): Class<Config> {
+  static removeTagReader(tagReader: typeof MediaTagReader): typeof Config {
     var tagReaderIx = mediaTagReaders.indexOf(tagReader);
 
     if (tagReaderIx >= 0) {

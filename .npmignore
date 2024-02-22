@@ -6,6 +6,6 @@ src
 .gitignore
 browser.js
 publish.sh
-build2/__mocks__/
-build2/__tests__/
+dist/__mocks__/
+dist/__tests__/
 dist/jsmediatags.js

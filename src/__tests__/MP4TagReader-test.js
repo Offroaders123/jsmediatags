@@ -1,11 +1,11 @@
 jest.autoMockOff();
 
-const MP4TagReader = require('../MP4TagReader');
-const MP4TagContents = require('../MP4TagContents');
-const ArrayFileReader = require('../ArrayFileReader');
+const MP4TagReader = require('../../dist/MP4TagReader');
+const MP4TagContents = require('../../dist/MP4TagContents');
+const ArrayFileReader = require('../../dist/ArrayFileReader');
 
-const bin = require('../ByteArrayUtils').bin;
-const pad = require('../ByteArrayUtils').pad;
+const bin = require('../../dist/ByteArrayUtils').bin;
+const pad = require('../../dist/ByteArrayUtils').pad;
 
 function createMP4FileContents(atoms) {
   return new MP4TagContents(

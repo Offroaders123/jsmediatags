@@ -1,16 +1,16 @@
 jest
   .enableAutomock()
-  .dontMock("../jsmediatags.js")
-  .dontMock("../ByteArrayUtils.js");
+  .dontMock("../../dist/jsmediatags.js")
+  .dontMock("../../dist/ByteArrayUtils.js");
 
-const jsmediatags = require("../jsmediatags");
-const NodeFileReader = require("../NodeFileReader");
-const XhrFileReader = require("../XhrFileReader");
-const ArrayFileReader = require("../ArrayFileReader");
-const ID3v1TagReader = require("../ID3v1TagReader");
-const ID3v2TagReader = require("../ID3v2TagReader");
-const MP4TagReader = require("../MP4TagReader");
-const FLACTagReader = require("../FLACTagReader");
+const jsmediatags = require("../../dist/jsmediatags");
+const NodeFileReader = require("../../dist/NodeFileReader");
+const XhrFileReader = require("../../dist/XhrFileReader");
+const ArrayFileReader = require("../../dist/ArrayFileReader");
+const ID3v1TagReader = require("../../dist/ID3v1TagReader");
+const ID3v2TagReader = require("../../dist/ID3v2TagReader");
+const MP4TagReader = require("../../dist/MP4TagReader");
+const FLACTagReader = require("../../dist/FLACTagReader");
 
 function throwOnSuccess(onError) {
   return {

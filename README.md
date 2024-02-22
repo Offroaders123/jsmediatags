@@ -337,11 +337,11 @@ var ID3v2TagReader = require('./src/ID3v2TagReader');
 
 ### NodeJS (With Compiled Code (faster))
 
-Run `npm run build` to generate proper JavaScript code into the `build2` directory.
+Run `npm run build` to generate proper JavaScript code into the `dist` directory.
 
 ```javascript
-var NodeFileReader = require('./build2/NodeFileReader');
-var ID3v2TagReader = require('./build2/ID3v2TagReader');
+var NodeFileReader = require('./dist/NodeFileReader');
+var ID3v2TagReader = require('./dist/ID3v2TagReader');
 ...
 ```
 

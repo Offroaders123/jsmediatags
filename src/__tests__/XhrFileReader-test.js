@@ -1,10 +1,10 @@
 jest
   .mock('xhr2')
-  .dontMock('../XhrFileReader.js')
-  .dontMock('../MediaFileReader.js')
-  .dontMock('../ChunkedFileData.js');
+  .dontMock('../../dist/XhrFileReader.js')
+  .dontMock('../../dist/MediaFileReader.js')
+  .dontMock('../../dist/ChunkedFileData.js');
 
-var XhrFileReader = require('../XhrFileReader');
+var XhrFileReader = require('../../dist/XhrFileReader');
 
 function throwOnError(onSuccess) {
   return {

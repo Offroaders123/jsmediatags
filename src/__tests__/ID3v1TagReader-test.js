@@ -1,10 +1,10 @@
 jest.autoMockOff();
 
-const ID3v1TagReader = require('../ID3v1TagReader');
-const ArrayFileReader = require('../ArrayFileReader');
+const ID3v1TagReader = require('../../dist/ID3v1TagReader');
+const ArrayFileReader = require('../../dist/ArrayFileReader');
 
-const bin = require('../ByteArrayUtils').bin;
-const pad = require('../ByteArrayUtils').pad;
+const bin = require('../../dist/ByteArrayUtils').bin;
+const pad = require('../../dist/ByteArrayUtils').pad;
 
 describe("ID3v1TagReader", function() {
   it("reads 1.0 tags", function() {

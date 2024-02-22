@@ -1,9 +1,9 @@
 jest
-  .dontMock('../BlobFileReader.js')
-  .dontMock('../MediaFileReader.js')
-  .dontMock('../ChunkedFileData.js');
+  .dontMock('../../dist/BlobFileReader.js')
+  .dontMock('../../dist/MediaFileReader.js')
+  .dontMock('../../dist/ChunkedFileData.js');
 
-var BlobFileReader = require('../BlobFileReader');
+var BlobFileReader = require('../../dist/BlobFileReader');
 
 function throwOnError(onSuccess) {
   return {

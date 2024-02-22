@@ -1,7 +1,7 @@
 jest
-  .dontMock('../ChunkedFileData.js');
+  .dontMock('../../dist/ChunkedFileData.js');
 
-var ChunkedFileData = require('../ChunkedFileData');
+var ChunkedFileData = require('../../dist/ChunkedFileData');
 
 describe("ChunkedFileData", function() {
   var chunkedFileData;

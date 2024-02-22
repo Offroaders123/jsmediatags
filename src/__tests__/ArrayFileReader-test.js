@@ -1,8 +1,8 @@
 jest
-  .dontMock('../ArrayFileReader.js')
-  .dontMock('../MediaFileReader.js');
+  .dontMock('../../dist/ArrayFileReader.js')
+  .dontMock('../../dist/MediaFileReader.js');
 
-var ArrayFileReader = require('../ArrayFileReader');
+var ArrayFileReader = require('../../dist/ArrayFileReader');
 
 function throwOnError(onSuccess) {
   return {

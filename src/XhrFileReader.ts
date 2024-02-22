@@ -19,7 +19,9 @@ type ContentRangeType = {
   instanceLength: ?number,
 };
 
-export = class XhrFileReader extends MediaFileReader {
+export = XhrFileReader;
+
+class XhrFileReader extends MediaFileReader {
   static _config: {
     avoidHeadRequests: boolean,
     disallowedXhrHeaders: Array<string>,

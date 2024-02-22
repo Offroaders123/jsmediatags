@@ -1,10 +1,10 @@
 jest.autoMockOff();
 
-const ID3v2TagReader = require('../ID3v2TagReader');
-const ID3v2TagContents = require('../ID3v2TagContents');
-const ArrayFileReader = require('../ArrayFileReader');
+const ID3v2TagReader = require('../../dist/ID3v2TagReader');
+const ID3v2TagContents = require('../../dist/ID3v2TagContents');
+const ArrayFileReader = require('../../dist/ArrayFileReader');
 
-const bin = require('../ByteArrayUtils').bin;
+const bin = require('../../dist/ByteArrayUtils').bin;
 
 describe("ID3v2TagReader", function() {
   var tagReader;

@@ -1,8 +1,8 @@
 jest.autoMockOff();
 
-const ArrayFileReader = require('../ArrayFileReader');
-const FLACTagContents = require('../FLACTagContents');
-const FLACTagReader = require('../FLACTagReader');
+const ArrayFileReader = require('../../dist/ArrayFileReader');
+const FLACTagContents = require('../../dist/FLACTagContents');
+const FLACTagReader = require('../../dist/FLACTagReader');
 
 describe("FLACTagReader", function() {
   var flacFileContents = new FLACTagContents([FLACTagContents.createCommentBlock(

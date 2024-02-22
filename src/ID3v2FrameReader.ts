@@ -590,7 +590,7 @@ frameReaderFunctions['TCON'] = function readGenreFrame(
   flags: ?Object
 ): any {
   var text = frameReaderFunctions['T*'].apply(this, arguments);
-  return (text: string).replace(/^\(\d+\)/, '');
+  return (text as string).replace(/^\(\d+\)/, '');
 };
 
 frameReaderFunctions['TCO'] = frameReaderFunctions['TCON'];

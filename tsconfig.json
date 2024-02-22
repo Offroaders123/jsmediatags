@@ -5,7 +5,9 @@
     "module": "CommonJS",
     "target": "ESNext",
     "isolatedModules": true,
-    "noEmit": true,
+    // "noEmit": true,
+    // "declaration": true,
+    // "sourceMap": true,
     "strict": true,
     "strictNullChecks": false, // temp
     "noImplicitOverride": true,

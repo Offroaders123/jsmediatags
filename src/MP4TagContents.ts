@@ -18,7 +18,7 @@ import type {
   ByteArray
 } from './FlowTypes';
 
-export = class MP4TagContents {
+class MP4TagContents {
   _atoms: Array<Atom>;
 
   constructor(ftyp: string, atoms?: Array<Atom>) {
@@ -85,3 +85,5 @@ class Atom {
     );
   }
 }
+
+export = MP4TagContents;

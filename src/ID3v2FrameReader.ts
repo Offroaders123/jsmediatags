@@ -175,7 +175,7 @@ const FRAME_DESCRIPTIONS = {
   "WXXX" : "User defined URL link frame"
 };
 
-export = class ID3v2FrameReader {
+class ID3v2FrameReader {
   static getFrameReaderFunction(frameId: string): ?FrameReaderSignature {
     if (frameId in frameReaderFunctions) {
       return frameReaderFunctions[frameId];
@@ -707,3 +707,5 @@ var PICTURE_TYPE = [
   "Band/artist logotype",
   "Publisher/Studio logotype"
 ];
+
+export = ID3v2FrameReader;

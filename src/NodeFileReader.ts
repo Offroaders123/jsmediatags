@@ -13,7 +13,7 @@ import type {
 } from './FlowTypes';
 
 
-export = class NodeFileReader extends MediaFileReader {
+class NodeFileReader extends MediaFileReader {
   _path: string;
   _fileData: ChunkedFileData;
 
@@ -100,3 +100,5 @@ export = class NodeFileReader extends MediaFileReader {
     fs.open(this._path, "r", undefined, readData);
   }
 }
+
+export = NodeFileReader;

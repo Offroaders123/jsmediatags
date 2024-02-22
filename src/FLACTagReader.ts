@@ -60,7 +60,7 @@ import type {
 /**
  * Class representing a MediaTagReader that parses FLAC tags.
  */
-export = class FLACTagReader extends MediaTagReader {
+class FLACTagReader extends MediaTagReader {
   _commentOffset: number;
   _pictureOffset: number;
 
@@ -338,3 +338,5 @@ export = class FLACTagReader extends MediaTagReader {
     return tag;
   }
 }
+
+export = FLACTagReader;

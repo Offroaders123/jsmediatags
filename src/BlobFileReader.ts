@@ -10,7 +10,7 @@ import type {
   LoadCallbackType
 } from './FlowTypes';
 
-export = class BlobFileReader extends MediaFileReader {
+class BlobFileReader extends MediaFileReader {
   _blob: Blob;
   _fileData: ChunkedFileData;
 
@@ -60,3 +60,5 @@ export = class BlobFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 }
+
+export = BlobFileReader;

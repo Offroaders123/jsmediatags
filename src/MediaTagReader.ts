@@ -12,7 +12,7 @@ import type {
   TagType
 } from './FlowTypes';
 
-export = class MediaTagReader {
+class MediaTagReader {
   _mediaFileReader: MediaFileReader;
   _tags: ?Array<string>;
 
@@ -108,3 +108,5 @@ export = class MediaTagReader {
     return tags;
   }
 }
+
+export = MediaTagReader;

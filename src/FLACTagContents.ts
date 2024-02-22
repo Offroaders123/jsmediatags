@@ -8,7 +8,7 @@ import type {
   ByteArray
 } from './FlowTypes';
 
-export = class FLACTagContents {
+class FLACTagContents {
   _blocks: Array<MetadataBlock>;
 
   constructor(blocks?: Array<MetadataBlock>) {
@@ -74,3 +74,5 @@ class MetadataBlock {
     return [ this._type + (this._final ? 128 : 0) ].concat(this._data);
   }
 }
+
+export = FLACTagContents;

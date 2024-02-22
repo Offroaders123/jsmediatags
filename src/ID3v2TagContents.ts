@@ -35,7 +35,7 @@ import type {
   TagFrameFlags
 } from './FlowTypes';
 
-export = class ID3v2TagContents {
+class ID3v2TagContents {
   _size: number;
   _major: number;
   _revision: number;
@@ -399,3 +399,5 @@ export = class ID3v2TagContents {
     ].concat(data));
   }
 }
+
+export = ID3v2TagContents;

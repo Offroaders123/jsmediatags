@@ -41,4 +41,4 @@ class ArrayBufferFileReader extends MediaFileReader {
     }
 }
 
-module.exports = ArrayBufferFileReader;
+export = ArrayBufferFileReader;

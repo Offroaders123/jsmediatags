@@ -14,7 +14,7 @@ import type {
 } from './FlowTypes';
 
 
-export = class ReactNativeFileReader extends MediaFileReader {
+class ReactNativeFileReader extends MediaFileReader {
   _path: string;
   _fileData: ChunkedFileData;
 
@@ -69,3 +69,5 @@ export = class ReactNativeFileReader extends MediaFileReader {
       });
   }
 }
+
+export = ReactNativeFileReader;

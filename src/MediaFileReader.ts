@@ -14,7 +14,7 @@ import type {
   CharsetType
 } from './FlowTypes';
 
-export = class MediaFileReader {
+class MediaFileReader {
   _isInitialized: boolean;
   _size: number;
 
@@ -220,3 +220,5 @@ export = class MediaFileReader {
     return size;
   }
 }
+
+export = MediaFileReader;

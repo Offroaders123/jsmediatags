@@ -18,7 +18,7 @@ import type {
   DataType
 } from './FlowTypes';
 
-export = class ChunkedFileData {
+class ChunkedFileData {
   // $FlowIssue - get/set properties not yet supported
   static get NOT_FOUND() { return NOT_FOUND; }
   _fileData: Array<ChunkType>;
@@ -213,3 +213,5 @@ export = class ChunkedFileData {
     throw new Error("Offset " + offset + " hasn't been loaded yet.");
   }
 }
+
+export = ChunkedFileData;

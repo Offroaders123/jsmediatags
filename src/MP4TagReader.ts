@@ -20,7 +20,7 @@ import type {
   TagFrame
 } from './FlowTypes';
 
-export = class MP4TagReader extends MediaTagReader {
+class MP4TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // The tag identifier is located in [4, 8] but since we'll need to reader
     // the header of the first block anyway, we load it instead to avoid
@@ -351,3 +351,5 @@ const SHORTCUTS = {
   "picture"   : "covr",
   "lyrics"    : "©lyr"
 };
+
+export = MP4TagReader;

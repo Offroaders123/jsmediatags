@@ -21,7 +21,7 @@ import type {
 
 const ID3_HEADER_SIZE = 10;
 
-export = class ID3v2TagReader extends MediaTagReader {
+class ID3v2TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // ID3 header
     return {
@@ -149,3 +149,5 @@ const SHORTCUTS = {
   "picture"   : ["APIC", "PIC"],
   "lyrics"    : ["USLT", "ULT"]
 };
+
+export = ID3v2TagReader;

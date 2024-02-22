@@ -11,7 +11,7 @@ import type {
   LoadCallbackType
 } from './FlowTypes';
 
-export = class ArrayFileReader extends MediaFileReader {
+class ArrayFileReader extends MediaFileReader {
   _array: ByteArray;
   _size: number;
 
@@ -44,3 +44,5 @@ export = class ArrayFileReader extends MediaFileReader {
     return this._array[offset];
   }
 }
+
+export = ArrayFileReader;

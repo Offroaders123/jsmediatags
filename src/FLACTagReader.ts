@@ -1,4 +1,4 @@
-var MediaTagReader = require('./MediaTagReader');
+import MediaTagReader = require('./MediaTagReader');
 
 /* The first 4 bytes of a FLAC file describes the header for the file. If these
  * bytes respectively read "fLaC", we can determine it is a FLAC file.
@@ -60,7 +60,7 @@ import type {
 /**
  * Class representing a MediaTagReader that parses FLAC tags.
  */
-class FLACTagReader extends MediaTagReader {
+export = class FLACTagReader extends MediaTagReader {
   _commentOffset: number;
   _pictureOffset: number;
 
@@ -338,5 +338,3 @@ class FLACTagReader extends MediaTagReader {
     return tag;
   }
 }
-
-module.exports = FLACTagReader;

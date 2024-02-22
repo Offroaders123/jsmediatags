@@ -3,8 +3,8 @@
  */
 'use strict';
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import ChunkedFileData = require('./ChunkedFileData');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
     LoadCallbackType

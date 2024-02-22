@@ -3,8 +3,8 @@
  */
 'use strict';
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import ChunkedFileData = require('./ChunkedFileData');
+import MediaFileReader = require('./MediaFileReader');
 
 const CHUNK_SIZE = 1024;
 
@@ -19,7 +19,7 @@ type ContentRangeType = {
   instanceLength: ?number,
 };
 
-class XhrFileReader extends MediaFileReader {
+export = class XhrFileReader extends MediaFileReader {
   static _config: {
     avoidHeadRequests: boolean,
     disallowedXhrHeaders: Array<string>,
@@ -316,5 +316,3 @@ XhrFileReader._config = {
   disallowedXhrHeaders: [],
   timeoutInSec: 30
 };
-
-module.exports = XhrFileReader;

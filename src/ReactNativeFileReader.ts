@@ -3,18 +3,18 @@
  */
 'use strict';
 
-const RNFS = require('react-native-fs');
-const { Buffer } = require('buffer');
+import RNFS = require('react-native-fs');
+import { Buffer } from 'buffer';
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import ChunkedFileData = require('./ChunkedFileData');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
   LoadCallbackType
 } from './FlowTypes';
 
 
-class ReactNativeFileReader extends MediaFileReader {
+export = class ReactNativeFileReader extends MediaFileReader {
   _path: string;
   _fileData: ChunkedFileData;
 
@@ -69,5 +69,3 @@ class ReactNativeFileReader extends MediaFileReader {
       });
   }
 }
-
-module.exports = ReactNativeFileReader;

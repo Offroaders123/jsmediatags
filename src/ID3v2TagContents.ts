@@ -11,11 +11,12 @@
  */
 'use strict';
 
-const ByteArrayUtils = require('./ByteArrayUtils');
-const bin = ByteArrayUtils.bin;
-const getSynchsafeInteger32 = ByteArrayUtils.getSynchsafeInteger32;
-const getInteger32 = ByteArrayUtils.getInteger32;
-const getInteger24 = ByteArrayUtils.getInteger24;
+import {
+  bin,
+  getSynchsafeInteger32,
+  getInteger32,
+  getInteger24
+} from './ByteArrayUtils';
 
 // Offsets
 const FLAGS = 5;
@@ -34,7 +35,7 @@ import type {
   TagFrameFlags
 } from './FlowTypes';
 
-class ID3v2TagContents {
+export = class ID3v2TagContents {
   _size: number;
   _major: number;
   _revision: number;
@@ -398,5 +399,3 @@ class ID3v2TagContents {
     ].concat(data));
   }
 }
-
-module.exports = ID3v2TagContents;

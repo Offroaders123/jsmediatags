@@ -8,16 +8,17 @@
  */
 'use strict';
 
-const ByteArrayUtils = require('./ByteArrayUtils');
-const bin = ByteArrayUtils.bin;
-const pad = ByteArrayUtils.pad;
-const getInteger32 = ByteArrayUtils.getInteger32;
+import {
+  bin,
+  pad,
+  getInteger32
+} from './ByteArrayUtils';
 
 import type {
   ByteArray
 } from './FlowTypes';
 
-class MP4TagContents {
+export = class MP4TagContents {
   _atoms: Array<Atom>;
 
   constructor(ftyp: string, atoms?: Array<Atom>) {
@@ -84,5 +85,3 @@ class Atom {
     );
   }
 }
-
-module.exports = MP4TagContents;

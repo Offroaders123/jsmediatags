@@ -2,7 +2,7 @@
  * @flow
  */
 
-var MediaFileReader = require('./MediaFileReader');
+import MediaFileReader = require('./MediaFileReader');
 
 export type CallbackType = {
   onSuccess: (data: any) => void,

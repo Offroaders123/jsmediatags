@@ -1,14 +1,14 @@
-const ByteArrayUtils = require('./ByteArrayUtils');
+import ByteArrayUtils = require('./ByteArrayUtils');
 
-const bin = require('./ByteArrayUtils').bin;
-const getInteger24 = require('./ByteArrayUtils').getInteger24;
-const getInteger32 = require('./ByteArrayUtils').getInteger32;
+import { bin } from './ByteArrayUtils';
+import { getInteger24 } from './ByteArrayUtils';
+import { getInteger32 } from './ByteArrayUtils';
 
 import type {
   ByteArray
 } from './FlowTypes';
 
-class FLACTagContents {
+export = class FLACTagContents {
   _blocks: Array<MetadataBlock>;
 
   constructor(blocks?: Array<MetadataBlock>) {
@@ -74,5 +74,3 @@ class MetadataBlock {
     return [ this._type + (this._final ? 128 : 0) ].concat(this._data);
   }
 }
-
-module.exports = FLACTagContents;

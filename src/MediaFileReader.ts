@@ -3,7 +3,7 @@
  */
 'use strict';
 
-const StringUtils = require('./StringUtils');
+import { StringUtils } from './StringUtils';
 
 import type {
   DecodedString
@@ -14,7 +14,7 @@ import type {
   CharsetType
 } from './FlowTypes';
 
-class MediaFileReader {
+export = class MediaFileReader {
   _isInitialized: boolean;
   _size: number;
 
@@ -220,5 +220,3 @@ class MediaFileReader {
     return size;
   }
 }
-
-module.exports = MediaFileReader;

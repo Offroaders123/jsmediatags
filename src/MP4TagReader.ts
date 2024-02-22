@@ -8,8 +8,8 @@
  */
 'use strict';
 
-var MediaTagReader = require('./MediaTagReader');
-var MediaFileReader = require('./MediaFileReader');
+import MediaTagReader = require('./MediaTagReader');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
   CallbackType,
@@ -20,7 +20,7 @@ import type {
   TagFrame
 } from './FlowTypes';
 
-class MP4TagReader extends MediaTagReader {
+export = class MP4TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // The tag identifier is located in [4, 8] but since we'll need to reader
     // the header of the first block anyway, we load it instead to avoid
@@ -351,5 +351,3 @@ const SHORTCUTS = {
   "picture"   : "covr",
   "lyrics"    : "©lyr"
 };
-
-module.exports = MP4TagReader;

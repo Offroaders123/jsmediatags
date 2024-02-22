@@ -3,7 +3,7 @@
  */
 'use strict';
 
-const MediaFileReader = require('./MediaFileReader');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
   CallbackType,
@@ -12,7 +12,7 @@ import type {
   TagType
 } from './FlowTypes';
 
-class MediaTagReader {
+export = class MediaTagReader {
   _mediaFileReader: MediaFileReader;
   _tags: ?Array<string>;
 
@@ -108,5 +108,3 @@ class MediaTagReader {
     return tags;
   }
 }
-
-module.exports = MediaTagReader;

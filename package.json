@@ -18,6 +18,7 @@
       "email": "jesse.ditson@gmail.com"
     }
   ],
+  "type": "commonjs",
   "main": "build2/jsmediatags.js",
   "browser": "dist/jsmediatags.js",
   "repository": {

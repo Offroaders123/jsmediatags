@@ -3,7 +3,7 @@
  */
 'use strict';
 
-var MediaFileReader = require('./MediaFileReader');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
   Byte,
@@ -11,7 +11,7 @@ import type {
   LoadCallbackType
 } from './FlowTypes';
 
-class ArrayFileReader extends MediaFileReader {
+export = class ArrayFileReader extends MediaFileReader {
   _array: ByteArray;
   _size: number;
 
@@ -44,5 +44,3 @@ class ArrayFileReader extends MediaFileReader {
     return this._array[offset];
   }
 }
-
-module.exports = ArrayFileReader;

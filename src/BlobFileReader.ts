@@ -3,14 +3,14 @@
  */
 'use strict';
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import ChunkedFileData = require('./ChunkedFileData');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
   LoadCallbackType
 } from './FlowTypes';
 
-class BlobFileReader extends MediaFileReader {
+export = class BlobFileReader extends MediaFileReader {
   _blob: Blob;
   _fileData: ChunkedFileData;
 
@@ -60,5 +60,3 @@ class BlobFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 }
-
-module.exports = BlobFileReader;

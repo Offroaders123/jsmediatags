@@ -59,10 +59,10 @@ const getInteger24 = function(number: number): ByteArray {
   ];
 }
 
-module.exports = {
-  bin: bin,
-  pad: pad,
-  getSynchsafeInteger32: getSynchsafeInteger32,
-  getInteger32: getInteger32,
-  getInteger24: getInteger24
+export {
+  bin,
+  pad,
+  getSynchsafeInteger32,
+  getInteger32,
+  getInteger24
 };

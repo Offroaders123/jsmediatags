@@ -3,17 +3,17 @@
  */
 'use strict';
 
-const fs = require('fs');
+import fs = require('fs');
 
-const ChunkedFileData = require('./ChunkedFileData');
-const MediaFileReader = require('./MediaFileReader');
+import ChunkedFileData = require('./ChunkedFileData');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
   LoadCallbackType
 } from './FlowTypes';
 
 
-class NodeFileReader extends MediaFileReader {
+export = class NodeFileReader extends MediaFileReader {
   _path: string;
   _fileData: ChunkedFileData;
 
@@ -100,5 +100,3 @@ class NodeFileReader extends MediaFileReader {
     fs.open(this._path, "r", undefined, readData);
   }
 }
-
-module.exports = NodeFileReader;

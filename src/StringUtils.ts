@@ -21,7 +21,7 @@ class InternalDecodedString {
   }
 }
 
-var StringUtils = {
+export var StringUtils = {
   readUTF16String: function(
     bytes: Array<number>,
     bigEndian: boolean,
@@ -120,5 +120,3 @@ var StringUtils = {
     return new InternalDecodedString(arr.join(""), i);
   }
 };
-
-module.exports = StringUtils;

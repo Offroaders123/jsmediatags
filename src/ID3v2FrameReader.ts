@@ -3,9 +3,9 @@
  */
 'use strict';
 
-var MediaFileReader = require('./MediaFileReader');
-const StringUtils = require('./StringUtils');
-var ArrayFileReader = require('./ArrayFileReader');
+import MediaFileReader = require('./MediaFileReader');
+import { StringUtils } from './StringUtils';
+import ArrayFileReader = require('./ArrayFileReader');
 
 import type {
   CharsetType,
@@ -175,7 +175,7 @@ const FRAME_DESCRIPTIONS = {
   "WXXX" : "User defined URL link frame"
 };
 
-class ID3v2FrameReader {
+export = class ID3v2FrameReader {
   static getFrameReaderFunction(frameId: string): ?FrameReaderSignature {
     if (frameId in frameReaderFunctions) {
       return frameReaderFunctions[frameId];
@@ -707,5 +707,3 @@ var PICTURE_TYPE = [
   "Band/artist logotype",
   "Publisher/Studio logotype"
 ];
-
-module.exports = ID3v2FrameReader;

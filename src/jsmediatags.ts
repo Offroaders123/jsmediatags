@@ -3,15 +3,15 @@
  */
 'use strict';
 
-const MediaFileReader = require("./MediaFileReader");
-const XhrFileReader = require("./XhrFileReader");
-const BlobFileReader = require("./BlobFileReader");
-const ArrayFileReader = require("./ArrayFileReader");
-const MediaTagReader = require("./MediaTagReader");
-const ID3v1TagReader = require("./ID3v1TagReader");
-const ID3v2TagReader = require("./ID3v2TagReader");
-const MP4TagReader = require("./MP4TagReader");
-const FLACTagReader = require("./FLACTagReader");
+import MediaFileReader = require("./MediaFileReader");
+import XhrFileReader = require("./XhrFileReader");
+import BlobFileReader = require("./BlobFileReader");
+import ArrayFileReader = require("./ArrayFileReader");
+import MediaTagReader = require("./MediaTagReader");
+import ID3v1TagReader = require("./ID3v1TagReader");
+import ID3v2TagReader = require("./ID3v2TagReader");
+import MP4TagReader = require("./MP4TagReader");
+import FLACTagReader = require("./FLACTagReader");
 
 import type {
   CallbackType,
@@ -281,8 +281,8 @@ if (typeof process !== "undefined" && !process.browser) {
   }
 }
 
-module.exports = {
-  "read": read,
-  "Reader": Reader,
-  "Config": Config
+export {
+  read,
+  Reader,
+  Config
 };

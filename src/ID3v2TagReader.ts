@@ -3,9 +3,9 @@
  */
 'use strict';
 
-var MediaTagReader = require('./MediaTagReader');
-var MediaFileReader = require('./MediaFileReader');
-var ID3v2FrameReader = require('./ID3v2FrameReader');
+import MediaTagReader = require('./MediaTagReader');
+import MediaFileReader = require('./MediaFileReader');
+import ID3v2FrameReader = require('./ID3v2FrameReader');
 
 import type {
   CallbackType,
@@ -21,7 +21,7 @@ import type {
 
 const ID3_HEADER_SIZE = 10;
 
-class ID3v2TagReader extends MediaTagReader {
+export = class ID3v2TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // ID3 header
     return {
@@ -149,5 +149,3 @@ const SHORTCUTS = {
   "picture"   : ["APIC", "PIC"],
   "lyrics"    : ["USLT", "ULT"]
 };
-
-module.exports = ID3v2TagReader;

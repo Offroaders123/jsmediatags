@@ -3,8 +3,8 @@
  */
 'use strict';
 
-var MediaTagReader = require('./MediaTagReader');
-var MediaFileReader = require('./MediaFileReader');
+import MediaTagReader = require('./MediaTagReader');
+import MediaFileReader = require('./MediaFileReader');
 
 import type {
   LoadCallbackType,
@@ -12,7 +12,7 @@ import type {
   TagType
 } from './FlowTypes';
 
-class ID3v1TagReader extends MediaTagReader {
+export = class ID3v1TagReader extends MediaTagReader {
   static getTagIdentifierByteRange(): ByteRange {
     // The identifier is TAG and is at offset: -128. However, to avoid a
     // fetch for the tag identifier and another for the data, we load the
@@ -105,5 +105,3 @@ var GENRES = [
   "Folklore","Ballad","Power Ballad","Rhythmic Soul","Freestyle",
   "Duet","Punk Rock","Drum Solo","Acapella","Euro-House","Dance Hall"
 ];
-
-module.exports = ID3v1TagReader;

@@ -1,10 +1,20 @@
-import MediaFileReader from "./MediaFileReader.js";
+/**
+ * @flow
+ */
+'use strict';
 
-import type { ByteArray, ByteRange, TagType } from "./FlowTypes.js";
+const MediaFileReader = require('./MediaFileReader');
 
-export default class MediaTagReader {
-  declare private _mediaFileReader: MediaFileReader;
-  declare private _tags?: string[] | null;
+import type {
+  CallbackType,
+  LoadCallbackType,
+  ByteRange,
+  TagType
+} from './FlowTypes';
+
+class MediaTagReader {
+  _mediaFileReader: MediaFileReader;
+  _tags: ?Array<string>;
 
   constructor(mediaFileReader: MediaFileReader) {
     this._mediaFileReader = mediaFileReader;
@@ -25,57 +35,78 @@ export default class MediaTagReader {
    * getTagIdentifierByteRange) this function checks if it can read the tag
    * format or not.
    */
-  static canReadTagFormat(tagIdentifier: ByteArray): boolean {
+  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
     throw new Error("Must implement");
   }
 
-  setTagsToRead(tags: string[]): MediaTagReader {
+  setTagsToRead(tags: Array<string>): MediaTagReader {
     this._tags = tags;
     return this;
   }
 
-  async read(): Promise<TagType> {
-    await this._mediaFileReader.init();
-    await this._loadData(this._mediaFileReader);
+  read(callbacks: CallbackType) {
+    var self = this;
 
-    let tags!: TagType;
-    try {
-      tags = this._parseData(this._mediaFileReader, this._tags);
-    } catch (error: any){
-      throw new Error(`parseData: ${error.message}`);
-    }
-    return tags;
+    this._mediaFileReader.init({
+      onSuccess: function() {
+        self._loadData(self._mediaFileReader, {
+          onSuccess: function() {
+            try {
+              var tags = self._parseData(self._mediaFileReader, self._tags);
+            } catch (ex) {
+              if (callbacks.onError) {
+                callbacks.onError({
+                  "type": "parseData",
+                  "info": ex.message
+                });
+                return;
+              }
+            }
+
+            // TODO: destroy mediaFileReader
+            callbacks.onSuccess(tags);
+          },
+          onError: callbacks.onError
+        });
+      },
+      onError: callbacks.onError
+    });
   }
 
-  getShortcuts(): { [key: string]: string | string[]; } {
+  getShortcuts(): {[key: string]: (string|Array<string>)} {
     return {};
   }
 
   /**
    * Load the necessary bytes from the media file.
    */
-  public async _loadData(mediaFileReader: MediaFileReader): Promise<void> {
+  _loadData(
+    mediaFileReader: MediaFileReader,
+    callbacks: LoadCallbackType
+  ): void {
     throw new Error("Must implement _loadData function");
   }
 
   /**
    * Parse the loaded data to read the media tags.
    */
-  public _parseData(mediaFileReader: MediaFileReader, tags?: string[] | null): TagType {
+  _parseData(mediaFileReader: MediaFileReader, tags: ?Array<string>): TagType {
     throw new Error("Must implement _parseData function");
   }
 
-  protected _expandShortcutTags(tagsWithShortcuts?: string[] | null): string[] | null | undefined {
+  _expandShortcutTags(tagsWithShortcuts: ?Array<string>): ?Array<string> {
     if (!tagsWithShortcuts) {
       return null;
     }
 
-    let tags: string[] = [];
-    const shortcuts = this.getShortcuts();
-    for (let i = 0, tagOrShortcut; tagOrShortcut = tagsWithShortcuts[i]; i++ ) {
+    var tags = [];
+    var shortcuts = this.getShortcuts();
+    for (var i = 0, tagOrShortcut; tagOrShortcut = tagsWithShortcuts[i]; i++ ) {
       tags = tags.concat(shortcuts[tagOrShortcut]||[tagOrShortcut]);
     }
 
     return tags;
   }
 }
+
+module.exports = MediaTagReader;

@@ -1,9 +1,19 @@
-import MediaFileReader from "./MediaFileReader.js";
+/**
+ * @flow
+ */
+'use strict';
 
-import type { ByteArray } from "./FlowTypes.js";
+var MediaFileReader = require('./MediaFileReader');
 
-export default class ArrayFileReader extends MediaFileReader {
-  declare public _array: ByteArray;
+import type {
+  Byte,
+  ByteArray,
+  LoadCallbackType
+} from './FlowTypes';
+
+class ArrayFileReader extends MediaFileReader {
+  _array: ByteArray;
+  _size: number;
 
   constructor(array: ByteArray) {
     super();
@@ -12,25 +22,27 @@ export default class ArrayFileReader extends MediaFileReader {
     this._isInitialized = true;
   }
 
-  static override canReadFile(file: any): boolean {
+  static canReadFile(file: any): boolean {
     return (
       Array.isArray(file) ||
-      (typeof Buffer === "function" && Buffer.isBuffer(file))
+      (typeof Buffer === 'function' && Buffer.isBuffer(file))
     );
   }
 
-  override async init(): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 0));
+  init(callbacks: LoadCallbackType) {
+    setTimeout(callbacks.onSuccess, 0);
   }
 
-  override async loadRange(range: [number, number]): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 0));
+  loadRange(range: [number, number], callbacks: LoadCallbackType) {
+    setTimeout(callbacks.onSuccess, 0);
   }
 
-  override getByteAt(offset: number): number {
+  getByteAt(offset: number): Byte {
     if (offset >= this._array.length) {
-      throw new Error(`Offset ${offset} hasn't been loaded yet.`);
+      throw new Error("Offset " + offset + " hasn't been loaded yet.");
     }
     return this._array[offset];
   }
 }
+
+module.exports = ArrayFileReader;

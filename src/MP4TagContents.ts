@@ -3,24 +3,31 @@
  * writing.
  *
  * http://atomicparsley.sourceforge.net/mpeg-4files.html
+ *
+ * @flow
  */
+'use strict';
 
-import { bin, pad, getInteger32 } from "./ByteArrayUtils.js";
+const ByteArrayUtils = require('./ByteArrayUtils');
+const bin = ByteArrayUtils.bin;
+const pad = ByteArrayUtils.pad;
+const getInteger32 = ByteArrayUtils.getInteger32;
 
-import type { ByteArray } from "./FlowTypes.js";
+import type {
+  ByteArray
+} from './FlowTypes';
 
-export default class MP4TagContents {
-  declare private _atoms: Atom[];
+class MP4TagContents {
+  _atoms: Array<Atom>;
 
-  constructor(ftyp: string, atoms?: Atom | Atom[]) {
+  constructor(ftyp: string, atoms?: Array<Atom>) {
     this._atoms = [
       new Atom("ftyp", pad(bin(ftyp), 24))
     ].concat(atoms || []);
   }
 
   toArray(): ByteArray {
-    return this._atoms.reduce((array, atom) => {
-      // @ts-expect-error
+    return this._atoms.reduce(function(array, atom) {
       return array.concat(atom.toArray());
     }, []);
   }
@@ -29,55 +36,53 @@ export default class MP4TagContents {
     return new Atom(atomName);
   }
 
-  static createContainerAtom(atomName: string, atoms: Atom[], data?: ByteArray): Atom {
+  static createContainerAtom(atomName: string, atoms: Array<Atom>, data?: ByteArray): Atom {
     return new Atom(atomName, data, atoms);
   }
 
   static createMetadataAtom(atomName: string, type: string, data: ByteArray): Atom {
-    const klass = {
-      uint8: 0,
-      uint8b: 21, // Apple changed from 21 to 0 in latest versions
-      text: 1,
-      jpeg: 13,
-      png: 14,
+    var klass = {
+      "uint8": 0,
+      "uint8b": 21, // Apple changed from 21 to 0 in latest versions
+      "text": 1,
+      "jpeg": 13,
+      "png": 14,
     }[type];
 
     return this.createContainerAtom(atomName, [
-      new Atom("data", [
-        // @ts-expect-error
-        0x00, 0x00, 0x00, klass, // 1 byte atom version + 3 byte atom flags
-        0x00, 0x00, 0x00, 0x00, // NULL space
-        ...data
-      ])
+      new Atom("data", [].concat(
+        [0x00, 0x00, 0x00, klass], // 1 byte atom version + 3 byte atom flags
+        [0x00, 0x00, 0x00, 0x00], // NULL space
+        data
+      ))
     ]);
   }
 }
 
 class Atom {
-  declare private _name: string;
-  declare private _data: ByteArray;
-  declare private _atoms: Atom[];
+  _name: string;
+  _data: Array<number>;
+  _atoms: Array<Atom>;
 
-  constructor(name: string, data?: ByteArray | null, atoms?: Atom[] | null) {
+  constructor(name: string, data: ?ByteArray, atoms: ?Array<Atom>) {
     this._name = name;
     this._data = data || [];
     this._atoms = atoms || [];
   }
 
   toArray(): ByteArray {
-    const atomsArray: ByteArray = this._atoms.reduce((array, atom) => {
-      // @ts-expect-error
+    var atomsArray = this._atoms.reduce(function(array, atom) {
       return array.concat(atom.toArray());
     }, []);
-    const length = 4 + this._name.length + this._data.length + atomsArray.length;
+    var length = 4 + this._name.length + this._data.length + atomsArray.length;
 
-    return [
-      ...getInteger32(length),
-      ...bin(this._name),
-      ...this._data,
-      ...atomsArray
-    ];
+    return [].concat(
+      getInteger32(length),
+      bin(this._name),
+      this._data,
+      atomsArray
+    );
   }
 }
 
-export type { Atom };
+module.exports = MP4TagContents;

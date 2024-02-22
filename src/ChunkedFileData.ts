@@ -1,7 +1,3 @@
-import type { ChunkType } from "./FlowTypes.js";
-
-const NOT_FOUND = -1;
-
 /**
  * This class represents a file that might not have all its data loaded yet.
  * It is used when loading the entire file is not an option because it's too
@@ -10,20 +6,33 @@ const NOT_FOUND = -1;
  * exception is when the data is not available yet, an error will be thrown.
  * This class does not load the data, it just manages it. It provides operations
  * to add and read data from the file.
+ *
+ * @flow
  */
-export default class ChunkedFileData {
-  static get NOT_FOUND() {
-    return NOT_FOUND as typeof NOT_FOUND;
-  }
+'use strict';
 
-  public _fileData: ChunkType[] = [];
+const NOT_FOUND = -1;
+
+import type {
+  ChunkType,
+  DataType
+} from './FlowTypes';
+
+class ChunkedFileData {
+  // $FlowIssue - get/set properties not yet supported
+  static get NOT_FOUND() { return NOT_FOUND; }
+  _fileData: Array<ChunkType>;
+
+  constructor() {
+    this._fileData = [];
+  }
 
   /**
    * Adds data to the file storage at a specific offset.
    */
-  addData(offset: number, data: Uint8Array): void {
-    const offsetEnd = offset+data.length-1;
-    const chunkRange = this._getChunkRange(offset, offsetEnd);
+  addData(offset: number, data: DataType): void {
+    var offsetEnd = offset+data.length-1;
+    var chunkRange = this._getChunkRange(offset, offsetEnd);
 
     if (chunkRange.startIx === NOT_FOUND) {
       this._fileData.splice(chunkRange.insertIx || 0, 0, {
@@ -34,18 +43,18 @@ export default class ChunkedFileData {
       // If the data to add collides with existing chunks we prepend and
       // append data from the half colliding chunks to make the collision at
       // 100%. The new data can then replace all the colliding chunkes.
-      const firstChunk = this._fileData[chunkRange.startIx];
-      const lastChunk = this._fileData[chunkRange.endIx];
-      const needsPrepend = offset > firstChunk.offset;
-      const needsAppend = offsetEnd < lastChunk.offset + lastChunk.data.length - 1;
+      var firstChunk = this._fileData[chunkRange.startIx];
+      var lastChunk = this._fileData[chunkRange.endIx];
+      var needsPrepend = offset > firstChunk.offset;
+      var needsAppend = offsetEnd < lastChunk.offset + lastChunk.data.length - 1;
 
-      const chunk = {
+      var chunk = {
         offset: Math.min(offset, firstChunk.offset),
         data: data
       };
 
       if (needsPrepend) {
-        const slicedData = this._sliceData(
+        var slicedData = this._sliceData(
           firstChunk.data,
           0,
           offset - firstChunk.offset
@@ -55,7 +64,7 @@ export default class ChunkedFileData {
 
       if (needsAppend) {
         // Use the lastChunk because the slice logic is easier to handle.
-        const slicedData = this._sliceData(
+        var slicedData = this._sliceData(
           chunk.data,
           0,
           lastChunk.offset - chunk.offset
@@ -71,16 +80,33 @@ export default class ChunkedFileData {
     }
   }
 
-  private _concatData(dataA: Uint8Array, dataB: Uint8Array): Uint8Array {
-      const dataAandB = new Uint8Array(dataA.length + dataB.length);
+  _concatData(dataA: DataType, dataB: DataType): DataType {
+    // TypedArrays don't support concat.
+    if (
+      typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView &&
+      ArrayBuffer.isView(dataA)
+    ) {
+      // $FlowIssue - flow thinks dataAandB is a string but it's not
+      var dataAandB = new dataA.constructor(dataA.length + dataB.length);
+      // $FlowIssue - flow thinks dataAandB is a string but it's not
       dataAandB.set(dataA, 0);
+      // $FlowIssue - flow thinks dataAandB is a string but it's not
       dataAandB.set(dataB, dataA.length);
       return dataAandB;
+    } else {
+      // $FlowIssue - flow thinks dataAandB is a TypedArray but it's not
+      return dataA.concat(dataB);
+    }
   }
 
-  private _sliceData(data: Uint8Array, begin: number, end: number): Uint8Array {
-    return data.slice(begin, end);
-    //   return (data as TypedArray).subarray(begin, end);
+  _sliceData(data: DataType, begin: number, end: number): DataType {
+    // Some TypeArray implementations do not support slice yet.
+    if (data.slice) {
+      return data.slice(begin, end);
+    } else {
+      // $FlowIssue - flow thinks data is a string but it's not
+      return data.subarray(begin, end);
+    }
   }
 
   /**
@@ -91,15 +117,18 @@ export default class ChunkedFileData {
    * should be inserted in the data list (startIx == NOT_FOUND and endIX ==
    * NOT_FOUND).
    */
-  public _getChunkRange(offsetStart: number, offsetEnd: number): { startIx: number; endIx: number; insertIx?: number; } {
-    let startChunkIx = NOT_FOUND;
-    let endChunkIx = NOT_FOUND;
-    let insertIx = 0;
+  _getChunkRange(
+    offsetStart: number,
+    offsetEnd: number
+  ): {startIx: number, endIx: number, insertIx?: number} {
+    var startChunkIx = NOT_FOUND;
+    var endChunkIx = NOT_FOUND;
+    var insertIx = 0;
 
     // Could use binary search but not expecting that many blocks to exist.
-    for (let i = 0; i < this._fileData.length; i++, insertIx = i) {
-      const chunkOffsetStart = this._fileData[i].offset;
-      const chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
+    for (var i = 0; i < this._fileData.length; i++, insertIx = i) {
+      var chunkOffsetStart = this._fileData[i].offset;
+      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
 
       if (offsetEnd < chunkOffsetStart-1) {
         // This offset range doesn't overlap with any chunks.
@@ -125,9 +154,9 @@ export default class ChunkedFileData {
     }
 
     // Find the ending chunk.
-    for (let i = startChunkIx; i < this._fileData.length; i++) {
-      const chunkOffsetStart = this._fileData[i].offset;
-      const chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
+    for (var i = startChunkIx; i < this._fileData.length; i++) {
+      var chunkOffsetStart = this._fileData[i].offset;
+      var chunkOffsetEnd = chunkOffsetStart + this._fileData[i].data.length;
 
       if (offsetEnd >= chunkOffsetStart-1) {
         // Candidate for the end chunk, it doesn't mean it is yet.
@@ -149,8 +178,8 @@ export default class ChunkedFileData {
   }
 
   hasDataRange(offsetStart: number, offsetEnd: number): boolean {
-    for (let i = 0; i < this._fileData.length; i++) {
-      const chunk = this._fileData[i];
+    for (var i = 0; i < this._fileData.length; i++) {
+      var chunk = this._fileData[i];
       if (offsetEnd < chunk.offset) {
         return false;
       }
@@ -165,11 +194,11 @@ export default class ChunkedFileData {
   }
 
   getByteAt(offset: number): any {
-    let dataChunk;
+    var dataChunk;
 
-    for (let i = 0; i < this._fileData.length; i++) {
-      const dataChunkStart = this._fileData[i].offset;
-      const dataChunkEnd = dataChunkStart + this._fileData[i].data.length - 1;
+    for (var i = 0; i < this._fileData.length; i++) {
+      var dataChunkStart = this._fileData[i].offset;
+      var dataChunkEnd = dataChunkStart + this._fileData[i].data.length - 1;
 
       if (offset >= dataChunkStart && offset <= dataChunkEnd) {
         dataChunk = this._fileData[i];
@@ -184,3 +213,5 @@ export default class ChunkedFileData {
     throw new Error("Offset " + offset + " hasn't been loaded yet.");
   }
 }
+
+module.exports = ChunkedFileData;

@@ -1,32 +1,44 @@
-import ChunkedFileData from "./ChunkedFileData.js";
-import MediaFileReader from "./MediaFileReader.js";
+/**
+ * @flow
+ */
+'use strict';
 
-export default class ArrayBufferFileReader extends MediaFileReader {
-  declare private _buffer: ArrayBuffer;
-  declare private _fileData: ChunkedFileData;
+const ChunkedFileData = require('./ChunkedFileData');
+const MediaFileReader = require('./MediaFileReader');
 
-  constructor(buffer: ArrayBuffer) {
-    super();
-    this._buffer = buffer;
-    this._fileData = new ChunkedFileData();
-  }
+import type {
+    LoadCallbackType
+} from './FlowTypes';
 
-  static override canReadFile(file: any): boolean {
-    return file instanceof ArrayBuffer
-  }
+class ArrayBufferFileReader extends MediaFileReader {
+    _buffer: ArrayBuffer;
+    _fileData: ChunkedFileData;
 
-  protected override async _init(): Promise<void> {
-    this._size = this._buffer.byteLength;
-    await new Promise(resolve => setTimeout(resolve, 1));
-  }
+    constructor(buffer: ArrayBuffer) {
+        super();
+        this._buffer = buffer;
+        this._fileData = new ChunkedFileData();
+    }
 
-  override async loadRange(range: [number, number]): Promise<void> {
-    const arrayBuf = this._buffer.slice(range[0], range[1] + 1);
-    const viewData = new Uint8Array(arrayBuf);
-    this._fileData.addData(range[0], viewData);
-  }
+    static canReadFile(file: any): boolean {
+        return typeof ArrayBuffer === 'function' && file instanceof ArrayBuffer
+    }
 
-  override getByteAt(offset: number): number {
-    return this._fileData.getByteAt(offset);
-  }
+    _init(callbacks: LoadCallbackType): void {
+        this._size = this._buffer.byteLength;
+        setTimeout(callbacks.onSuccess, 1);
+    }
+
+    loadRange(range: [number, number], callbacks: LoadCallbackType): void {
+        var arrayBuf = this._buffer.slice(range[0], range[1] + 1);
+        var viewData = new Uint8Array(arrayBuf);
+        this._fileData.addData(range[0], viewData);
+        callbacks.onSuccess();
+    }
+
+    getByteAt(offset: number): number {
+        return this._fileData.getByteAt(offset);
+    }
 }
+
+module.exports = ArrayBufferFileReader;

@@ -1,13 +1,17 @@
-import { bin } from "./ByteArrayUtils.js";
-import { getInteger24 } from "./ByteArrayUtils.js";
-import { getInteger32 } from "./ByteArrayUtils.js";
+const ByteArrayUtils = require('./ByteArrayUtils');
 
-import type { ByteArray } from "./FlowTypes.js";
+const bin = require('./ByteArrayUtils').bin;
+const getInteger24 = require('./ByteArrayUtils').getInteger24;
+const getInteger32 = require('./ByteArrayUtils').getInteger32;
 
-export default class FLACTagContents {
-  declare private _blocks: MetadataBlock[];
+import type {
+  ByteArray
+} from './FlowTypes';
 
-  constructor(blocks?: MetadataBlock[]) {
+class FLACTagContents {
+  _blocks: Array<MetadataBlock>;
+
+  constructor(blocks?: Array<MetadataBlock>) {
     this._blocks = [];
     this._blocks.push(FLACTagContents.createStreamBlock());
     this._blocks = this._blocks.concat(blocks || []);
@@ -15,7 +19,7 @@ export default class FLACTagContents {
 
   toArray(): ByteArray {
     this._blocks[this._blocks.length - 1].setFinal();
-    return this._blocks.reduce((array, block) => {
+    return this._blocks.reduce(function(array, block) {
       return array.concat(block.toArray());
     }, bin("fLaC"));
   }
@@ -25,48 +29,36 @@ export default class FLACTagContents {
   }
 
   static createStreamBlock(): MetadataBlock {
-    let data: ByteArray = [0x00, 0x00, 0x22].concat(Array(34).fill(0x00));
+    let data = [0x00, 0x00, 0x22].concat(Array(34).fill(0x00));
     return this.createBlock(0, data);
   }
 
-  static createCommentBlock(...data: string[][]): MetadataBlock {
+  static createCommentBlock(...data: Array<Array<string>>): MetadataBlock {
     let length = 12;
-    let byteArray: ByteArray = [];
+    let byteArray = [];
     for (let i = 0; i < data.length; i++) {
       length += data[i][0].length + data[i][1].length + 5;
       byteArray = byteArray.concat(getInteger32(data[i][0].length + data[i][1].length + 1).reverse());
       let entry = data[i][0] + "=" + data[i][1];
       byteArray = byteArray.concat(bin(entry));
     }
-    let array: ByteArray = [
-      ...getInteger24(length),
-      0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      ...getInteger32(data.length).reverse(),
-      ...byteArray
-    ];
+    let array = [].concat(getInteger24(length), [0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
+      getInteger32(data.length).reverse(), byteArray);
     return this.createBlock(4, array);
   }
 
   static createPictureBlock() {
-    let data: ByteArray = [
-      ...getInteger24(45),
-      ...getInteger32(3),
-      ...getInteger32(10),
-      ...bin("image/jpeg"),
-      ...getInteger32(9),
-      ...bin("A Picture"),
-      ...Array(16).fill(0x00),
-      ...getInteger32(4),
-      ...bin("data")
-    ];
+    let data = [].concat(getInteger24(45), getInteger32(3), getInteger32(10),
+      bin("image/jpeg"), getInteger32(9), bin("A Picture"), Array(16).fill(0x00),
+      getInteger32(4), bin("data"));
     return this.createBlock(6, data);
   }
 }
 
 class MetadataBlock {
-  declare private _data: ByteArray;
-  declare private _final: boolean;
-  declare private _type: number;
+  _data: Array<number>;
+  _final: boolean;
+  _type: number;
 
   constructor(type: number, data: ByteArray) {
     this._type = type;
@@ -74,11 +66,13 @@ class MetadataBlock {
     this._final = false;
   }
 
-  setFinal(): void {
+  setFinal() {
     this._final = true;
   }
 
-  toArray(): ByteArray {
+  toArray() {
     return [ this._type + (this._final ? 128 : 0) ].concat(this._data);
   }
 }
+
+module.exports = FLACTagContents;

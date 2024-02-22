@@ -1,109 +1,116 @@
-import type MediaFileReader from "./MediaFileReader.js";
+/**
+ * @flow
+ */
 
-export type XHRCallbackType = Promise<XMLHttpRequest>;
+var MediaFileReader = require('./MediaFileReader');
+
+export type CallbackType = {
+  onSuccess: (data: any) => void,
+  onError?: (error: Object) => void
+};
+
+export type LoadCallbackType = {
+  onSuccess: () => void,
+  onError?: (error: Object) => void
+};
 
 export type CharsetType =
-  | "utf-16"
-  | "utf-16le"
-  | "utf-16be"
-  | "utf-8"
-  | "iso-8859-1";
+  "utf-16" |
+  "utf-16le" |
+  "utf-16be" |
+  "utf-8" |
+  "iso-8859-1";
 
-export interface ByteRange {
-  /**
-   * A negative offset is relative to the end of the file.
-  */
-  offset: number;
-  length: number;
-}
+export type ByteRange = {
+  offset: number, // negative offset is relative to the end of the file.
+  length: number
+};
 
-export interface ChunkType {
-  offset: number;
-  data: Uint8Array;
-}
+export type DataType = Array<number> | $TypedArray | string;
 
-export type ByteArray = number[];
+export type ChunkType = {
+  offset: number,
+  data: DataType
+};
 
-export type FrameReaderSignature = (offset: number, length: number, data: MediaFileReader, flags?: Object | null, id3header?: TagHeader) => any;
+export type Byte = number;
 
-export interface TagFrames {
-  [key: string]: TagFrame;
-}
+export type ByteArray = Array<Byte>;
 
-export interface TagFrame {
-  id: string;
-  size: number;
-  description: string;
-  data: any;
-}
+export type FrameReaderSignature = (
+  offset: number,
+  length: number,
+  data: MediaFileReader,
+  flags: ?Object,
+  id3header?: TagHeader
+) => any;
 
-export interface TagFrameHeader {
-  id: string;
-  size: number;
-  headerSize: number;
-  flags?: TagFrameFlags | null;
-}
+export type TagFrames = {[key: string]: TagFrame};
 
-export interface TagFrameFlags {
+export type TagFrame = {
+  id: string,
+  size: number,
+  description: string,
+  data: any
+};
+
+export type TagFrameHeader = {
+  id: string,
+  size: number,
+  headerSize: number,
+  flags: ?TagFrameFlags
+};
+
+export type TagFrameFlags = {
   message: {
-    tag_alter_preservation: boolean;
-    file_alter_preservation: boolean;
-    read_only: boolean;
-  };
+    tag_alter_preservation: boolean,
+    file_alter_preservation: boolean,
+    read_only: boolean
+  },
   format: {
-    grouping_identity: boolean;
-    compression: boolean;
-    encryption: boolean;
-    unsynchronisation: boolean;
-    data_length_indicator: boolean;
-  };
-}
+    grouping_identity: boolean,
+    compression: boolean,
+    encryption: boolean,
+    unsynchronisation: boolean,
+    data_length_indicator: boolean
+  }
+};
 
-export interface TagHeader {
-  version: string;
-  major: number;
-  revision: number;
-  flags: TagHeaderFlags;
-  size: number;
-}
+export type TagHeader = {
+  version: string,
+  major: number,
+  revision: number,
+  flags: TagHeaderFlags,
+  size: number
+};
 
-export interface TagHeaderFlags {
-  unsynchronisation: boolean;
-  extended_header: boolean;
-  experimental_indicator: boolean;
-  footer_present: boolean;
-}
+export type TagHeaderFlags = {
+  unsynchronisation: boolean,
+  extended_header: boolean,
+  experimental_indicator: boolean,
+  footer_present: boolean
+};
 
-export interface TagType {
-  type: string;
-  ftyp?: string;
-  version?: string;
-  tags: Tags;
-}
+export type TagType = {
+  type: string,
+  tags: {[key: string]: FrameType | ShortcutType}
+};
 
-export type Tags = ShortcutTags & TagFrames;
+export type FrameType = {
+  id: string,
+  description: string,
+  data: any
+};
 
-export interface ShortcutTags {
-  title?: string;
-  artist?: string;
-  album?: string;
-  year?: string;
-  comment?: string;
-  track?: number;
-  genre?: string;
-  picture?: PictureType;
-  lyrics?: string;
-}
+type ShortcutType = any;
 
-export interface PictureType {
-  format: string;
-  type: string;
-  description: string;
-  data: ByteArray;
-}
-
-export interface FrameType {
-  id: string;
-  description: string;
-  data: any;
-}
+type ShortcutNameType =
+  "title" |
+  "artist" |
+  "album" |
+  "year" |
+  "comment" |
+  "track" |
+  "genre" |
+  "picture" |
+  "lyrics";

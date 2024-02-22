@@ -1,10 +1,19 @@
-import MediaTagReader from "./MediaTagReader.js";
-import MediaFileReader from "./MediaFileReader.js";
+/**
+ * @flow
+ */
+'use strict';
 
-import type { ByteArray, ByteRange, TagType } from "./FlowTypes.js";
+var MediaTagReader = require('./MediaTagReader');
+var MediaFileReader = require('./MediaFileReader');
 
-export default class ID3v1TagReader extends MediaTagReader {
-  static override getTagIdentifierByteRange(): ByteRange {
+import type {
+  LoadCallbackType,
+  ByteRange,
+  TagType
+} from './FlowTypes';
+
+class ID3v1TagReader extends MediaTagReader {
+  static getTagIdentifierByteRange(): ByteRange {
     // The identifier is TAG and is at offset: -128. However, to avoid a
     // fetch for the tag identifier and another for the data, we load the
     // entire data since it's so small.
@@ -14,61 +23,57 @@ export default class ID3v1TagReader extends MediaTagReader {
     };
   }
 
-  static override canReadTagFormat(tagIdentifier: ByteArray): boolean {
-    const id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
+  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+    var id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
     return id === "TAG";
   }
 
-  public override async _loadData(mediaFileReader: MediaFileReader): Promise<void> {
-    const fileSize = mediaFileReader.getSize();
-    await mediaFileReader.loadRange([fileSize - 128, fileSize - 1]);
+  _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+    var fileSize = mediaFileReader.getSize();
+    mediaFileReader.loadRange([fileSize - 128, fileSize - 1], callbacks);
   }
 
-  public override _parseData(data: MediaFileReader, tags?: string[] | null): TagType {
-    const offset = data.getSize() - 128;
+  _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+    var offset = data.getSize() - 128;
 
-    const title = data.getStringWithCharsetAt(offset + 3, 30).toString();
-    const artist = data.getStringWithCharsetAt(offset + 33, 30).toString();
-    const album = data.getStringWithCharsetAt(offset + 63, 30).toString();
-    const year = data.getStringWithCharsetAt(offset + 93, 4).toString();
+    var title = data.getStringWithCharsetAt(offset + 3, 30).toString();
+    var artist = data.getStringWithCharsetAt(offset + 33, 30).toString();
+    var album = data.getStringWithCharsetAt(offset + 63, 30).toString();
+    var year = data.getStringWithCharsetAt(offset + 93, 4).toString();
 
-    const trackFlag = data.getByteAt(offset + 97 + 28);
-    let track = data.getByteAt(offset + 97 + 29);
-    let version: string;
-    let comment: string;
-
+    var trackFlag = data.getByteAt(offset + 97 + 28);
+    var track = data.getByteAt(offset + 97 + 29);
     if (trackFlag == 0 && track != 0) {
-      version = "1.1";
-      comment = data.getStringWithCharsetAt(offset + 97, 28).toString();
+      var version = "1.1";
+      var comment = data.getStringWithCharsetAt(offset + 97, 28).toString();
     } else {
-      version = "1.0";
-      comment = data.getStringWithCharsetAt(offset + 97, 30).toString();
+      var version = "1.0";
+      var comment = data.getStringWithCharsetAt(offset + 97, 30).toString();
       track = 0;
     }
 
-    const genreIdx = data.getByteAt(offset + 97 + 30);
-    let genre: GENRES;
+    var genreIdx = data.getByteAt(offset + 97 + 30);
     if (genreIdx < 255) {
-      genre = GENRES[genreIdx];
+      var genre = GENRES[genreIdx];
     } else {
-      // @ts-expect-error
-      genre = "";
+      var genre = "";
     }
 
-    const tag = {
-      type: "ID3",
-      version: version,
-      tags: {
-        title,
-        artist,
-        album,
-        year,
-        comment,
-        genre
+    var tag = {
+      "type": "ID3",
+      "version" : version,
+      "tags": {
+        "title" : title,
+        "artist" : artist,
+        "album" : album,
+        "year" : year,
+        "comment" : comment,
+        "genre" : genre
       }
-    } as TagType;
+    };
 
     if (track) {
+      // $FlowIssue - flow is not happy with adding properties
       tag.tags.track = track;
     }
 
@@ -76,9 +81,7 @@ export default class ID3v1TagReader extends MediaTagReader {
   }
 }
 
-type GENRES = typeof GENRES[number];
-
-const GENRES = [
+var GENRES = [
   "Blues","Classic Rock","Country","Dance","Disco","Funk","Grunge",
   "Hip-Hop","Jazz","Metal","New Age","Oldies","Other","Pop","R&B",
   "Rap","Reggae","Rock","Techno","Industrial","Alternative","Ska",
@@ -101,4 +104,6 @@ const GENRES = [
   "Porn Groove","Satire","Slow Jam","Club","Tango","Samba",
   "Folklore","Ballad","Power Ballad","Rhythmic Soul","Freestyle",
   "Duet","Punk Rock","Drum Solo","Acapella","Euro-House","Dance Hall"
-] as const;
+];
+
+module.exports = ID3v1TagReader;

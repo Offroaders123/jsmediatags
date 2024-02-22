@@ -18,8 +18,8 @@
       "email": "jesse.ditson@gmail.com"
     }
   ],
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "build2/jsmediatags.js",
+  "browser": "dist/jsmediatags.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aadsm/jsmediatags.git"
@@ -36,33 +36,52 @@
     "url": "https://github.com/aadsm/jsmediatags/issues"
   },
   "homepage": "https://github.com/aadsm/jsmediatags#readme",
+  "react-native": {
+    "fs": false,
+    "./NodeFileReader": false
+  },
+  "dependencies": {
+    "xhr2": "^0.1.4"
+  },
+  "optionalPeerDependencies": {
+    "buffer": "^5.0.8",
+    "react-native-fs": "^2.9.2"
+  },
   "devDependencies": {
-    "jest": "^29.5.0",
-    "jest-ts-webcompat-resolver": "^1.0.0",
-    "ts-jest": "^29.1.0",
-    "typescript": "^5.0.4"
+    "@babel/cli": "^7.12.16",
+    "@babel/core": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-transform-block-scoping": "^7.4.4",
+    "@babel/plugin-transform-classes": "^7.4.4",
+    "@babel/plugin-transform-flow-strip-types": "^7.4.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
+    "@babel/preset-env": "^7.5.0",
+    "babel-jest": "^26.6.3",
+    "babelify": "^10.0.0",
+    "browserify": "^16.3.0",
+    "flow-bin": "~0.53.1",
+    "google-closure-compiler": "20170626.0.0",
+    "jest-cli": "^26.6.3",
+    "react": "^16.2.0",
+    "react-native": "^0.64.0",
+    "watchify": "^4.0.0"
   },
   "scripts": {
-    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "build": "tsc --project ./tsconfig.build.json",
-    "dev": "tsc -w"
+    "test": "jest",
+    "build": "babel src --ignore __tests__,__mocks,FlowTypes.js --out-dir build2",
+    "watch": "babel --ignore __tests__,__mocks,FlowTypes.js --watch src --out-dir build2",
+    "dist-dev": "mkdir -p dist && browserify src/jsmediatags.js --detect-globals false -i ./src/NodeFileReader.js -i ./src/ReactNativeFileReader.js -o dist/jsmediatags.js -s jsmediatags -t babelify",
+    "dist-watch": "mkdir -p dist && watchify src/jsmediatags.js -v --detect-globals false -i ./src/NodeFileReader.js -i ./src/ReactNativeFileReader.js -o dist/jsmediatags.js -s jsmediatags -t babelify",
+    "dist": "npm run dist-dev && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level QUIET --compilation_level SIMPLE_OPTIMIZATIONS --js dist/jsmediatags.js > dist/jsmediatags.min.js"
   },
   "jest": {
-    "preset": "ts-jest/presets/default-esm",
-    "resolver": "jest-ts-webcompat-resolver",
+    "rootDir": "./src",
+    "timers": "fake",
     "transform": {
-      "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          "tsconfig": "./tsconfig.json",
-          "useESM": true,
-          "diagnostics": false
-        }
-      ]
-    },
-    "fakeTimers": {
-      "enableGlobally": true,
-      "legacyFakeTimers": true
+      ".js$": "babel-jest"
     }
+  },
+  "engines": {
+    "node": ">=4.0.0"
   }
 }

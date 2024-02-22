@@ -23,18 +23,18 @@ class NodeFileReader extends MediaFileReader {
     this._fileData = new ChunkedFileData();
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return (
       typeof file === 'string' &&
       !/^[a-z]+:\/\//i.test(file)
     );
   }
 
-  getByteAt(offset: number): number {
+  override getByteAt(offset: number): number {
     return this._fileData.getByteAt(offset);
   }
 
-  _init(callbacks: LoadCallbackType) {
+  override _init(callbacks: LoadCallbackType) {
     var self = this;
 
     fs.stat(self._path, function(err, stats) {
@@ -49,7 +49,7 @@ class NodeFileReader extends MediaFileReader {
     });
   }
 
-  loadRange(range: [number, number], callbacks: LoadCallbackType) {
+  override loadRange(range: [number, number], callbacks: LoadCallbackType) {
     var fd = -1;
     var self = this;
     var fileData = this._fileData;

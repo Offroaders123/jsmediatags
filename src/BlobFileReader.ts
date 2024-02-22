@@ -20,7 +20,7 @@ class BlobFileReader extends MediaFileReader {
     this._fileData = new ChunkedFileData();
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return (
       (typeof Blob !== "undefined" && file instanceof Blob) ||
       // File extends Blob but it seems that File instanceof Blob doesn't
@@ -29,12 +29,12 @@ class BlobFileReader extends MediaFileReader {
     );
   }
 
-  _init(callbacks: LoadCallbackType): void {
+  override _init(callbacks: LoadCallbackType): void {
     this._size = this._blob.size;
     setTimeout(callbacks.onSuccess, 1);
   }
 
-  loadRange(range: [number, number], callbacks: LoadCallbackType): void {
+  override loadRange(range: [number, number], callbacks: LoadCallbackType): void {
     var self = this;
     // $FlowIssue - flow isn't aware of mozSlice or webkitSlice
     var blobSlice = this._blob.slice || this._blob.mozSlice || this._blob.webkitSlice;
@@ -56,7 +56,7 @@ class BlobFileReader extends MediaFileReader {
     browserFileReader.readAsArrayBuffer(blob);
   }
 
-  getByteAt(offset: number): number {
+  override getByteAt(offset: number): number {
     return this._fileData.getByteAt(offset);
   }
 }

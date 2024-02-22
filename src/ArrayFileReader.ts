@@ -22,22 +22,22 @@ class ArrayFileReader extends MediaFileReader {
     this._isInitialized = true;
   }
 
-  static canReadFile(file: any): boolean {
+  static override canReadFile(file: any): boolean {
     return (
       Array.isArray(file) ||
       (typeof Buffer === 'function' && Buffer.isBuffer(file))
     );
   }
 
-  init(callbacks: LoadCallbackType) {
+  override init(callbacks: LoadCallbackType) {
     setTimeout(callbacks.onSuccess, 0);
   }
 
-  loadRange(range: [number, number], callbacks: LoadCallbackType) {
+  override loadRange(range: [number, number], callbacks: LoadCallbackType) {
     setTimeout(callbacks.onSuccess, 0);
   }
 
-  getByteAt(offset: number): Byte {
+  override getByteAt(offset: number): Byte {
     if (offset >= this._array.length) {
       throw new Error("Offset " + offset + " hasn't been loaded yet.");
     }

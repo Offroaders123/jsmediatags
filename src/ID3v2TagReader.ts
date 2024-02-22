@@ -22,7 +22,7 @@ import type {
 const ID3_HEADER_SIZE = 10;
 
 class ID3v2TagReader extends MediaTagReader {
-  static getTagIdentifierByteRange(): ByteRange {
+  static override getTagIdentifierByteRange(): ByteRange {
     // ID3 header
     return {
       offset: 0,
@@ -30,12 +30,12 @@ class ID3v2TagReader extends MediaTagReader {
     };
   }
 
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static override canReadTagFormat(tagIdentifier: Array<number>): boolean {
     var id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 3));
     return id === 'ID3';
   }
 
-  _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
     mediaFileReader.loadRange([6, 9], {
       onSuccess: function() {
         mediaFileReader.loadRange(
@@ -48,7 +48,7 @@ class ID3v2TagReader extends MediaTagReader {
     });
   }
 
-  _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  override _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
     var offset = 0;
     var major = data.getByteAt(offset+3);
     if (major > 4) { return {"type": "ID3", "version": ">2.4", "tags": {}}; }
@@ -132,7 +132,7 @@ class ID3v2TagReader extends MediaTagReader {
     }
   }
 
-  getShortcuts(): {[key: string]: string|Array<string>} {
+  override getShortcuts(): {[key: string]: string|Array<string>} {
     return SHORTCUTS;
   }
 }

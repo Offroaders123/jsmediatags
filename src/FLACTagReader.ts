@@ -73,7 +73,7 @@ class FLACTagReader extends MediaTagReader {
    *
    * @return {ByteRange} The byte range that identifies the tag for a FLAC.
    */
-  static getTagIdentifierByteRange(): ByteRange {
+  static override getTagIdentifierByteRange(): ByteRange {
     return {
       offset: 0,
       length: FLAC_HEADER_SIZE
@@ -89,7 +89,7 @@ class FLACTagReader extends MediaTagReader {
    *
    * @return {boolean} True if the header is fLaC, false otherwise.
    */
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static override canReadTagFormat(tagIdentifier: Array<number>): boolean {
     var id = String.fromCharCode.apply(String, tagIdentifier.slice(0, 4));
     return id === 'fLaC';
   }
@@ -105,7 +105,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {MediaFileReader} mediaFileReader - The MediaFileReader used to parse the file.
    * @param {LoadCallbackType} callbacks - The callback to call once _loadData is completed.
    */
-  _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
     var self = this;
     mediaFileReader.loadRange([4, 7], {
       onSuccess: function() {
@@ -247,7 +247,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {Array<string>} [tags] - Optional tags to also be retrieved from the file.
    * @return {TagType} - An object containing the tag information for the file.
    */
-  _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
+  override _parseData(data: MediaFileReader, tags: ?Array<string>): TagType {
     var vendorLength = data.getLongAt(this._commentOffset, false);
     var offsetVendor = this._commentOffset + 4;
     /* This line is able to retrieve the vendor string that the VorbisComment block

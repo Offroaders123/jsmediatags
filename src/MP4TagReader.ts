@@ -21,7 +21,7 @@ import type {
 } from './FlowTypes';
 
 class MP4TagReader extends MediaTagReader {
-  static getTagIdentifierByteRange(): ByteRange {
+  static override getTagIdentifierByteRange(): ByteRange {
     // The tag identifier is located in [4, 8] but since we'll need to reader
     // the header of the first block anyway, we load it instead to avoid
     // making two requests.
@@ -31,12 +31,12 @@ class MP4TagReader extends MediaTagReader {
     };
   }
 
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static override canReadTagFormat(tagIdentifier: Array<number>): boolean {
     var id = String.fromCharCode.apply(String, tagIdentifier.slice(4, 8));
     return id === "ftyp";
   }
 
-  _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
     // MP4 metadata isn't located in a specific location of the file. Roughly
     // speaking, it's composed of blocks chained together like a linked list.
     // These blocks are called atoms (or boxes).
@@ -116,7 +116,7 @@ class MP4TagReader extends MediaTagReader {
     return atomName !== "----";
   }
 
-  _parseData(data: MediaFileReader, tagsToRead: ?Array<string>): TagType {
+  override _parseData(data: MediaFileReader, tagsToRead: ?Array<string>): TagType {
     var tags = {};
 
     tagsToRead = this._expandShortcutTags(tagsToRead);
@@ -268,7 +268,7 @@ class MP4TagReader extends MediaTagReader {
     };
   }
 
-  getShortcuts(): {[key: string]: string|Array<string>} {
+  override getShortcuts(): {[key: string]: string|Array<string>} {
     return SHORTCUTS;
   }
 }

@@ -36,7 +36,7 @@ class MP4TagReader extends MediaTagReader {
     return id === "ftyp";
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     // MP4 metadata isn't located in a specific location of the file. Roughly
     // speaking, it's composed of blocks chained together like a linked list.
     // These blocks are called atoms (or boxes).
@@ -64,7 +64,7 @@ class MP4TagReader extends MediaTagReader {
     offset: number,
     parentAtomFullName: string,
     callbacks: LoadCallbackType
-  ) {
+  ): void {
     if (offset >= mediaFileReader.getSize()) {
       callbacks.onSuccess();
       return;
@@ -150,7 +150,7 @@ class MP4TagReader extends MediaTagReader {
     tagsToRead: Array<string> | null,
     parentAtomFullName?: string,
     indent?: string
-  ) {
+  ): void {
     indent = indent === undefined ? "" : indent + "  ";
 
     var seek = offset;

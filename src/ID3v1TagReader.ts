@@ -28,7 +28,7 @@ class ID3v1TagReader extends MediaTagReader {
     return id === "TAG";
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     var fileSize = mediaFileReader.getSize();
     mediaFileReader.loadRange([fileSize - 128, fileSize - 1], callbacks);
   }

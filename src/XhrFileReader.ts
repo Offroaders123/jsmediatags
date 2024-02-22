@@ -41,7 +41,7 @@ class XhrFileReader extends MediaFileReader {
     );
   }
 
-  static setConfig(config: Object) {
+  static setConfig(config: Object): void {
     for (var key in config) if (config.hasOwnProperty(key)) {
       this._config[key] = config[key];
     }
@@ -193,7 +193,7 @@ class XhrFileReader extends MediaFileReader {
     method: string,
     range: [number, number] | null,
     callbacks: CallbackType
-  ) {
+  ): void {
     var xhr = this._createXHRObject();
     xhr.open(method, this._url);
 
@@ -255,7 +255,7 @@ class XhrFileReader extends MediaFileReader {
     xhr.send(null);
   }
 
-  _setRequestHeader(xhr: XMLHttpRequest, headerName: string, headerValue: string) {
+  _setRequestHeader(xhr: XMLHttpRequest, headerName: string, headerValue: string): void {
     if (XhrFileReader._config.disallowedXhrHeaders.indexOf(headerName.toLowerCase()) < 0) {
       xhr.setRequestHeader(headerName, headerValue);
     }

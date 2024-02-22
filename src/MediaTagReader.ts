@@ -44,7 +44,7 @@ class MediaTagReader {
     return this;
   }
 
-  read(callbacks: CallbackType) {
+  read(callbacks: CallbackType): void {
     var self = this;
 
     this._mediaFileReader.init({

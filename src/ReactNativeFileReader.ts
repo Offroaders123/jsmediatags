@@ -35,7 +35,7 @@ class ReactNativeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  override _init(callbacks: LoadCallbackType) {
+  override _init(callbacks: LoadCallbackType): void {
     var self = this;
 
     RNFS.stat(self._path)
@@ -48,7 +48,7 @@ class ReactNativeFileReader extends MediaFileReader {
       })
   }
 
-  override loadRange(range: [number, number], callbacks: LoadCallbackType) {
+  override loadRange(range: [number, number], callbacks: LoadCallbackType): void {
     var fd = -1;
     var self = this;
     var fileData = this._fileData;

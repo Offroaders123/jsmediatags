@@ -28,11 +28,11 @@ class ArrayFileReader extends MediaFileReader {
     );
   }
 
-  override init(callbacks: LoadCallbackType) {
+  override init(callbacks: LoadCallbackType): void {
     setTimeout(callbacks.onSuccess, 0);
   }
 
-  override loadRange(range: [number, number], callbacks: LoadCallbackType) {
+  override loadRange(range: [number, number], callbacks: LoadCallbackType): void {
     setTimeout(callbacks.onSuccess, 0);
   }
 

@@ -22,11 +22,11 @@ import type {
 var mediaFileReaders: Array<typeof MediaFileReader> = [];
 var mediaTagReaders: Array<typeof MediaTagReader> = [];
 
-function read(location: Object, callbacks: CallbackType) {
+function read(location: Object, callbacks: CallbackType): void {
   new Reader(location).read(callbacks);
 }
 
-function isRangeValid(range: ByteRange, fileSize: number) {
+function isRangeValid(range: ByteRange, fileSize: number): boolean {
   const invalidPositiveRange = range.offset >= 0
     && range.offset + range.length >= fileSize
 
@@ -61,7 +61,7 @@ class Reader {
     return this;
   }
 
-  read(callbacks: CallbackType) {
+  read(callbacks: CallbackType): void {
     var FileReader = this._getFileReader();
     var fileReader = new FileReader(this._file);
     var self = this;
@@ -99,7 +99,7 @@ class Reader {
     throw new Error("No suitable file reader found for " + this._file);
   }
 
-  _getTagReader(fileReader: MediaFileReader, callbacks: CallbackType) {
+  _getTagReader(fileReader: MediaFileReader, callbacks: CallbackType): void {
     if (this._tagReader) {
       var tagReader = this._tagReader;
       setTimeout(function() {
@@ -110,7 +110,7 @@ class Reader {
     }
   }
 
-  _findTagReader(fileReader: MediaFileReader, callbacks: CallbackType) {
+  _findTagReader(fileReader: MediaFileReader, callbacks: CallbackType): void {
     // We don't want to make multiple fetches per tag reader to get the tag
     // identifier. The strategy here is to combine all the tag identifier
     // ranges into one and make a single fetch. This is particularly important
@@ -196,7 +196,7 @@ class Reader {
     fileReader: MediaFileReader,
     tagReaders: Array<typeof MediaTagReader>,
     callbacks: LoadCallbackType
-  ) {
+  ): void {
     if (tagReaders.length === 0) {
       // Force async
       setTimeout(callbacks.onSuccess, 1);
@@ -243,19 +243,19 @@ class Config {
     return Config;
   }
 
-  static EXPERIMENTAL_avoidHeadRequests() {
+  static EXPERIMENTAL_avoidHeadRequests(): void {
     XhrFileReader.setConfig({
       avoidHeadRequests: true
     });
   }
 
-  static setDisallowedXhrHeaders(disallowedXhrHeaders: Array<string>) {
+  static setDisallowedXhrHeaders(disallowedXhrHeaders: Array<string>): void {
     XhrFileReader.setConfig({
       disallowedXhrHeaders: disallowedXhrHeaders
     });
   }
 
-  static setXhrTimeoutInSec(timeoutInSec: number) {
+  static setXhrTimeoutInSec(timeoutInSec: number): void {
     XhrFileReader.setConfig({
       timeoutInSec: timeoutInSec
     });

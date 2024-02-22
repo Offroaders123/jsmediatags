@@ -106,7 +106,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {MediaFileReader} mediaFileReader - The MediaFileReader used to parse the file.
    * @param {LoadCallbackType} callbacks - The callback to call once _loadData is completed.
    */
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     var self = this;
     mediaFileReader.loadRange([4, 7], {
       onSuccess: function() {
@@ -139,7 +139,7 @@ class FLACTagReader extends MediaTagReader {
     mediaFileReader: MediaFileReader,
     offset: number,
     callbacks: LoadCallbackType
-  ) {
+  ): void {
     var self = this;
     /* As mentioned above, this first byte is loaded to see what metadata type
      * this block represents.
@@ -208,7 +208,7 @@ class FLACTagReader extends MediaTagReader {
     blockHeader: number,
     blockSize: number,
     callbacks: LoadCallbackType
-  ) {
+  ): void {
     var self = this;
     if (blockHeader > 127) {
       if (!self._commentOffset) {

@@ -34,7 +34,7 @@ class NodeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  override _init(callbacks: LoadCallbackType) {
+  override _init(callbacks: LoadCallbackType): void {
     var self = this;
 
     fs.stat(self._path, function(err, stats) {
@@ -49,7 +49,7 @@ class NodeFileReader extends MediaFileReader {
     });
   }
 
-  override loadRange(range: [number, number], callbacks: LoadCallbackType) {
+  override loadRange(range: [number, number], callbacks: LoadCallbackType): void {
     var fd = -1;
     var self = this;
     var fileData = this._fileData;
@@ -63,7 +63,7 @@ class NodeFileReader extends MediaFileReader {
       return;
     }
 
-    var readData = function(err: Error | null, _fd: number | null) {
+    var readData = function(err: Error | null, _fd: number | null): void {
       if (err) {
         onError({"type": "fs", "info": err});
         return;
@@ -76,7 +76,7 @@ class NodeFileReader extends MediaFileReader {
       fs.read(_fd!, buffer, 0, length, range[0], processData);
     };
 
-    var processData = function(err: Error | null, bytesRead: number, buffer: Buffer) {
+    var processData = function(err: Error | null, bytesRead: number, buffer: Buffer): void {
       fs.close(fd, function(err) {
         if (err) {
           console.error(err);
@@ -92,7 +92,7 @@ class NodeFileReader extends MediaFileReader {
       onSuccess();
     };
 
-    var storeBuffer = function(buffer: Buffer) {
+    var storeBuffer = function(buffer: Buffer): void {
       var data = Array.prototype.slice.call(buffer, 0, length);
       fileData.addData(range[0], data);
     }

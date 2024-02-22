@@ -85,7 +85,7 @@ class ID3v2TagContents {
       binaryFlags = this._contents[FLAGS] || 0;
     }
 
-    function setOrUnsetBit(shouldSet: boolean, bitmap: number, bit: number) {
+    function setOrUnsetBit(shouldSet: boolean, bitmap: number, bit: number): number {
       if (shouldSet) {
         return bitmap |= 1<<bit;
       } else {
@@ -300,7 +300,7 @@ class ID3v2TagContents {
     return this;
   }
 
-  _addExtendedHeaderData(tagKey: keyof typeof this._extendedHeader, tagData: ByteArray) {
+  _addExtendedHeaderData(tagKey: keyof typeof this._extendedHeader, tagData: ByteArray): void {
     var offset = START_EXTENDED_DATA_V4;
 
     // Each flag that is set in the extended header has data attached, which
@@ -325,7 +325,7 @@ class ID3v2TagContents {
     this._addData(offset, data);
   }
 
-  _initExtendedHeader() {
+  _initExtendedHeader(): void {
     this._hasExtendedHeader = true;
     this._updateFlags({extended_header: true});
 
@@ -346,7 +346,7 @@ class ID3v2TagContents {
     }
   }
 
-  _updateSize() {
+  _updateSize(): void {
     // Header (10 bytes) is not included in the size.
     var size = 0;
 
@@ -375,7 +375,7 @@ class ID3v2TagContents {
     this._setData(SIZE, getSynchsafeInteger32(size));
   }
 
-  _setBitAtOffset(offset: number, bit: number) {
+  _setBitAtOffset(offset: number, bit: number): void {
     var data = this._getData(offset, 1);
     data[0] |= 1<<bit;
     this._setData(offset, data);
@@ -385,14 +385,14 @@ class ID3v2TagContents {
     return this._contents.slice(offset, offset+length);
   }
 
-  _setData(offset: number, data: ByteArray) {
+  _setData(offset: number, data: ByteArray): void {
     this._contents.splice.apply(this._contents, [
       offset,
       data.length,
     ].concat(data));
   }
 
-  _addData(offset: number, data: ByteArray) {
+  _addData(offset: number, data: ByteArray): void {
     this._contents.splice.apply(this._contents, [
       offset,
       0,

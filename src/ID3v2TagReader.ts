@@ -35,7 +35,7 @@ class ID3v2TagReader extends MediaTagReader {
     return id === 'ID3';
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType) {
+  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     mediaFileReader.loadRange([6, 9], {
       onSuccess: function() {
         mediaFileReader.loadRange(

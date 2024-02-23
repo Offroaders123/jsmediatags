@@ -14,7 +14,7 @@ import type {
   CharsetType
 } from './FlowTypes';
 
-class MediaFileReader {
+abstract class MediaFileReader {
   _isInitialized: boolean;
   _size: number;
 
@@ -50,17 +50,13 @@ class MediaFileReader {
     }
   }
 
-  _init(callbacks: LoadCallbackType): void {
-    throw new Error("Must implement init function");
-  }
+  abstract _init(callbacks: LoadCallbackType): void;
 
   /**
    * @param range The start and end indexes of the range to load.
    *        Ex: [0, 7] load bytes 0 to 7 inclusive.
    */
-  loadRange(range: [number, number], callbacks: LoadCallbackType): void {
-    throw new Error("Must implement loadRange function");
-  }
+  abstract loadRange(range: [number, number], callbacks: LoadCallbackType): void;
 
   /**
    * @return The size of the file in bytes.
@@ -73,9 +69,7 @@ class MediaFileReader {
     return this._size;
   }
 
-  getByteAt(offset: number): number {
-    throw new Error("Must implement getByteAt function");
-  }
+  abstract getByteAt(offset: number): number;
 
   getBytesAt(offset: number, length: number): Array<number> {
     var bytes = new Array(length);

@@ -28,7 +28,7 @@ class ArrayFileReader extends MediaFileReader {
     );
   }
 
-  override init(callbacks: LoadCallbackType): void {
+  override _init(callbacks: LoadCallbackType): void {
     setTimeout(callbacks.onSuccess, 0);
   }
 

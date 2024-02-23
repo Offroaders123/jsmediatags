@@ -12,7 +12,7 @@ import type {
   TagType
 } from './FlowTypes';
 
-class MediaTagReader {
+abstract class MediaTagReader {
   _mediaFileReader: MediaFileReader;
   _tags: Array<string> | null;
 
@@ -80,19 +80,15 @@ class MediaTagReader {
   /**
    * Load the necessary bytes from the media file.
    */
-  _loadData(
+  abstract _loadData(
     mediaFileReader: MediaFileReader,
     callbacks: LoadCallbackType
-  ): void {
-    throw new Error("Must implement _loadData function");
-  }
+  ): void;
 
   /**
    * Parse the loaded data to read the media tags.
    */
-  _parseData(mediaFileReader: MediaFileReader, tags: Array<string> | null): TagType {
-    throw new Error("Must implement _parseData function");
-  }
+  abstract _parseData(mediaFileReader: MediaFileReader, tags: Array<string> | null): TagType;
 
   _expandShortcutTags(tagsWithShortcuts: Array<string> | null): Array<string> | null {
     if (!tagsWithShortcuts) {

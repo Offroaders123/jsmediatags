@@ -25,8 +25,8 @@ class XhrFileReader extends MediaFileReader {
     disallowedXhrHeaders: Array<string>,
     timeoutInSec: number
   };
-  _url: string;
-  _fileData: ChunkedFileData;
+  private _url: string;
+  private _fileData: ChunkedFileData;
 
   constructor(url: string) {
     super();
@@ -52,7 +52,7 @@ class XhrFileReader extends MediaFileReader {
     }
   }
 
-  override _init(callbacks: LoadCallbackType): void {
+  protected override _init(callbacks: LoadCallbackType): void {
     if (XhrFileReader._config.avoidHeadRequests) {
       this._fetchSizeWithGetRequest(callbacks);
     } else {
@@ -60,7 +60,7 @@ class XhrFileReader extends MediaFileReader {
     }
   }
 
-  _fetchSizeWithHeadRequest(callbacks: LoadCallbackType): void {
+  private _fetchSizeWithHeadRequest(callbacks: LoadCallbackType): void {
     var self = this;
 
     this._makeXHRRequest("HEAD", null, {
@@ -79,7 +79,7 @@ class XhrFileReader extends MediaFileReader {
     });
   }
 
-  _fetchSizeWithGetRequest(callbacks: LoadCallbackType): void {
+  private _fetchSizeWithGetRequest(callbacks: LoadCallbackType): void {
     var self = this;
     var range = this._roundRangeToChunkMultiple([0, 0]);
 
@@ -108,7 +108,7 @@ class XhrFileReader extends MediaFileReader {
     });
   }
 
-  _fetchEntireFile(callbacks: LoadCallbackType): void {
+  private _fetchEntireFile(callbacks: LoadCallbackType): void {
     var self = this;
     this._makeXHRRequest("GET", null, {
       onSuccess: function(xhr: XMLHttpRequest) {
@@ -121,11 +121,11 @@ class XhrFileReader extends MediaFileReader {
     });
   }
 
-  _getXhrResponseContent(xhr: XMLHttpRequest): string {
+  private _getXhrResponseContent(xhr: XMLHttpRequest): string {
     return xhr.responseBody || xhr.responseText || "";
   }
 
-  _parseContentLength(xhr: XMLHttpRequest): number | null {
+  private _parseContentLength(xhr: XMLHttpRequest): number | null {
     var contentLength = this._getResponseHeader(xhr, "Content-Length");
 
     if (contentLength == null) {
@@ -135,7 +135,7 @@ class XhrFileReader extends MediaFileReader {
     }
   }
 
-  _parseContentRange(xhr: XMLHttpRequest): ContentRangeType | null {
+  private _parseContentRange(xhr: XMLHttpRequest): ContentRangeType | null {
     var contentRange = this._getResponseHeader(xhr, "Content-Range");
 
     if (contentRange) {
@@ -183,13 +183,13 @@ class XhrFileReader extends MediaFileReader {
     });
   }
 
-  _roundRangeToChunkMultiple(range: [number, number]): [number, number] {
+  private _roundRangeToChunkMultiple(range: [number, number]): [number, number] {
     var length = range[1] - range[0] + 1;
     var newLength = Math.ceil(length/CHUNK_SIZE) * CHUNK_SIZE;
     return [range[0], range[0] + newLength - 1];
   }
 
-  _makeXHRRequest(
+  private _makeXHRRequest(
     method: string,
     range: [number, number] | null,
     callbacks: CallbackType
@@ -255,13 +255,13 @@ class XhrFileReader extends MediaFileReader {
     xhr.send(null);
   }
 
-  _setRequestHeader(xhr: XMLHttpRequest, headerName: string, headerValue: string): void {
+  private _setRequestHeader(xhr: XMLHttpRequest, headerName: string, headerValue: string): void {
     if (XhrFileReader._config.disallowedXhrHeaders.indexOf(headerName.toLowerCase()) < 0) {
       xhr.setRequestHeader(headerName, headerValue);
     }
   }
 
-  _hasResponseHeader(xhr: XMLHttpRequest, headerName: string): boolean {
+  private _hasResponseHeader(xhr: XMLHttpRequest, headerName: string): boolean {
     var allResponseHeaders = xhr.getAllResponseHeaders();
 
     if (!allResponseHeaders) {
@@ -277,7 +277,7 @@ class XhrFileReader extends MediaFileReader {
     return headerNames.indexOf(headerName.toLowerCase()) >= 0;
   }
 
-  _getResponseHeader(xhr: XMLHttpRequest, headerName: string): string | null {
+  private _getResponseHeader(xhr: XMLHttpRequest, headerName: string): string | null {
     if (!this._hasResponseHeader(xhr, headerName)) {
       return null;
     }
@@ -290,14 +290,14 @@ class XhrFileReader extends MediaFileReader {
     return character.charCodeAt(0) & 0xff;
   }
 
-  _isWebWorker(): boolean {
+  private _isWebWorker(): boolean {
     return (
       typeof WorkerGlobalScope !== 'undefined' &&
       self instanceof WorkerGlobalScope
     );
   }
 
-  _createXHRObject(): XMLHttpRequest {
+  private _createXHRObject(): XMLHttpRequest {
     if (typeof window === "undefined" && !this._isWebWorker()) {
       // $FlowIssue - flow is not able to recognize this module.
       return new (require("xhr2").XMLHttpRequest)();

@@ -287,7 +287,7 @@ class ID3v2FrameReader {
     return frames;
   }
 
-  static _getFrameHeaderSize(id3header: TagHeader): number {
+  private static _getFrameHeaderSize(id3header: TagHeader): number {
     var major = id3header.major;
 
     if (major == 2) {
@@ -299,7 +299,7 @@ class ID3v2FrameReader {
     }
   }
 
-  static _readFrameHeader(
+  private static _readFrameHeader(
     data: MediaFileReader,
     offset: number,
     id3header: TagHeader
@@ -348,7 +348,7 @@ class ID3v2FrameReader {
     };
   }
 
-  static _readFrameFlags(data: MediaFileReader, offset: number): TagFrameFlags {
+  private static _readFrameFlags(data: MediaFileReader, offset: number): TagFrameFlags {
     return {
       message: {
         tag_alter_preservation  : data.isBitSetAt(offset, 6),
@@ -365,7 +365,7 @@ class ID3v2FrameReader {
     };
   }
 
-  static _getFrameDescription(frameId: string): string {
+  private static _getFrameDescription(frameId: string): string {
     if (frameId in FRAME_DESCRIPTIONS) {
       return FRAME_DESCRIPTIONS[frameId];
     } else {

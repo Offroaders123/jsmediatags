@@ -28,12 +28,12 @@ class ID3v1TagReader extends MediaTagReader {
     return id === "TAG";
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
+  protected override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     var fileSize = mediaFileReader.getSize();
     mediaFileReader.loadRange([fileSize - 128, fileSize - 1], callbacks);
   }
 
-  override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
+  protected override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
     var offset = data.getSize() - 128;
 
     var title = data.getStringWithCharsetAt(offset + 3, 30).toString();

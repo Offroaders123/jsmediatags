@@ -19,7 +19,7 @@ import type {
 } from './FlowTypes';
 
 class MP4TagContents {
-  _atoms: Array<Atom>;
+  private _atoms: Array<Atom>;
 
   constructor(ftyp: string, atoms?: Array<Atom>) {
     this._atoms = [
@@ -61,9 +61,9 @@ class MP4TagContents {
 }
 
 class Atom {
-  _name: string;
-  _data: Array<number>;
-  _atoms: Array<Atom>;
+  private _name: string;
+  private _data: Array<number>;
+  private _atoms: Array<Atom>;
 
   constructor(name: string, data?: ByteArray, atoms?: Array<Atom>) {
     this._name = name;

@@ -37,10 +37,10 @@ function isRangeValid(range: ByteRange, fileSize: number): boolean {
 }
 
 class Reader {
-  _file: any;
-  _tagsToRead?: Array<string>;
-  _fileReader?: typeof MediaFileReader;
-  _tagReader?: typeof MediaTagReader;
+  private _file: any;
+  private _tagsToRead?: Array<string>;
+  private _fileReader?: typeof MediaFileReader;
+  private _tagReader?: typeof MediaTagReader;
 
   constructor(file: any) {
     this._file = file;
@@ -81,7 +81,7 @@ class Reader {
     });
   }
 
-  _getFileReader(): typeof MediaFileReader {
+  private _getFileReader(): typeof MediaFileReader {
     if (this._fileReader) {
       return this._fileReader;
     } else {
@@ -89,7 +89,7 @@ class Reader {
     }
   }
 
-  _findFileReader(): typeof MediaFileReader {
+  private _findFileReader(): typeof MediaFileReader {
     for (var i = 0; i < mediaFileReaders.length; i++) {
       if (mediaFileReaders[i]!.canReadFile(this._file)) {
         return mediaFileReaders[i]!;
@@ -99,7 +99,7 @@ class Reader {
     throw new Error("No suitable file reader found for " + this._file);
   }
 
-  _getTagReader(fileReader: MediaFileReader, callbacks: CallbackType): void {
+  private _getTagReader(fileReader: MediaFileReader, callbacks: CallbackType): void {
     if (this._tagReader) {
       var tagReader = this._tagReader;
       setTimeout(function() {
@@ -110,7 +110,7 @@ class Reader {
     }
   }
 
-  _findTagReader(fileReader: MediaFileReader, callbacks: CallbackType): void {
+  private _findTagReader(fileReader: MediaFileReader, callbacks: CallbackType): void {
     // We don't want to make multiple fetches per tag reader to get the tag
     // identifier. The strategy here is to combine all the tag identifier
     // ranges into one and make a single fetch. This is particularly important
@@ -192,7 +192,7 @@ class Reader {
     this._loadTagIdentifierRanges(fileReader, tagReadersAtFileEnd, loadTagIdentifiersCallbacks);
   }
 
-  _loadTagIdentifierRanges(
+  private _loadTagIdentifierRanges(
     fileReader: MediaFileReader,
     tagReaders: Array<typeof MediaTagReader>,
     callbacks: LoadCallbackType

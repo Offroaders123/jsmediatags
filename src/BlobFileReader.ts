@@ -11,8 +11,8 @@ import type {
 } from './FlowTypes';
 
 class BlobFileReader extends MediaFileReader {
-  _blob: Blob;
-  _fileData: ChunkedFileData;
+  private _blob: Blob;
+  private _fileData: ChunkedFileData;
 
   constructor(blob: Blob) {
     super();
@@ -29,7 +29,7 @@ class BlobFileReader extends MediaFileReader {
     );
   }
 
-  override _init(callbacks: LoadCallbackType): void {
+  protected override _init(callbacks: LoadCallbackType): void {
     this._size = this._blob.size;
     setTimeout(callbacks.onSuccess, 1);
   }

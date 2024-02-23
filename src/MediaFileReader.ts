@@ -15,8 +15,8 @@ import type {
 } from './FlowTypes';
 
 abstract class MediaFileReader {
-  _isInitialized: boolean;
-  _size: number;
+  protected _isInitialized: boolean;
+  protected _size: number;
 
   constructor(path?: unknown) {
     this._isInitialized = false;
@@ -50,7 +50,7 @@ abstract class MediaFileReader {
     }
   }
 
-  abstract _init(callbacks: LoadCallbackType): void;
+  protected abstract _init(callbacks: LoadCallbackType): void;
 
   /**
    * @param range The start and end indexes of the range to load.

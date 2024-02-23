@@ -6,7 +6,7 @@
 export type DecodedString = InternalDecodedString;
 
 class InternalDecodedString {
-  _value: string;
+  private _value: string;
   bytesReadCount: number;
   length: number;
 

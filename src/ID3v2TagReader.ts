@@ -35,7 +35,7 @@ class ID3v2TagReader extends MediaTagReader {
     return id === 'ID3';
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
+  protected override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     mediaFileReader.loadRange([6, 9], {
       onSuccess: function() {
         mediaFileReader.loadRange(
@@ -48,7 +48,7 @@ class ID3v2TagReader extends MediaTagReader {
     });
   }
 
-  override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
+  protected override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
     var offset = 0;
     var major = data.getByteAt(offset+3);
     if (major > 4) { return {"type": "ID3", "version": ">2.4", "tags": {}}; }
@@ -119,7 +119,7 @@ class ID3v2TagReader extends MediaTagReader {
     return id3;
   }
 
-  _getFrameData(frames: TagFrames, ids: Array<string>): Object | null {
+  private _getFrameData(frames: TagFrames, ids: Array<string>): Object | null {
     var frame;
     for (var i = 0, id; id = ids[i]; i++) {
       if (id in frames) {

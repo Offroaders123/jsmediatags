@@ -9,7 +9,7 @@ import type {
 } from './FlowTypes';
 
 class FLACTagContents {
-  _blocks: Array<MetadataBlock>;
+  private _blocks: Array<MetadataBlock>;
 
   constructor(blocks?: Array<MetadataBlock>) {
     this._blocks = [];
@@ -56,9 +56,9 @@ class FLACTagContents {
 }
 
 class MetadataBlock {
-  _data: Array<number>;
-  _final: boolean;
-  _type: number;
+  private _data: Array<number>;
+  private _final: boolean;
+  private _type: number;
 
   constructor(type: number, data: ByteArray) {
     this._type = type;

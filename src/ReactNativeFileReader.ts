@@ -15,8 +15,8 @@ import type {
 
 
 class ReactNativeFileReader extends MediaFileReader {
-  _path: string;
-  _fileData: ChunkedFileData;
+  private _path: string;
+  private _fileData: ChunkedFileData;
 
   constructor(path: string) {
     super();
@@ -35,7 +35,7 @@ class ReactNativeFileReader extends MediaFileReader {
     return this._fileData.getByteAt(offset);
   }
 
-  override _init(callbacks: LoadCallbackType): void {
+  protected override _init(callbacks: LoadCallbackType): void {
     var self = this;
 
     RNFS.stat(self._path)

@@ -62,8 +62,8 @@ import type MediaFileReader = require('./MediaFileReader.js');
  * Class representing a MediaTagReader that parses FLAC tags.
  */
 class FLACTagReader extends MediaTagReader {
-  _commentOffset!: number;
-  _pictureOffset!: number;
+  private _commentOffset!: number;
+  private _pictureOffset!: number;
 
   /**
    * Gets the byte range for the tag identifier.
@@ -106,7 +106,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {MediaFileReader} mediaFileReader - The MediaFileReader used to parse the file.
    * @param {LoadCallbackType} callbacks - The callback to call once _loadData is completed.
    */
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
+  protected override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     var self = this;
     mediaFileReader.loadRange([4, 7], {
       onSuccess: function() {
@@ -135,7 +135,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {number} offset - The offset to start checking the header from.
    * @param {LoadCallbackType} callbacks - The callback to call once the header has been found.
    */
-  _loadBlock(
+  private _loadBlock(
     mediaFileReader: MediaFileReader,
     offset: number,
     callbacks: LoadCallbackType
@@ -202,7 +202,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {number} blockSize - The size of the previously processed header.
    * @param {LoadCallbackType} callbacks - The callback functions to be called.
    */
-  _nextBlock(
+  private _nextBlock(
     mediaFileReader: MediaFileReader,
     offset: number,
     blockHeader: number,
@@ -248,7 +248,7 @@ class FLACTagReader extends MediaTagReader {
    * @param {Array<string>} [tags] - Optional tags to also be retrieved from the file.
    * @return {TagType} - An object containing the tag information for the file.
    */
-  override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
+  protected override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
     var vendorLength = data.getLongAt(this._commentOffset, false);
     var offsetVendor = this._commentOffset + 4;
     /* This line is able to retrieve the vendor string that the VorbisComment block

@@ -36,7 +36,7 @@ class MP4TagReader extends MediaTagReader {
     return id === "ftyp";
   }
 
-  override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
+  protected override _loadData(mediaFileReader: MediaFileReader, callbacks: LoadCallbackType): void {
     // MP4 metadata isn't located in a specific location of the file. Roughly
     // speaking, it's composed of blocks chained together like a linked list.
     // These blocks are called atoms (or boxes).
@@ -59,7 +59,7 @@ class MP4TagReader extends MediaTagReader {
     });
   }
 
-  _loadAtom(
+  private _loadAtom(
     mediaFileReader: MediaFileReader,
     offset: number,
     parentAtomFullName: string,
@@ -108,15 +108,15 @@ class MP4TagReader extends MediaTagReader {
     }
   }
 
-  _isContainerAtom(atomName: string): boolean {
+  private _isContainerAtom(atomName: string): boolean {
     return ["moov", "udta", "meta", "ilst"].indexOf(atomName) >= 0;
   }
 
-  _canReadAtom(atomName: string): boolean {
+  private _canReadAtom(atomName: string): boolean {
     return atomName !== "----";
   }
 
-  override _parseData(data: MediaFileReader, tagsToRead: Array<string> | null): TagType {
+  protected override _parseData(data: MediaFileReader, tagsToRead: Array<string> | null): TagType {
     var tags = {};
 
     tagsToRead = this._expandShortcutTags(tagsToRead);
@@ -142,7 +142,7 @@ class MP4TagReader extends MediaTagReader {
     };
   }
 
-  _readAtom(
+  private _readAtom(
     tags: Object,
     data: MediaFileReader,
     offset: number,
@@ -184,7 +184,7 @@ class MP4TagReader extends MediaTagReader {
     }
   }
 
-  _readMetadataAtom(data: MediaFileReader, offset: number): TagFrame {
+  private _readMetadataAtom(data: MediaFileReader, offset: number): TagFrame {
     // 16: size + name + size + "data" (4 bytes each)
     // 8: 1 byte atom version & 3 bytes atom flags + 4 bytes NULL space
     // 8: 4 bytes track + 4 bytes total

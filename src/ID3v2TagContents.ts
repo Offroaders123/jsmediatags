@@ -36,18 +36,18 @@ import type {
 } from './FlowTypes';
 
 class ID3v2TagContents {
-  _size!: number;
-  _major: number;
-  _revision: number;
-  _contents: ByteArray;
-  _frames: {[key: string]: Array<ByteArray>};
-  _extendedHeader: {
+  private _size!: number;
+  private _major: number;
+  private _revision: number;
+  private _contents: ByteArray;
+  private _frames: {[key: string]: Array<ByteArray>};
+  private _extendedHeader: {
     UPDATE: number,
     CRC: number,
     RESTRICTIONS: number
   };
-  _hasExtendedHeader?: boolean;
-  _nextFrameOffset!: number;
+  private _hasExtendedHeader?: boolean;
+  private _nextFrameOffset!: number;
 
   constructor(major: number, revision: number) {
     if (major < 2 || major > 4) {

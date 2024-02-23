@@ -12,7 +12,7 @@ import type {
 } from './FlowTypes';
 
 class ArrayFileReader extends MediaFileReader {
-  _array: ByteArray;
+  private _array: ByteArray;
 
   constructor(array: ByteArray) {
     super();
@@ -28,7 +28,7 @@ class ArrayFileReader extends MediaFileReader {
     );
   }
 
-  override _init(callbacks: LoadCallbackType): void {
+  protected override _init(callbacks: LoadCallbackType): void {
     setTimeout(callbacks.onSuccess, 0);
   }
 

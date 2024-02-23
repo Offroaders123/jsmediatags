@@ -13,8 +13,8 @@ import type {
 } from './FlowTypes';
 
 abstract class MediaTagReader {
-  _mediaFileReader: MediaFileReader;
-  _tags: Array<string> | null;
+  private _mediaFileReader: MediaFileReader;
+  private _tags: Array<string> | null;
 
   constructor(mediaFileReader: MediaFileReader) {
     this._mediaFileReader = mediaFileReader;
@@ -80,7 +80,7 @@ abstract class MediaTagReader {
   /**
    * Load the necessary bytes from the media file.
    */
-  abstract _loadData(
+  protected abstract _loadData(
     mediaFileReader: MediaFileReader,
     callbacks: LoadCallbackType
   ): void;
@@ -88,9 +88,9 @@ abstract class MediaTagReader {
   /**
    * Parse the loaded data to read the media tags.
    */
-  abstract _parseData(mediaFileReader: MediaFileReader, tags: Array<string> | null): TagType;
+  protected abstract _parseData(mediaFileReader: MediaFileReader, tags: Array<string> | null): TagType;
 
-  _expandShortcutTags(tagsWithShortcuts: Array<string> | null): Array<string> | null {
+  protected _expandShortcutTags(tagsWithShortcuts: Array<string> | null): Array<string> | null {
     if (!tagsWithShortcuts) {
       return null;
     }

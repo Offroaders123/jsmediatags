@@ -11,8 +11,8 @@ import type {
 } from './FlowTypes';
 
 class ArrayBufferFileReader extends MediaFileReader {
-    _buffer: ArrayBuffer;
-    _fileData: ChunkedFileData;
+    private _buffer: ArrayBuffer;
+    private _fileData: ChunkedFileData;
 
     constructor(buffer: ArrayBuffer) {
         super();
@@ -24,7 +24,7 @@ class ArrayBufferFileReader extends MediaFileReader {
         return typeof ArrayBuffer === 'function' && file instanceof ArrayBuffer
     }
 
-    override _init(callbacks: LoadCallbackType): void {
+    protected override _init(callbacks: LoadCallbackType): void {
         this._size = this._buffer.byteLength;
         setTimeout(callbacks.onSuccess, 1);
     }

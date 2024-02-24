@@ -8,13 +8,9 @@ import MediaFileReader = require('./MediaFileReader');
 import { ID3v2FrameReader } from './ID3v2FrameReader';
 
 import type {
-  CallbackType,
   LoadCallbackType,
   TagFrames,
   TagHeader,
-  TagFrameHeader,
-  TagFrameFlags,
-  CharsetType,
   ByteRange,
   TagType,
 } from './FlowTypes';

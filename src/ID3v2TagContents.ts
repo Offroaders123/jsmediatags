@@ -58,7 +58,7 @@ class ID3v2TagContents {
     this._revision = revision;
     this._contents = ([] as ByteArray).concat(
       bin("ID3"),
-      [major, revision],
+      [this._major, this._revision],
       [0], // flags
       [0, 0, 0, 0] // size
     );
@@ -372,7 +372,7 @@ class ID3v2TagContents {
     this._nextFrameOffset = size + HEADER_SIZE;
 
     this._size = size;
-    this._setData(SIZE, getSynchsafeInteger32(size));
+    this._setData(SIZE, getSynchsafeInteger32(this._size));
   }
 
   _setBitAtOffset(offset: number, bit: number): void {

@@ -33,7 +33,7 @@ class ID3v1TagReader extends MediaTagReader {
     mediaFileReader.loadRange([fileSize - 128, fileSize - 1], callbacks);
   }
 
-  protected override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
+  protected override _parseData(data: MediaFileReader, _tags: Array<string> | null): TagType {
     var offset = data.getSize() - 128;
 
     var title = data.getStringWithCharsetAt(offset + 3, 30).toString();

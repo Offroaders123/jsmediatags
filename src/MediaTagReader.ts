@@ -35,7 +35,7 @@ abstract class MediaTagReader {
    * getTagIdentifierByteRange) this function checks if it can read the tag
    * format or not.
    */
-  static canReadTagFormat(tagIdentifier: Array<number>): boolean {
+  static canReadTagFormat(_tagIdentifier: Array<number>): boolean {
     throw new Error("Must implement");
   }
 

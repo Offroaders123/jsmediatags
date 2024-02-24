@@ -49,13 +49,11 @@ class ReactNativeFileReader extends MediaFileReader {
   }
 
   override loadRange(range: [number, number], callbacks: LoadCallbackType): void {
-    var fd = -1;
-    var self = this;
     var fileData = this._fileData;
 
     var length = range[1] - range[0] + 1;
     var onSuccess = callbacks.onSuccess;
-    var onError = callbacks.onError || function(object){};
+    var onError = callbacks.onError || function(){};
 
     RNFS.read(this._path, length, range[0], {encoding: 'base64'})
       .then(readData => {

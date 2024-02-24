@@ -245,10 +245,10 @@ class FLACTagReader extends MediaTagReader {
    * Note that the longs and integers in this block are encoded in little endian
    * as opposed to big endian for the rest of the FLAC spec.
    * @param {MediaFileReader} data - The MediaFileReader to parse the file with.
-   * @param {Array<string>} [tags] - Optional tags to also be retrieved from the file.
+   * @param {Array<string>} [_tags] - Optional tags to also be retrieved from the file.
    * @return {TagType} - An object containing the tag information for the file.
    */
-  protected override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
+  protected override _parseData(data: MediaFileReader, _tags: Array<string> | null): TagType {
     var vendorLength = data.getLongAt(this._commentOffset, false);
     var offsetVendor = this._commentOffset + 4;
     /* This line is able to retrieve the vendor string that the VorbisComment block

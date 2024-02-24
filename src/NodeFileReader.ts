@@ -51,12 +51,11 @@ class NodeFileReader extends MediaFileReader {
 
   override loadRange(range: [number, number], callbacks: LoadCallbackType): void {
     var fd = -1;
-    var self = this;
     var fileData = this._fileData;
 
     var length = range[1] - range[0] + 1;
     var onSuccess = callbacks.onSuccess;
-    var onError = callbacks.onError || function(object){};
+    var onError = callbacks.onError || function(){};
 
     if (fileData.hasDataRange(range[0], range[1])) {
       process.nextTick(onSuccess);
@@ -76,7 +75,7 @@ class NodeFileReader extends MediaFileReader {
       fs.read(_fd!, buffer, 0, length, range[0], processData);
     };
 
-    var processData = function(err: Error | null, bytesRead: number, buffer: Buffer): void {
+    var processData = function(err: Error | null, _bytesRead: number, buffer: Buffer): void {
       fs.close(fd, function(err) {
         if (err) {
           console.error(err);

@@ -32,7 +32,7 @@ class ArrayFileReader extends MediaFileReader {
     setTimeout(callbacks.onSuccess, 0);
   }
 
-  override loadRange(range: [number, number], callbacks: LoadCallbackType): void {
+  override loadRange(_range: [number, number], callbacks: LoadCallbackType): void {
     setTimeout(callbacks.onSuccess, 0);
   }
 

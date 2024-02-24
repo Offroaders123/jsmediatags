@@ -248,7 +248,6 @@ class ID3v2FrameReader {
         break;
       }
 
-      var unsyncData;
       if (flags && flags.format.unsynchronisation && !id3header.flags.unsynchronisation) {
         frameData = this.getUnsyncFileReader(frameData, frameDataOffset, frameSize);
         frameDataOffset = 0;
@@ -396,7 +395,7 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
+  _flags?: Object | null,
   id3header?: TagHeader
 ) {
   var start = offset;
@@ -436,7 +435,7 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: Object | null,
+  _flags: Object | null,
   id3header: TagHeader
 ) {
   var originalOffset = offset;
@@ -463,7 +462,7 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags: Object | null,
+  _flags: Object | null,
   id3header: TagHeader
 ) {
   var originalOffset = offset;
@@ -491,8 +490,8 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ) {
   var start = offset;
   var charset = getTextEncoding(data.getByteAt(offset));
@@ -531,10 +530,10 @@ var frameReaderFunctions = {
 
 ['PCNT']: function readCounterFrame(
   offset: number,
-  length: number,
+  _length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ) {
   // FIXME: implement the rest of the spec
   return data.getLongAt(offset, false);
@@ -554,8 +553,8 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ) {
   var charset = getTextEncoding(data.getByteAt(offset));
 
@@ -566,8 +565,8 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ): Object {
   var charset = getTextEncoding(data.getByteAt(offset));
 
@@ -578,8 +577,8 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ): Object | null {
   if (length === 0) {
     return null;
@@ -592,8 +591,8 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ): string | null {
   if (length === 0) {
     return null;
@@ -607,7 +606,7 @@ var frameReaderFunctions = {
   data: MediaFileReader,
   flags?: Object | null
 ) {
-  var text = frameReaderFunctions['T*'].apply(this, arguments);
+  var text = frameReaderFunctions['T*'].apply(this, [offset, length, data, flags]);
   return (text as string).replace(/^\(\d+\)/, '');
 },
 
@@ -624,8 +623,8 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ) {
   var start = offset;
   var charset = getTextEncoding(data.getByteAt(offset));
@@ -656,8 +655,8 @@ var frameReaderFunctions = {
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  _flags?: Object | null,
+  _id3header?: TagHeader
 ) {
   var ownerIdentifier =
     StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));

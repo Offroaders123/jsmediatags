@@ -12,9 +12,7 @@ import MediaTagReader = require('./MediaTagReader');
 import MediaFileReader = require('./MediaFileReader');
 
 import type {
-  CallbackType,
   LoadCallbackType,
-  CharsetType,
   ByteRange,
   TagType,
   TagFrame
@@ -336,6 +334,7 @@ const ATOM_DESCRIPTIONS = {
   "flvr": "Codec Flavor"
 };
 
+// @ts-expect-error - unused
 const UNSUPPORTED_ATOMS = {
   "----": 1,
 };

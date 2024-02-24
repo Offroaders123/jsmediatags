@@ -107,7 +107,7 @@ export type FrameType = {
 
 type ShortcutType = any;
 
-type ShortcutNameType =
+export type ShortcutNameType =
   "title" |
   "artist" |
   "album" |

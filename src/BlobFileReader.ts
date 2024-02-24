@@ -41,13 +41,13 @@ class BlobFileReader extends MediaFileReader {
     var blob = blobSlice.call(this._blob, range[0], range[1] + 1);
     var browserFileReader = new FileReader();
 
-    browserFileReader.onloadend = function(event) {
+    browserFileReader.onloadend = function() {
       var intArray = new Uint8Array(browserFileReader.result as ArrayBuffer);
       self._fileData.addData(range[0], intArray);
       callbacks.onSuccess();
     };
     browserFileReader.onerror =
-    browserFileReader.onabort = function(event) {
+    browserFileReader.onabort = function() {
       if (callbacks.onError) {
         callbacks.onError({"type": "blob", "info": browserFileReader.error});
       }

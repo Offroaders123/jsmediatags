@@ -1,5 +1,3 @@
-import ByteArrayUtils = require('./ByteArrayUtils');
-
 import { bin } from './ByteArrayUtils';
 import { getInteger24 } from './ByteArrayUtils';
 import { getInteger32 } from './ByteArrayUtils';

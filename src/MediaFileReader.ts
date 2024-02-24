@@ -18,7 +18,7 @@ abstract class MediaFileReader {
   protected _isInitialized: boolean;
   protected _size: number;
 
-  constructor(path?: unknown) {
+  constructor(_path?: unknown) {
     this._isInitialized = false;
     this._size = 0;
   }
@@ -26,7 +26,7 @@ abstract class MediaFileReader {
   /**
    * Decides if this media file reader is able to read the given file.
    */
-  static canReadFile(file: any): boolean {
+  static canReadFile(_file: any): boolean {
     throw new Error("Must implement canReadFile function");
   }
 

@@ -50,7 +50,7 @@ class ID3v2TagReader extends MediaTagReader {
 
   protected override _parseData(data: MediaFileReader, tags: Array<string> | null): TagType {
     var offset = 0;
-    var major = data.getByteAt(offset+3);
+    var major: TagHeader["major"] = data.getByteAt(offset+3);
     if (major > 4) { return {"type": "ID3", "version": ">2.4", "tags": {}}; }
     var revision = data.getByteAt(offset+4);
     var unsynch = data.isBitSetAt(offset+5, 7);
@@ -71,7 +71,7 @@ class ID3v2TagReader extends MediaTagReader {
       }
     }
 
-    var id3 = {
+    var id3: TagHeader = {
       "type": "ID3",
       "version" : '2.' + major + '.' + revision,
       "major" : major,

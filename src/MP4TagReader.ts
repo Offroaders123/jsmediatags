@@ -117,14 +117,14 @@ class MP4TagReader extends MediaTagReader {
   }
 
   protected override _parseData(data: MediaFileReader, tagsToRead: Array<string> | null): TagType {
-    var tags = {};
+    var tags: TagType["tags"] = {};
 
     tagsToRead = this._expandShortcutTags(tagsToRead);
     this._readAtom(tags, data, 0, data.getSize(), tagsToRead);
 
     // create shortcuts for most common data.
     for (var name in SHORTCUTS) if (SHORTCUTS.hasOwnProperty(name)) {
-      var tag = tags[SHORTCUTS[name]];
+      var tag = tags[SHORTCUTS[name as keyof typeof SHORTCUTS]];
       if (tag) {
         if (name === "track") {
           tags[name] = tag.data.track;
@@ -177,7 +177,7 @@ class MP4TagReader extends MediaTagReader {
         parentAtomFullName === "moov.udta.meta.ilst" &&
         this._canReadAtom(atomName)
       ) {
-        tags[atomName] = this._readMetadataAtom(data, seek);
+        tags[atomName as keyof typeof tags] = this._readMetadataAtom(data, seek);
       }
 
       seek += atomSize;
@@ -194,7 +194,7 @@ class MP4TagReader extends MediaTagReader {
     var atomName = data.getStringAt(offset + 4, 4);
 
     var klass = data.getInteger24At(offset + METADATA_HEADER + 1, true);
-    var type = TYPES[klass];
+    var type = TYPES[klass as keyof typeof TYPES];
     var atomData;
     var bigEndian = true;
     if (atomName == "trkn") {
@@ -263,7 +263,7 @@ class MP4TagReader extends MediaTagReader {
     return {
       id: atomName,
       size: atomSize,
-      description: ATOM_DESCRIPTIONS[atomName] || "Unknown",
+      description: ATOM_DESCRIPTIONS[atomName as keyof typeof ATOM_DESCRIPTIONS] || "Unknown",
       data: atomData
     };
   }
@@ -277,12 +277,12 @@ class MP4TagReader extends MediaTagReader {
  * https://developer.apple.com/library/content/documentation/QuickTime/QTFF/Metadata/Metadata.html#//apple_ref/doc/uid/TP40000939-CH1-SW35
 */
 const TYPES = {
-  "0": "uint8",
-  "1": "text",
-  "13": "jpeg",
-  "14": "png",
-  "21": "int",
-  "22": "uint"
+  0: "uint8",
+  1: "text",
+  13: "jpeg",
+  14: "png",
+  21: "int",
+  22: "uint"
 };
 
 const ATOM_DESCRIPTIONS = {

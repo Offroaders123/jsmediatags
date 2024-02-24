@@ -10,7 +10,8 @@ const CHUNK_SIZE = 1024;
 
 import type {
   LoadCallbackType,
-  CallbackType
+  CallbackType,
+  XhrConfig
 } from './FlowTypes';
 
 type ContentRangeType = {
@@ -20,11 +21,7 @@ type ContentRangeType = {
 };
 
 class XhrFileReader extends MediaFileReader {
-  static _config: {
-    avoidHeadRequests: boolean,
-    disallowedXhrHeaders: Array<string>,
-    timeoutInSec: number
-  };
+  static _config: XhrConfig;
   private _url: string;
   private _fileData: ChunkedFileData;
 
@@ -41,9 +38,9 @@ class XhrFileReader extends MediaFileReader {
     );
   }
 
-  static setConfig(config: Object): void {
+  static setConfig(config: Partial<XhrConfig>): void {
     for (var key in config) if (config.hasOwnProperty(key)) {
-      this._config[key] = config[key];
+      this._config[key as keyof XhrConfig] = config[key as keyof XhrConfig];
     }
 
     var disallowedXhrHeaders = this._config.disallowedXhrHeaders;
@@ -316,5 +313,12 @@ XhrFileReader._config = {
   disallowedXhrHeaders: [],
   timeoutInSec: 30
 };
+
+declare global {
+  var WorkerGlobalScope: typeof Window;
+  interface XMLHttpRequest {
+    responseBody: XMLHttpRequest["response"];
+  }
+}
 
 export = XhrFileReader;

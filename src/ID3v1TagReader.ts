@@ -69,7 +69,7 @@ class ID3v1TagReader extends MediaTagReader {
         "year" : year,
         "comment" : comment,
         "genre" : genre
-      }
+      } as { title: string; artist: string; album: string; year: string; comment: string; genre: string; track: number; }
     };
 
     if (track) {

@@ -42,8 +42,8 @@ export type FrameReaderSignature = (
   offset: number,
   length: number,
   data: MediaFileReader,
-  flags?: Object | null,
-  id3header?: TagHeader
+  flags: Object | null,
+  id3header: TagHeader
 ) => any;
 
 export type TagFrames = {[key: string]: TagFrame};
@@ -55,8 +55,10 @@ export type TagFrame = {
   data: any
 };
 
+export type FrameId = keyof typeof frameReaderFunctions;
+
 export type TagFrameHeader = {
-  id: keyof typeof frameReaderFunctions,
+  id: FrameId | "",
   size: number,
   headerSize: number,
   flags: TagFrameFlags | null
@@ -79,7 +81,7 @@ export type TagFrameFlags = {
 
 export type TagHeader = {
   version: string,
-  major: number,
+  major: 2 | 3 | 4,
   revision: number,
   flags: TagHeaderFlags,
   size: number
@@ -115,3 +117,9 @@ type ShortcutNameType =
   "genre" |
   "picture" |
   "lyrics";
+
+export interface XhrConfig {
+  avoidHeadRequests: boolean;
+  disallowedXhrHeaders: string[];
+  timeoutInSec: number;
+}

@@ -1,6 +1,6 @@
 jest.autoMockOff();
 
-const ID3v2FrameReader = require('../../dist/ID3v2FrameReader');
+const { ID3v2FrameReader } = require('../../dist/ID3v2FrameReader');
 const ArrayFileReader = require('../../dist/ArrayFileReader');
 const bin = require('../../dist/ByteArrayUtils').bin;
 

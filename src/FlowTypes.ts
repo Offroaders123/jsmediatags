@@ -3,6 +3,7 @@
  */
 
 import type MediaFileReader = require('./MediaFileReader');
+import type { frameReaderFunctions } from './ID3v2FrameReader';
 
 export type CallbackType = {
   onSuccess: (data: any) => void,
@@ -55,7 +56,7 @@ export type TagFrame = {
 };
 
 export type TagFrameHeader = {
-  id: string,
+  id: keyof typeof frameReaderFunctions,
   size: number,
   headerSize: number,
   flags: TagFrameFlags | null

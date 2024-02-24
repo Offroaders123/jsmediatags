@@ -176,7 +176,7 @@ const FRAME_DESCRIPTIONS = {
 };
 
 class ID3v2FrameReader {
-  static getFrameReaderFunction(frameId: string): FrameReaderSignature | null {
+  static getFrameReaderFunction(frameId: keyof typeof frameReaderFunctions): FrameReaderSignature | null {
     if (frameId in frameReaderFunctions) {
       return frameReaderFunctions[frameId];
     } else if (frameId[0] === "T") {
@@ -216,7 +216,7 @@ class ID3v2FrameReader {
       offset < (end - frameHeaderSize)
     ) {
       var header = this._readFrameHeader(data, offset, id3header);
-      var frameId = header.id;
+      var frameId: keyof typeof frameReaderFunctions = header.id;
 
       // No frame ID sometimes means it's the last frame (GTFO).
       if (!frameId) {
@@ -389,15 +389,15 @@ class ID3v2FrameReader {
   }
 };
 
-var frameReaderFunctions = {};
+var frameReaderFunctions = {
 
-frameReaderFunctions['APIC'] = function readPictureFrame(
+['APIC']: function readPictureFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   var start = offset;
   var charset = getTextEncoding(data.getByteAt(offset));
   switch (id3header && id3header.major) {
@@ -427,18 +427,18 @@ frameReaderFunctions['APIC'] = function readPictureFrame(
     "description" : desc.toString(),
     "data" : data.getBytesAt(offset, (start+length) - offset)
   };
-};
+},
 
 // ID3v2 chapters according to http://id3.org/id3v2-chapters-1.0
-frameReaderFunctions['CHAP'] = function readChapterFrame(
+['CHAP']: function readChapterFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   var originalOffset = offset;
-  var result = {};
+  var result = {} as { id: string; startTime: number; endTime: number; startOffset: number; endOffset: number; subFrames: TagFrames; };
   var id = StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));
   result.id = id.toString();
   offset += id.bytesReadCount;
@@ -452,20 +452,20 @@ frameReaderFunctions['CHAP'] = function readChapterFrame(
   offset+=4;
 
   var remainingLength = length - (offset - originalOffset);
-  result.subFrames = this.readFrames(offset, offset + remainingLength, data, id3header);
+  result.subFrames = ID3v2FrameReader.readFrames(offset, offset + remainingLength, data, id3header);
   return result;
-};
+},
 
 // ID3v2 table of contents according to http://id3.org/id3v2-chapters-1.0
-frameReaderFunctions['CTOC'] = function readTableOfContentsFrame(
+['CTOC']: function readTableOfContentsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   var originalOffset = offset;
-  var result = { childElementIds: [], id: undefined, topLevel: undefined, ordered: undefined, entryCount: undefined, subFrames: undefined };
+  var result = { childElementIds: [] as string[] } as { childElementIds: string[]; id: string; topLevel: boolean; ordered: boolean; entryCount: number; subFrames: TagFrames; };
   var id = StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));
   result.id = id.toString();
   offset += id.bytesReadCount;
@@ -481,17 +481,17 @@ frameReaderFunctions['CTOC'] = function readTableOfContentsFrame(
   }
 
   var remainingLength = length - (offset - originalOffset);
-  result.subFrames = this.readFrames(offset, offset + remainingLength, data, id3header);
+  result.subFrames = ID3v2FrameReader.readFrames(offset, offset + remainingLength, data, id3header);
   return result;
-}
+},
 
-frameReaderFunctions['COMM'] = function readCommentsFrame(
+['COMM']: function readCommentsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   var start = offset;
   var charset = getTextEncoding(data.getByteAt(offset));
   var language = data.getStringAt( offset+1, 3 );
@@ -505,46 +505,46 @@ frameReaderFunctions['COMM'] = function readCommentsFrame(
     short_description : shortdesc.toString(),
     text : text.toString()
   };
-};
+},
 
-frameReaderFunctions['COM'] = frameReaderFunctions['COMM'];
+// frameReaderFunctions['COM'] = frameReaderFunctions['COMM'];
 
-frameReaderFunctions['PIC'] = function(
+['PIC']: function(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   return frameReaderFunctions['APIC'](offset, length, data, flags, id3header);
-};
+},
 
-frameReaderFunctions['PCNT'] = function readCounterFrame(
+['PCNT']: function readCounterFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   // FIXME: implement the rest of the spec
   return data.getLongAt(offset, false);
-};
+},
 
-frameReaderFunctions['CNT'] = frameReaderFunctions['PCNT'];
+// frameReaderFunctions['CNT'] = frameReaderFunctions['PCNT'];
 
-frameReaderFunctions['T*'] = function readTextFrame(
+['T*']: function readTextFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   var charset = getTextEncoding(data.getByteAt(offset));
 
   return data.getStringWithCharsetAt(offset+1, length-1, charset).toString();
-};
+},
 
-frameReaderFunctions['TXXX'] = function readTextFrame(
+['TXXX']: function readTextFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
@@ -554,9 +554,9 @@ frameReaderFunctions['TXXX'] = function readTextFrame(
   var charset = getTextEncoding(data.getByteAt(offset));
 
   return getUserDefinedFields(offset, length, data, charset);
-};
+},
 
-frameReaderFunctions['WXXX'] = function readUrlFrame(
+['WXXX']: function readUrlFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
@@ -568,9 +568,9 @@ frameReaderFunctions['WXXX'] = function readUrlFrame(
   }
   var charset = getTextEncoding(data.getByteAt(offset));
   return getUserDefinedFields(offset, length, data, charset);
-};
+},
 
-frameReaderFunctions['W*'] = function readUrlFrame(
+['W*']: function readUrlFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
@@ -581,27 +581,27 @@ frameReaderFunctions['W*'] = function readUrlFrame(
     return null;
   }
   return data.getStringWithCharsetAt(offset, length, 'iso-8859-1').toString();
-};
+},
 
-frameReaderFunctions['TCON'] = function readGenreFrame(
+['TCON']: function readGenreFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null
-): any {
+) {
   var text = frameReaderFunctions['T*'].apply(this, arguments);
   return (text as string).replace(/^\(\d+\)/, '');
-};
+},
 
-frameReaderFunctions['TCO'] = frameReaderFunctions['TCON'];
+// frameReaderFunctions['TCO'] = frameReaderFunctions['TCON'];
 
-frameReaderFunctions['USLT'] = function readLyricsFrame(
+['USLT']: function readLyricsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   var start = offset;
   var charset = getTextEncoding(data.getByteAt(offset));
   var language = data.getStringAt(offset+1, 3);
@@ -615,17 +615,17 @@ frameReaderFunctions['USLT'] = function readLyricsFrame(
     descriptor : descriptor.toString(),
     lyrics : lyrics.toString()
   };
-};
+},
 
-frameReaderFunctions['ULT'] = frameReaderFunctions['USLT'];
+// frameReaderFunctions['ULT'] = frameReaderFunctions['USLT'];
 
-frameReaderFunctions['UFID'] = function readLyricsFrame(
+['UFID']: function readLyricsFrame(
   offset: number,
   length: number,
   data: MediaFileReader,
   flags?: Object | null,
   id3header?: TagHeader
-): any {
+) {
   var ownerIdentifier =
     StringUtils.readNullTerminatedString(data.getBytesAt(offset, length));
   offset += ownerIdentifier.bytesReadCount;
@@ -637,7 +637,19 @@ frameReaderFunctions['UFID'] = function readLyricsFrame(
     ownerIdentifier: ownerIdentifier.toString(),
     identifier: identifier
   };
+}
+
 };
+
+frameReaderFunctions['COM'] = frameReaderFunctions['COMM'];
+
+frameReaderFunctions['CNT'] = frameReaderFunctions['PCNT'];
+
+frameReaderFunctions['TCO'] = frameReaderFunctions['TCON'];
+
+frameReaderFunctions['ULT'] = frameReaderFunctions['USLT'];
+
+export type { frameReaderFunctions };
 
 function getTextEncoding(bite: number): CharsetType {
   var charset: CharsetType;
@@ -708,4 +720,4 @@ var PICTURE_TYPE = [
   "Publisher/Studio logotype"
 ];
 
-export = ID3v2FrameReader;
+export { ID3v2FrameReader };

@@ -5,7 +5,7 @@
 
 import MediaTagReader = require('./MediaTagReader');
 import MediaFileReader = require('./MediaFileReader');
-import ID3v2FrameReader = require('./ID3v2FrameReader');
+import { ID3v2FrameReader } from './ID3v2FrameReader';
 
 import type {
   CallbackType,
